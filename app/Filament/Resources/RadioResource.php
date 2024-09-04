@@ -118,9 +118,10 @@ class RadioResource extends Resource
                 Tables\Columns\TextColumn::make('name')->label('Name')->searchable(),
                 Tables\Columns\ImageColumn::make('img')
                     ->label('Image')
-                    ->disk('public') // Especifica el disco 'public'
-                    ->defaultImageUrl(url('/storage/radios/placeholder.png')) // Placeholder
-                    ->circular()  // Opcional: hace la imagen circular
+                    ->disk('public')  // Especifica el disco donde está almacenada la imagen
+                    ->path('radios')  // Define el directorio donde se almacenan las imágenes
+                    ->defaultImageUrl(url('/uploads/radios/radio_default.jpg'))  // Imagen por defecto si no existe
+                    ->url(fn ($record) => url('uploads/radios/' . $record->img))  // Construye la URL completa para visualizar la imagen
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),
                 Tables\Columns\TextColumn::make('source_radio')->label('Source')->searchable(),
