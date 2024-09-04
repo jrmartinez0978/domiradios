@@ -36,7 +36,7 @@ class GenreResource extends Resource
                     ->label('Image')
                     ->image()
                     ->directory('/genres')
-                    ->disk ('local')
+                    ->disk ('public')
                     ->visibility('public')
                     ->maxSize(2024)  // Máximo 2MB
                     ->hint('Image size should be 500x500 pixels')
