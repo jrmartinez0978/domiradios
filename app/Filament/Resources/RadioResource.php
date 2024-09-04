@@ -118,9 +118,9 @@ class RadioResource extends Resource
                 Tables\Columns\TextColumn::make('name')->label('Name')->searchable(),
                 Tables\Columns\ImageColumn::make('img')
                     ->label('Image')
-                    ->disk('public') // Especifica el disco 'public'
-                    ->defaultImageUrl(url('/images/placeholder.png')) // Placeholder
-                    ->circular()  // Opcional: hace la imagen circular
+                    ->disk('public')  // Especifica el disco 'public'
+                    ->defaultImageUrl(asset('public/radios/radio_default.jpg'))  // Imagen por defecto si no existe
+                    ->url(fn ($record) => asset('public/radios/' . $record->img))  // Construye la URL completa desde 'public/radios/'
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),
                 Tables\Columns\TextColumn::make('source_radio')->label('Source')->searchable(),
