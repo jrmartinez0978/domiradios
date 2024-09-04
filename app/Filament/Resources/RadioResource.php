@@ -66,7 +66,7 @@ class RadioResource extends Resource
                 Forms\Components\FileUpload::make('img')
                     ->label('Image')
                     ->image()
-                    ->directory('/radios')
+                    ->directory('/radios') // Directorio donde se guardará la imagen
                     ->disk('public')
                     ->visibility('public')
                     ->maxSize(2024)  // Máximo 2MB
@@ -74,9 +74,9 @@ class RadioResource extends Resource
                     ->columnSpanFull()
                     ->nullable()  // Permitir que sea nulo
                     ->preserveFilenames()  // Preservar el nombre original del archivo
-                    ->saveUploadedFileUsing(function ($file, $state) {
+                    ->saveUploadedFileUsing(function ($file, $state) {   // Función para guardar el archivo
                         // Guarda el archivo en el directorio 'radios' y retorna solo el nombre del archivo
-                        $filePath = $file->storeAs('radios', $file->getClientOriginalName(), 'public');
+                        $filePath = $file->storeAs('radios', $file->getClientOriginalName(), 'public');   // Guarda el archivo en el directorio 'radios'
                         return $file->getClientOriginalName(); // Solo almacena el nombre del archivo en la base de datos
                     }),
                 Forms\Components\TextInput::make('user_agent_radio')
@@ -117,11 +117,10 @@ class RadioResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Name')->searchable(),
                 Tables\Columns\ImageColumn::make('img')
-                    ->label('Image')
+                    ->label('Image') // Etiqueta de la columna
                     ->disk('public')  // Especifica el disco donde está almacenada la imagen
-                    ->path('radios')  // Define el directorio donde se almacenan las imágenes
+                    ->getUrlUsing(fn ($record) => asset('storage/radios/' . $record->img)) // URL de la imagen
                     ->defaultImageUrl(url('//radios/radio_default.jpg'))  // Imagen por defecto si no existe
-                    ->url(fn ($record) => url('storage/radios/' . $record->img))  // Construye la URL completa para visualizar la imagen
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),
                 Tables\Columns\TextColumn::make('source_radio')->label('Source')->searchable(),
