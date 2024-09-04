@@ -14,9 +14,10 @@ class RadioResource extends Resource
 {
     protected static ?string $model = Radio::class;
     protected static ?string $navigationIcon = 'heroicon-o-radio';
+
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel ()::count();
+        return static::getModel()::count();
     }
 
     public static function form(Forms\Form $form): Forms\Form
@@ -30,7 +31,7 @@ class RadioResource extends Resource
                 Forms\Components\TextInput::make('slug')
                     ->label('Slug')
                     ->required()
-                    ->default(fn ($record) => $record ? Str::slug($record->name) : '')
+                    ->default(fn($record) => $record ? Str::slug($record->name) : '')
                     ->hidden(),
                 Forms\Components\TextInput::make('bitrate')
                     ->label('BitRate')
@@ -62,7 +63,7 @@ class RadioResource extends Resource
                     ->label('Genres')
                     ->relationship('genres', 'name')
                     ->required(),
-                    Forms\Components\FileUpload::make('img')
+                Forms\Components\FileUpload::make('img')
                     ->label('Image')
                     ->image()
                     ->directory('/radios')
@@ -85,22 +86,22 @@ class RadioResource extends Resource
                     ->label('Facebook URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\TextInput::make('url_twitter')
                     ->label('Twitter URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\TextInput::make('url_instagram')
                     ->label('Instagram URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\TextInput::make('url_website')
                     ->label('Website URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\Toggle::make('isFeatured')
                     ->label('Featured')
                     ->default(false),
@@ -115,7 +116,15 @@ class RadioResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Name')->searchable(),
-                Tables\Columns\ImageColumn::make('img')->label('Image')->sortable(),
+                Tables\Columns\ImageColumn::make('img')
+                    ->label('Image')
+                    ->disk('public') // Especifica el disco 'public'
+                    ->path('radios')  // Directorio donde se almacenan las imágenes
+                    ->url(function ($record) {
+                        // Construir la URL de la imagen
+                        return asset('storage/radios/' . $record->img);
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),
                 Tables\Columns\TextColumn::make('source_radio')->label('Source')->searchable(),
                 Tables\Columns\TextColumn::make('link_radio')->label('Link')->searchable(),
@@ -169,6 +178,7 @@ class RadioResource extends Resource
         ];
     }
 }
+
 
 
 
