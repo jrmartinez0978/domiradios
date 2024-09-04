@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Filament\Panel;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
 
-class User extends Authenticatable
+
+class User extends Authenticatable implements FilamentUser
 {
     use Notifiable;
 
@@ -47,4 +50,9 @@ class User extends Authenticatable
      * @var string
      */
     protected $primaryKey = 'user_id';
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return str_ends_with($this->email, '@gmail.com') && $this->hasVerifiedEmail();
+    }
 }
