@@ -119,11 +119,8 @@ class RadioResource extends Resource
                 Tables\Columns\ImageColumn::make('img')
                     ->label('Image')
                     ->disk('public') // Especifica el disco 'public'
-                    ->path('radios')  // Directorio donde se almacenan las imágenes
-                    ->url(function ($record) {
-                        // Construir la URL de la imagen
-                        return asset('storage/radios/' . $record->img);
-                    })
+                    ->defaultImageUrl(url('/images/placeholder.png')) // Placeholder
+                    ->circular()  // Opcional: hace la imagen circular
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),
                 Tables\Columns\TextColumn::make('source_radio')->label('Source')->searchable(),
@@ -178,7 +175,3 @@ class RadioResource extends Resource
         ];
     }
 }
-
-
-
-
