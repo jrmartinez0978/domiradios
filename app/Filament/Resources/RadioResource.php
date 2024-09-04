@@ -65,14 +65,19 @@ class RadioResource extends Resource
                     Forms\Components\FileUpload::make('img')
                     ->label('Image')
                     ->image()
-                    ->directory('/emisoras')
-                    ->disk ('public')
+                    ->directory('/radios')
+                    ->disk('public')
                     ->visibility('public')
                     ->maxSize(2024)  // Máximo 2MB
                     ->hint('Image size should be 500x500 pixels')
                     ->columnSpanFull()
                     ->nullable()  // Permitir que sea nulo
-                    ->preserveFilenames(),  // Preservar el nombre original del archivo
+                    ->preserveFilenames()  // Preservar el nombre original del archivo
+                    ->saveUploadedFileUsing(function ($file, $state) {
+                        // Guarda el archivo en el directorio 'radios' y retorna solo el nombre del archivo
+                        $filePath = $file->storeAs('radios', $file->getClientOriginalName(), 'public');
+                        return $file->getClientOriginalName(); // Solo almacena el nombre del archivo en la base de datos
+                    }),
                 Forms\Components\TextInput::make('user_agent_radio')
                     ->label('User Agent')
                     ->maxLength(255),
