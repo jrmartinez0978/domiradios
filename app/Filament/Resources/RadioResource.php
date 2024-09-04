@@ -120,7 +120,7 @@ class RadioResource extends Resource
                     ->label('Image')
                     ->disk('public')  // Especifica el disco donde está almacenada la imagen
                     ->path('radios')  // Define el directorio donde se almacenan las imágenes
-                    ->defaultImageUrl(url('/storage/radios/radio_default.jpg'))  // Imagen por defecto si no existe
+                    ->defaultImageUrl(url('//radios/radio_default.jpg'))  // Imagen por defecto si no existe
                     ->url(fn ($record) => url('storage/radios/' . $record->img))  // Construye la URL completa para visualizar la imagen
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),

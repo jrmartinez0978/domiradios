@@ -28,7 +28,11 @@ class ListRadios extends ListRecords
                 ->searchable(),
             Tables\Columns\ImageColumn::make('img')
                 ->label('Image')
-                ->circular(), // Para mostrar la imagen de forma circular si lo deseas
+                ->disk('public')  // Usa el disco 'public'
+                ->path('radios')  // Define la carpeta donde se almacenan las imágenes
+                ->defaultImageUrl(asset('storage/radios/radio_default.jpg'))  // Imagen por defecto si no hay ninguna
+                ->url(fn ($record) => asset('storage/radios/' . $record->img))  // Construye la URL completa
+                ->circular(),  // Opcional: muestra la imagen como circular
             Tables\Columns\TextColumn::make('type_radio')
                 ->label('Format')
                 ->sortable()
@@ -70,3 +74,4 @@ class ListRadios extends ListRecords
         return 3; // Número de columnas en la grid
     }
 }
+
