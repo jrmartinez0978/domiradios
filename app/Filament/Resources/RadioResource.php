@@ -65,7 +65,7 @@ class RadioResource extends Resource
                     Forms\Components\FileUpload::make('img')
                     ->label('Image')
                     ->image()
-                    ->directory('/radios')
+                    ->directory('/emisoras')
                     ->disk ('public')
                     ->visibility('public')
                     ->maxSize(2024)  // Máximo 2MB
