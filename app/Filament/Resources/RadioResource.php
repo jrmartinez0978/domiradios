@@ -66,7 +66,7 @@ class RadioResource extends Resource
                     ->label('Image')
                     ->image()
                     ->directory('/radios')
-                    ->disk ('ftp')
+                    ->disk ('local')
                     ->visibility('public')
                     ->maxSize(2024)  // Máximo 2MB
                     ->hint('Image size should be 500x500 pixels')
