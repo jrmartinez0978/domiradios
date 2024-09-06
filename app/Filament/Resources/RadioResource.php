@@ -150,7 +150,7 @@ class RadioResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Relaciones si es necesario...
+            'genres' => RadioGenreResource::class,
         ];
     }
 
