@@ -7,18 +7,17 @@ use App\Models\Radio;
 
 class RadioIndex extends Component
 {
-    public $search; // Para la búsqueda en vivo
+    public $search = '';  // Variable para la búsqueda
 
     public function render()
     {
-        // Obtén las radios, y si hay una búsqueda, filtra por el nombre
-        // $radios = Radio::where('name', 'like', '%' . $this->search . '%')->get();
-        $radios = Radio::where('name', 'like', '%' . $this->search . '%')->paginate(6);
-
+        // Filtrar emisoras por nombre utilizando LIKE
+        $radios = Radio::where('name', 'like', '%' . $this->search . '%')->get();
 
         return view('livewire.radio-index', [
             'radios' => $radios,
         ]);
     }
 }
+
 

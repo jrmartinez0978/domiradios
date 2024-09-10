@@ -27,6 +27,7 @@
 
     <!-- Styles -->
     @vite('resources/css/app.css')
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
     @livewireStyles
 </head>
 <body class="antialiased bg-gray-100">

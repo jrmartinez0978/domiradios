@@ -33,7 +33,7 @@ class RadioResource extends Resource
                     ->default(fn ($record) => $record ? Str::slug($record->name) : '')
                     ->hidden(),
                 Forms\Components\TextInput::make('bitrate')
-                    ->label('BitRate')
+                    ->label('Frecuencia')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('tags')
