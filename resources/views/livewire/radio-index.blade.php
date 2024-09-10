@@ -1,4 +1,3 @@
-
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="bg-white shadow sm:rounded-lg p-6">
         <!-- Barra de búsqueda -->
@@ -10,10 +9,14 @@
     </div>
 
     @if($radios->count())
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Adaptación responsiva para la cuadrícula de tarjetas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($radios as $radio)
                 <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                    <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-32 object-cover rounded-md">
+                    <!-- Imagen cuadrada de la emisora -->
+                    <div class="aspect-w-1 aspect-h-1">
+                        <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md">
+                    </div>
                     <h2 class="text-xl font-bold mt-4">{{ $radio->name }}</h2>
                     <p class="text-sm text-gray-600">Frecuencia: {{ $radio->bitrate }}</p>
                     <p class="text-sm text-gray-600">Género: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
@@ -68,3 +71,4 @@
         }
     }
 </script>
+
