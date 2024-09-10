@@ -4,7 +4,7 @@
             <!-- Caja de búsqueda -->
             <input
                 type="text"
-                wire:model.debounce.500ms="search"
+                wire:model.live="search"
                 class="w-full border border-gray-300 p-2 rounded mb-4"
                 placeholder="Buscar emisoras por nombre...">
 

@@ -12,7 +12,9 @@ class RadioIndex extends Component
     public function render()
     {
         // Obtén las radios, y si hay una búsqueda, filtra por el nombre
-        $radios = Radio::where('name', 'like', '%' . $this->search . '%')->get();
+        // $radios = Radio::where('name', 'like', '%' . $this->search . '%')->get();
+        $radios = Radio::where('name', 'like', '%' . $this->search . '%')->paginate(6);
+
 
         return view('livewire.radio-index', [
             'radios' => $radios,
