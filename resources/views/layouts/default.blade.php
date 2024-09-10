@@ -26,7 +26,8 @@
     <meta name="twitter:image" content="@yield('twitter_image', asset('images/default-twitter-image.jpg'))" />
 
     <!-- Styles -->
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     @livewireStyles
 </head>
 <body class="antialiased bg-gray-100">
@@ -49,7 +50,7 @@
     </footer>
 
     @livewireScripts
-    <script src="{{ mix('js/app.js') }}"></script>
+
 </body>
 </html>
 
