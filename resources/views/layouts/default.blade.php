@@ -26,7 +26,8 @@
     <meta name="twitter:image" content="@yield('twitter_image', asset('images/default-twitter-image.jpg'))" />
 
     <!-- Styles -->
-    @vite('resources/css/app.css')
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 
     @livewireStyles
 </head>
