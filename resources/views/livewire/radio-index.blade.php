@@ -27,6 +27,7 @@
             </h2>
             <p class="text-sm text-gray-600">Frecuencia: {{ $radio->bitrate }}</p>
             <p class="text-sm text-gray-600">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
+            <p class="text-sm text-gray-600">Género: {{ $radio->tags }}</p>
 
 
                     <!-- Reproductor de audio con botón único Play/Stop -->

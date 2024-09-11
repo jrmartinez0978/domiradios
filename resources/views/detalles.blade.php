@@ -15,6 +15,7 @@
                 <h1 class="text-4xl font-bold">{{ $radio->name }}</h1>
                 <p class="text-gray-600 mt-2 text-lg">Frecuencia: {{ $radio->bitrate }}</p>
                 <p class="text-gray-600 text-lg">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
+                <p class="text-gray-600 text-lg">Generos: {{ $radio->tags }}</p>
 
                 <!-- Reproductor de audio con botón único Play/Stop -->
                 <div class="mt-4">
