@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 @section('title', $radio->name . ' - Escucha en vivo')
-@section('meta_description', $radio->description)
+@section('meta_description', strip_tags($radio->description))
 @section('meta_keywords', $radio->tags)
 
 @section('content')
@@ -72,7 +72,7 @@
         <!-- Descripción -->
         <div class="mt-6">
             <h2 class="text-2xl font-bold">Descripción</h2>
-            <p class="mt-2 text-gray-600">{{ $radio->description }}</p>
+            <p class="mt-2 text-gray-600">{!! $radio->description !!}</p>
         </div>
     </div>
 

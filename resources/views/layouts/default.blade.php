@@ -37,10 +37,13 @@
     <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold text-gray-900">
-                @yield('header', 'Directorio de Radios')
+                <a href="{{ url('/') }}" class="hover:text-blue-500">
+                    @yield('header', 'Directorio de Radios')
+                </a>
             </h1>
         </div>
     </header>
+
 
     <main>
         @yield('content')
