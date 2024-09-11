@@ -79,7 +79,7 @@
     <!-- Emisoras relacionadas -->
     <div class="mt-8">
         <h2 class="text-lg font-semibold mb-4">Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}</h2>
-        <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-4 mt-4">
+        <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-4 mt-4">
             @foreach($relatedRadios as $related)
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <a href="{{ route('emisoras.show', $related->slug) }}">
