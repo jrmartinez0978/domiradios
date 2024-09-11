@@ -14,9 +14,10 @@ class RadioResource extends Resource
 {
     protected static ?string $model = Radio::class;
     protected static ?string $navigationIcon = 'heroicon-o-radio';
+
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel ()::count();
+        return static::getModel()::count();
     }
 
     public static function form(Forms\Form $form): Forms\Form
@@ -26,12 +27,19 @@ class RadioResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        // Cuando se actualiza el nombre, genera automáticamente el slug
+                        $set('slug', Str::slug($state));
+                    }),
+
+                // Hacer que el campo slug sea visible para que el usuario pueda modificarlo si lo desea
                 Forms\Components\TextInput::make('slug')
                     ->label('Slug')
                     ->required()
-                    ->default(fn ($record) => $record ? Str::slug($record->name) : '')
-                    ->hidden(),
+                    ->hint('El slug se genera automáticamente a partir del nombre')
+                    ->maxLength(255),
+
                 Forms\Components\TextInput::make('bitrate')
                     ->label('Frecuencia')
                     ->required()
@@ -59,17 +67,17 @@ class RadioResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\MultiSelect::make('genre_ids')
-                    ->label('Genres')
+                    ->label('Ciudades')
                     ->relationship('genres', 'name')
                     ->required(),
-                    Forms\Components\FileUpload::make('img')
+                Forms\Components\FileUpload::make('img')
                     ->label('Image')
                     ->image()
                     ->directory('/radios')
-                    ->disk ('public')
+                    ->disk('public')
                     ->visibility('public')
                     ->maxSize(2024)  // Máximo 2MB
-                    ->hint('Image size should be 500x500 pixels')
+                    ->hint('El tamaño de la imagen debe ser 500x500 píxeles')
                     ->columnSpanFull()
                     ->nullable()  // Permitir que sea nulo
                     ->preserveFilenames(),  // Preservar el nombre original del archivo

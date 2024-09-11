@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Radio extends Model
 {
@@ -11,6 +12,7 @@ class Radio extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'tags',
         'bitrate',
         'img',
@@ -26,8 +28,20 @@ class Radio extends Model
         'isActive',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(function ($radio) {
+            // Genera automáticamente el slug a partir del nombre si no se ha definido
+            if (empty($radio->slug)) {
+                $radio->slug = Str::slug($radio->name);
+            }
+        });
+    }
+
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id');
     }
 }
+

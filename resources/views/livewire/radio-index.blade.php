@@ -4,23 +4,29 @@
         <!-- Barra de búsqueda -->
         <input
             type="text"
-            wire:model.debounce.500ms="search"
+            wire:model.live="search"
             class="w-full border border-gray-300 p-2 rounded mb-4"
             placeholder="Buscar emisoras por nombre...">
     </div>
 
     @if($radios->count())
         <!-- Adaptación responsiva para la cuadrícula de tarjetas -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($radios as $radio)
-                <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                    <!-- Imagen cuadrada de la emisora -->
-                    <div class="aspect-w-1 aspect-h-1">
-                        <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md">
-                    </div>
-                    <h2 class="text-xl font-bold mt-4">{{ $radio->name }}</h2>
-                    <p class="text-sm text-gray-600">Frecuencia: {{ $radio->bitrate }}</p>
-                    <p class="text-sm text-gray-600">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    @foreach($radios as $radio)
+        <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <!-- Imagen cuadrada de la emisora -->
+            <div class="aspect-w-1 aspect-h-1">
+                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md">
+            </div>
+            <!-- Título con enlace a la página de detalles -->
+            <h2 class="text-xl font-bold mt-4">
+                <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}" class="hover:text-blue-500 transition-colors">
+                    {{ $radio->name }}
+                </a>
+
+            </h2>
+            <p class="text-sm text-gray-600">Frecuencia: {{ $radio->bitrate }}</p>
+            <p class="text-sm text-gray-600">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
 
 
                     <!-- Reproductor de audio con botón único Play/Stop -->
