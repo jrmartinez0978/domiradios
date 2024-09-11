@@ -9,6 +9,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Mokhosh\FilamentRating\Components\Rating;  // Importamos el componente de rating
+use Mokhosh\FilamentRating\Columns\RatingColumn;  // Importamos la columna de rating
 
 class RadioResource extends Resource
 {
@@ -33,7 +35,7 @@ class RadioResource extends Resource
                         $set('slug', Str::slug($state));
                     }),
 
-                // Hacer que el campo slug sea visible para que el usuario pueda modificarlo si lo desea
+                // Campo slug visible para que el usuario pueda modificarlo si lo desea
                 Forms\Components\TextInput::make('slug')
                     ->label('Slug')
                     ->required()
@@ -62,6 +64,16 @@ class RadioResource extends Resource
                         'Other' => 'Other',
                     ])
                     ->required(),
+                Forms\Components\RichEditor::make('description')
+                    ->label('Descripción')
+                    ->maxLength(1000)
+                    ->nullable()
+                    ->columnspan('full'),
+                // Implementación del campo de clasificación (rating)
+                Rating::make('rating')
+                    ->stars(5)  // Número máximo de estrellas (por defecto 5)
+                    ->required(),  // Clasificación obligatoria
+
                 Forms\Components\TextInput::make('link_radio')
                     ->label('Link')
                     ->required()
@@ -88,22 +100,22 @@ class RadioResource extends Resource
                     ->label('Facebook URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\TextInput::make('url_twitter')
                     ->label('Twitter URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\TextInput::make('url_instagram')
                     ->label('Instagram URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\TextInput::make('url_website')
                     ->label('Website URL')
                     ->url()
                     ->maxLength(255)
-                    ->nullable(),  // Permitir que sea nulo
+                    ->nullable(),
                 Forms\Components\Toggle::make('isFeatured')
                     ->label('Featured')
                     ->default(false),
@@ -124,6 +136,10 @@ class RadioResource extends Resource
                 Tables\Columns\TextColumn::make('link_radio')->label('Link')->searchable(),
                 Tables\Columns\IconColumn::make('isFeatured')->label('Featured')->boolean(),
                 Tables\Columns\IconColumn::make('isActive')->label('Active')->boolean(),
+
+                // Columna de clasificación (rating) en la tabla
+                RatingColumn::make('rating')
+                    ->stars(5),  // Número de estrellas en la tabla
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('genre')
@@ -172,6 +188,3 @@ class RadioResource extends Resource
         ];
     }
 }
-
-
-

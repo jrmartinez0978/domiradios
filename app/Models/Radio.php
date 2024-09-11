@@ -26,6 +26,8 @@ class Radio extends Model
         'url_website',
         'isFeatured',
         'isActive',
+        'rating',          // Campo para la clasificación
+        'description',     // Campo para la descripción
     ];
 
     protected static function boot()

@@ -36,7 +36,7 @@
                             id="play-btn-{{ $radio->id }}"
                             class="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800"
                             onclick="togglePlay({{ $radio->id }})">
-                            Play
+                            Reproducir
                         </button>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
         } else {
             // Reproduce la emisora y actualiza el botón
             player.play();
-            playBtn.textContent = 'Stop';
+            playBtn.textContent = 'Detener';
             playBtn.classList.remove('bg-green-700');
             playBtn.classList.add('bg-red-700');
             currentPlaying = player; // Guarda el reproductor actual como el que está sonando

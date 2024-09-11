@@ -51,9 +51,25 @@
                     </a>
                     @endif
                 </div>
+
+                <!-- Guardar en Favoritos y Clasificación -->
+                <div class="mt-6 flex items-center">
+                    <button id="fav-btn" class="bg-yellow-500 text-white px-4 py-2 rounded-full hover:bg-yellow-600 transition">
+                        Guardar en Favoritos
+                    </button>
+                    <div class="ml-4">
+                        <span class="text-gray-600">Clasificación:</span>
+                        <div class="flex items-center">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="fa fa-star {{ $i <= $radio->rating ? 'text-yellow-400' : 'text-gray-400' }}"></i>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Descripción -->
         <div class="mt-6">
             <h2 class="text-2xl font-bold">Descripción</h2>
             <p class="mt-2 text-gray-600">{{ $radio->description }}</p>
@@ -61,17 +77,17 @@
     </div>
 
     <!-- Emisoras relacionadas -->
-<div class="mt-8">
-    <h2 class="text-lg font-semibold mb-4">Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}</h2>
-    <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-7 gap-6 mt-4">
-        @foreach($relatedRadios as $related)
-            <div class="bg-white p-4 rounded-lg shadow-md">
-                <a href="{{ route('emisoras.show', $related->slug) }}">
-                    <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="w-full h-auto rounded-md mb-4">
-                    <h3 class="text-s">{{ $related->name }}</h3>
-                </a>
-            </div>
-        @endforeach
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold mb-4">Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}</h2>
+        <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-4 mt-4">
+            @foreach($relatedRadios as $related)
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <a href="{{ route('emisoras.show', $related->slug) }}">
+                        <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="w-full h-auto rounded-md mb-4">
+                        <h3 class="text-center text-s">{{ $related->name }}</h3>
+                    </a>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
@@ -95,8 +111,18 @@
         }
         isPlaying = !isPlaying;
     });
+
+    // Guardar en favoritos
+    document.getElementById('fav-btn').addEventListener('click', function() {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        if (!favorites.includes('{{ $radio->id }}')) {
+            favorites.push('{{ $radio->id }}');
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            alert('Emisora añadida a favoritos.');
+        } else {
+            alert('La emisora ya está en favoritos.');
+        }
+    });
 </script>
 @endsection
-
-
 
