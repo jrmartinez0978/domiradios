@@ -5,5 +5,6 @@
 @section('meta_keywords', 'emisoras, radio, dominicanas, streaming, en vivo')
 
 @section('content')
+@include('nav')
     <livewire:radio-index />
 @endsection
