@@ -19,7 +19,7 @@
                 <!-- Reproductor de audio con botón único Play/Stop -->
                 <div class="mt-4">
                     <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
-                    <button id="play-btn" class="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition">
+                    <button id="play-btn" class="w-full md:w-auto bg-green-600 text-white px-16 py-2 rounded-full hover:bg-green-700 transition">
                         Reproducir
                     </button>
                 </div>
@@ -62,7 +62,7 @@
 
     <!-- Emisoras relacionadas -->
     <div class="mt-8">
-        <h2 class="text-2xl font-bold">Emisoras relacionadas</h2>
+        <h2 class="text-lg font-semibold mb-4">Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             @foreach($relatedRadios as $related)
                 <div class="bg-white p-4 rounded-lg shadow-md">
