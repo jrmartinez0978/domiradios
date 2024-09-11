@@ -68,7 +68,7 @@
             <div class="bg-white p-4 rounded-lg shadow-md">
                 <a href="{{ route('emisoras.show', $related->slug) }}">
                     <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="w-full h-auto rounded-md mb-4">
-
+                    <h3 class="text-s">{{ $related->name }}</h3>
                 </a>
             </div>
         @endforeach
