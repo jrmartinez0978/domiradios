@@ -11,7 +11,7 @@
 
     @if($radios->count())
         <!-- Adaptación responsiva para la cuadrícula de tarjetas -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6">
     @foreach($radios as $radio)
         <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <!-- Imagen cuadrada de la emisora -->
