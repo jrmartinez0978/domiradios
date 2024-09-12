@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <h1 class="text-3xl font-bold mb-6 text-center">Ciudades</h1>
 
-    <!-- Grid de ciudades -->
+    <!-- Grid de ciudades ok -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6">
         @foreach($genres as $genre)
             <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
