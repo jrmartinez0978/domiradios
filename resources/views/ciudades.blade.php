@@ -16,6 +16,7 @@
                          alt="{{ $genre->name }}"
                          class="w-full h-32 object-cover rounded-md">
                 </a>
+                </a>
                 <h3 class="text-center text-xl font-bold mt-2">{{ $genre->name }}</h3>
 
                 <!-- Botón elegante de "Ver emisoras" -->
