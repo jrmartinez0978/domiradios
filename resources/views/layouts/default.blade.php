@@ -43,8 +43,12 @@
             </h1>
         </div>
     </header>
-
-
+<nav>
+    <ul class="flex justify-center bg-gray-800 text-white py-4">
+        <li><a href="/" class="px-6 hover:text-gray-300 transition duration-300">Inicio</a></li>
+        <li><a href="/ciudades" class="px-6 hover:text-gray-300 transition duration-300">Ciudades</a></li>
+    </ul>
+</nav>
     <main>
         @yield('content')
     </main>

@@ -32,6 +32,10 @@ class GenreResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                    Forms\Components\TextInput::make('slug')
+                    ->label('Slug')
+                    ->hint('The slug will be automatically generated from the name')
+                    ->maxLength(255),
                     Forms\Components\FileUpload::make('img')
                     ->label('Image')
                     ->image()

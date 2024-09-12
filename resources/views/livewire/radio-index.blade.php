@@ -16,7 +16,9 @@
         <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <!-- Imagen cuadrada de la emisora -->
             <div class="aspect-w-1 aspect-h-1">
-                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md">
+                <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}">
+                    <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md">
+                </a>
             </div>
             <!-- Título con enlace a la página de detalles -->
             <h2 class="text-xl font-bold mt-4">
