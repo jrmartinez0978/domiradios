@@ -3,14 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RadioController;
 
+// Ruta para la página de inicio
 Route::get('/', function () {
     return view('emisoras');
 })->name('inicio');
 
+// Ruta para mostrar los detalles de una emisora por su slug
 Route::get('/emisoras/{slug}', [RadioController::class, 'show'])->name('emisoras.show');
+
+// Ruta para mostrar las emisoras de una ciudad por su slug
 Route::get('/ciudades/{slug}', [RadioController::class, 'emisorasPorCiudad'])->name('ciudades.show');
+
+// Ruta para mostrar la lista de todas las ciudades
 Route::get('/ciudades', [RadioController::class, 'indexCiudades'])->name('ciudades.index');
-route::get('/emisoras_por_ciudad', [RadioController::class, 'emisorasPorCiudad'])->name('emisoras_por_ciudad');
+
 
 
 
