@@ -19,7 +19,7 @@
                 <h3 class="text-center text-xl font-bold mt-2">{{ $genre->name }}</h3>
 
                 <!-- Botón elegante de "Ver emisoras" -->
-                <a href="{{ route('ciudades.show', ['slug']) }}"
+                <a href="{{ route('ciudades.show', [$genre->slug]) }}"
                    class="mt-4 bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition">
                     Ver emisoras
                 </a>
