@@ -10,7 +10,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6">
         @foreach($genres as $genre)
             <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <a href="{{ route('ciudades.show', ['slug'] => $genre->slug]) }}">
+                <a href="{{ route('ciudades.show', ['slug' => $genre->slug]) }}">
                     <!-- Verificar si el género tiene una imagen, de lo contrario mostrar una imagen por defecto -->
                     <img src="{{ $genre->img ? Storage::url($genre->img) : asset('images/default-image.jpg') }}"
                          alt="{{ $genre->name }}"
