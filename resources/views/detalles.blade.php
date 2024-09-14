@@ -93,56 +93,56 @@
     </div>
 </div>
 
-<script>
-    const audioPlayer = document.getElementById('audio-player');
-    const playButton = document.getElementById('play-btn');
-    let isPlaying = false;
-
-    playButton.addEventListener('click', function () {
-        if (isPlaying) {
-            audioPlayer.pause();
-            playButton.textContent = 'Reproducir';
-            playButton.classList.remove('bg-red-600');
-            playButton.classList.add('bg-green-600');
-        } else {
-            audioPlayer.play();
-            playButton.textContent = 'Detener';
-            playButton.classList.remove('bg-green-600');
-            playButton.classList.add('bg-red-600');
-        }
-        isPlaying = !isPlaying;
-    });
-
-    // Inicializar el botón de favoritos
-    const favBtn = document.getElementById('fav-btn');
+<script>document.addEventListener('DOMContentLoaded', function () {
+    const radioId = '{{ $radio->id }}';  // ID de la emisora actual
     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    const radioId = '{{ $radio->id }}';
+    const favButton = document.getElementById('fav-btn');
 
-    // Cambiar el estado del botón según si está en favoritos
-    if (favorites.includes(radioId)) {
-        favBtn.textContent = 'Ver en Favoritos';
-        favBtn.classList.remove('bg-green-600');
-        favBtn.classList.add('bg-red-600');
-        favBtn.addEventListener('click', function () {
-            window.location.href = '{{ route("favoritos") }}';
-        });
-    } else {
-        favBtn.textContent = 'Agregar a Favoritos';
-        favBtn.classList.remove('bg-red-600');
-        favBtn.classList.add('bg-green-600');
-        favBtn.addEventListener('click', function () {
-            favorites.push(radioId);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            alert('Emisora añadida a favoritos.');
-            favBtn.textContent = 'Ver en Favoritos';
-            favBtn.classList.remove('bg-green-600');
-            favBtn.classList.add('bg-red-600');
-            favBtn.onclick = function () {
-                window.location.href = '{{ route("favoritos") }}';
-            };
-        });
+    // Función para redirigir a favoritos
+    function redirectToFavorites() {
+        window.location.href = '/favoritos';
     }
+
+    // Función para actualizar el estado del botón
+    function updateFavButton() {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const isFavorite = favorites.includes(radioId);
+
+        if (isFavorite) {
+            favButton.textContent = 'Ver en Favoritos';
+            favButton.classList.remove('bg-green-500');
+            favButton.classList.add('bg-red-500');
+            favButton.onclick = redirectToFavorites;
+        } else {
+            favButton.textContent = 'Agregar a Favoritos';
+            favButton.classList.remove('bg-red-500');
+            favButton.classList.add('bg-green-500');
+            favButton.onclick = toggleFavorite;
+        }
+    }
+
+    // Función para agregar o quitar de favoritos
+    function toggleFavorite() {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const isFavorite = favorites.includes(radioId);
+
+        if (isFavorite) {
+            // Eliminar de favoritos
+            favorites = favorites.filter(fav => fav !== radioId);
+        } else {
+            // Agregar a favoritos
+            favorites.push(radioId);
+        }
+
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        updateFavButton();  // Actualizar el botón después de la acción
+    }
+
+    // Inicializar el estado del botón al cargar la página
+    updateFavButton();
+});
 </script>
+
 @endsection
 
 

@@ -1,13 +1,13 @@
 @extends('layouts.default')
 
-@section('title', 'Favoritos - Tus Emisoras Favoritas')
+@section('title', 'Tus Emisoras Favoritas')
 
 @section('content')
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <h1 class="text-3xl font-bold mb-6 text-center">Tus Emisoras Favoritas</h1>
 
     <!-- Grid de emisoras favoritas -->
-    <div id="favoritos-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="favoritos-list" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6">
         <!-- Aquí se mostrarán las emisoras favoritas -->
     </div>
 
@@ -40,13 +40,13 @@
                     let html = '';
                     data.forEach(radio => {
                         html += `
-                            <div id="radio-${radio.id}" class="bg-white p-4 rounded-lg shadow-md">
+                            <div class="bg-white p-4 rounded-lg shadow-md">
                                 <a href="/emisoras/${radio.slug}">
                                     <img src="/storage/${radio.img}" alt="${radio.name}" class="w-full h-auto rounded-md mb-4">
                                     <h3 class="text-center text-xl font-bold">${radio.name}</h3>
                                 </a>
-                                <button class="w-full bg-red-500 text-white mt-4 px-4 py-2 rounded hover:bg-red-600 transition" onclick="removeFromFavorites(${radio.id})">
-                                    Quitar de Favoritos
+                                <button class="w-full bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition" onclick="removeFromFavorites('${radio.id}')">
+                                    Eliminar
                                 </button>
                             </div>
                         `;
@@ -63,25 +63,15 @@
         }
     });
 
-    // Función para quitar una emisora de los favoritos
+    // Función para quitar emisoras de favoritos
     function removeFromFavorites(radioId) {
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-        // Eliminar la emisora del array de favoritos
-        favorites = favorites.filter(id => id !== radioId);
-
-        // Actualizar el localStorage con la nueva lista
+        favorites = favorites.filter(fav => fav !== radioId);
         localStorage.setItem('favorites', JSON.stringify(favorites));
-
-        // Eliminar la tarjeta de la emisora en la página sin recargar
-        document.getElementById(`radio-${radioId}`).remove();
-
-        // Si ya no hay emisoras favoritas, mostrar el mensaje de "No hay favoritos"
-        if (favorites.length === 0) {
-            document.getElementById('no-favorites-message').classList.remove('hidden');
-        }
+        location.reload(); // Recargar la página para reflejar los cambios
     }
 </script>
 @endsection
+
 
 

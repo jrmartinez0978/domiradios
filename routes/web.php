@@ -2,11 +2,22 @@
 // routes/web.php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RadioController;
+use App\Models\Radio;
+use Illuminate\Http\Request;
 
 // Ruta para la página de inicio
 Route::get('/', function () {
     return view('emisoras');
 })->name('inicio');
+
+// routes/web.php
+Route::post('/api/favoritos', function (Request $request) {
+    $ids = $request->input('ids', []);
+    $favoritos = Radio::whereIn('id', $ids)->get();
+
+    return response()->json($favoritos);
+});
+
 
 // Ruta para mostrar los detalles de una emisora por su slug
 Route::get('/emisoras/{slug}', [RadioController::class, 'show'])->name('emisoras.show');
