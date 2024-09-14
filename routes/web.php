@@ -12,7 +12,7 @@ Route::get('/', function () {
 Route::get('/emisoras/{slug}', [RadioController::class, 'show'])->name('emisoras.show');
 
 // Ruta para mostrar las emisoras de una ciudad por su slug
-Route::get('/ciudades/{genre}', [RadioController::class, 'emisorasPorCiudad'])->name('ciudades.show');
+Route::get('/ciudades/{slug}', [RadioController::class, 'emisorasPorCiudad'])->name('ciudades.show');
 
 // Ruta para mostrar la lista de todas las ciudades
 Route::get('/ciudades', [RadioController::class, 'indexCiudades'])->name('ciudades.index');

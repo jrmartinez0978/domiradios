@@ -32,16 +32,19 @@ class RadioController extends Controller
     }
 
     // Método para mostrar las emisoras por ciudad (géneros)
-    public function emisorasPorCiudad(Genre $genre)
-{
-    // Las emisoras relacionadas al género (ciudad)
-    $radios = Radio::whereHas('genres', function ($query) use ($genre) {
-        $query->where('genres.id', $genre->id);
-    })->get();
+    public function emisorasPorCiudad($slug)
+    {
+        // Buscar el género (ciudad) por su slug
+        $genre = Genre::where('slug', $slug)->firstOrFail();
 
-    return view('emisoras_por_ciudad', compact('radios', 'genre'));
-}
+        // Obtener las emisoras relacionadas a esa ciudad
+        $radios = Radio::whereHas('genres', function ($query) use ($genre) {
+            $query->where('genres.id', $genre->id); // Especificar 'genres.id'
+        })->get();
 
+        // Retornar la vista con las emisoras de la ciudad
+        return view('emisoras_por_ciudad', compact('radios', 'genre'));
+    }
 
     // Método para mostrar todas las ciudades (géneros)
     public function indexCiudades()
