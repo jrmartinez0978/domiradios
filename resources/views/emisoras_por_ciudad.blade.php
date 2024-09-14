@@ -16,8 +16,9 @@
                 </div>
                 <!-- Nombre de la emisora -->
                 <h3 class="text-center text-lg font-bold mt-2">{{ $radio->name }}</h3>
-                <!-- Enlace a los detalles de la emisora -->
-                <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}" class="block mt-2 text-blue-500 text-center hover:underline">
+                <!-- Botón verde de escuchar -->
+                <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}"
+                   class="block mt-4 bg-green-500 text-white text-center px-4 py-2 rounded-md hover:bg-green-600 transition">
                     Escuchar
                 </a>
             </div>
@@ -25,3 +26,4 @@
     </div>
 </div>
 @endsection
+
