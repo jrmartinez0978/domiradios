@@ -17,6 +17,11 @@ Route::get('/ciudades/{slug}', [RadioController::class, 'emisorasPorCiudad'])->n
 // Ruta para mostrar la lista de todas las ciudades
 Route::get('/ciudades', [RadioController::class, 'indexCiudades'])->name('ciudades.index');
 
+Route::get('/favoritos', [RadioController::class, 'favoritos'])->name('favoritos');
+
+// Ruta API para obtener emisoras favoritas (puede usarse en una versión más avanzada si se implementa autenticación)
+Route::post('/api/favoritos', [RadioController::class, 'obtenerFavoritos'])->name('api.favoritos');
+
 
 
 

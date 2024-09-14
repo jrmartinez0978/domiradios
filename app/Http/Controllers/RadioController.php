@@ -4,13 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Radio;
 use App\Models\Genre;
+use Illuminate\Http\Request;
 
 class RadioController extends Controller
 {
     // Método para mostrar la vista de favoritos
     public function favoritos()
     {
-        return view('emisoras.favoritos');
+        return view('favoritos');
+
+    }
+    // Nueva API para obtener emisoras favoritas
+    public function obtenerFavoritos(Request $request)
+    {
+        $ids = $request->input('ids', []);  // Obtener los IDs de emisoras favoritos desde el frontend
+        $favoritos = Radio::whereIn('id', $ids)->get();  // Obtener las emisoras que coincidan con esos IDs
+
+        return response()->json($favoritos);
     }
 
     // Método para mostrar los detalles de una emisora por su slug
