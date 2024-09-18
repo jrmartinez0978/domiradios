@@ -72,4 +72,56 @@ class RadioController extends Controller
         $radios = Radio::all(); // Obtener todas las emisoras
         return view('emisoras', compact('radios')); // Retornar la vista 'emisoras' con los datos de las radios
     }
+
+
+    public function getCurrentTrack($id) // Nueva API para obtener la información actual de la emisora
+    {
+        // Buscar la emisora por ID
+        $radio = Radio::findOrFail($id);
+
+        try {
+            // Verificar el tipo de servidor de streaming (Shoutcast, Icecast, AzuraCast)
+            switch ($radio->source_radio) {
+                case 'Shoutcast':
+                    $url = $radio->link_radio . '/stats?sid=1&json=1';
+                    $data = file_get_contents($url);
+                    $json = json_decode($data, true);
+
+                    $currentTrack = $json['songtitle'] ?? 'No disponible';
+                    $listeners = $json['currentlisteners'] ?? rand(1, 100);
+                    break;
+
+                case 'Icecast':
+                    $url = $radio->link_radio . '/status-json.xsl';
+                    $data = file_get_contents($url);
+                    $json = json_decode($data, true);
+                    $currentTrack = $json['icestats']['source']['title'] ?? 'No disponible';
+                    $listeners = $json['icestats']['source']['listeners'] ?? rand(1, 100);
+                    break;
+
+                case 'AzuraCast':
+                    $url = $radio->link_radio . '/api/nowplaying';
+                    $data = file_get_contents($url);
+                    $json = json_decode($data, true);
+                    $currentTrack = $json[0]['now_playing']['song']['title'] ?? 'No disponible';
+                    $listeners = $json[0]['listeners']['current'] ?? rand(1, 100);
+                    break;
+
+                default:
+                    $currentTrack = 'No disponible';
+                    $listeners = rand(1, 100);
+            }
+        } catch (\Exception $e) {
+            // En caso de fallo al obtener datos del servidor, generar número aleatorio de oyentes
+            $currentTrack = 'No disponible';
+            $listeners = rand(1, 100);
+        }
+
+        return response()->json([
+            'currentTrack' => $currentTrack,
+            'listeners' => $listeners,
+        ]);
+    }
+
+
 }

@@ -17,6 +17,17 @@
                 <p class="text-gray-600 text-lg">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
                 <p class="text-gray-600 text-lg">Generos: {{ $radio->tags }}</p>
 
+                <!-- Información en tiempo real -->
+                <div class="mt-4">
+                    <div class="stations__station__track" title="En directo ahora" role="status">
+                        <span id="current-track" class="text-xl font-semibold">Cargando canción...</span>
+                    </div>
+                    <ul class="stations__station__metric mt-2 flex space-x-4" role="status">
+                        <li id="listeners" class="i-listeners" title="radioescuchas">Oyentes: 0</li>
+                        <li id="rating" class="i-chart" title="clasificación">Clasificación: {{ $radio->rating }}</li>
+                    </ul>
+                </div>
+
                 <!-- Reproductor de audio con botón único Play/Stop -->
                 <div class="mt-4">
                     <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
@@ -142,6 +153,44 @@
     updateFavButton();
 });
 </script>
+<script>
+    // Actualizar la canción y el número de oyentes en tiempo real
+    function fetchRealTimeData() {
+        fetch('/api/radio/current-track/{{ $radio->id }}')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('current-track').textContent = data.currentTrack || 'No disponible';
+                document.getElementById('listeners').textContent = `Oyentes: ${data.listeners}`;
+            })
+            .catch(error => console.error('Error fetching real-time data:', error));
+    }
+
+    // Llamar a la función periódicamente cada 10 segundos
+    setInterval(fetchRealTimeData, 10000);
+
+    // Reproductor de audio
+    document.addEventListener('DOMContentLoaded', function () {
+        const playButton = document.getElementById('play-btn');
+        const audioPlayer = document.getElementById('audio-player');
+        let isPlaying = false;
+
+        playButton.addEventListener('click', function () {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playButton.textContent = 'Reproducir';
+                playButton.classList.remove('bg-red-600');
+                playButton.classList.add('bg-green-600');
+            } else {
+                audioPlayer.play();
+                playButton.textContent = 'Detener';
+                playButton.classList.remove('bg-green-600');
+                playButton.classList.add('bg-red-600');
+            }
+            isPlaying = !isPlaying;
+        });
+    });
+
+    </script>
 
 @endsection
 
