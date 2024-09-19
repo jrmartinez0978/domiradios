@@ -52,6 +52,8 @@ class RadioResource extends Resource
                 Forms\Components\Select::make('type_radio')
                     ->label('Format')
                     ->options([
+                        'FLAC' => 'FLAC (audio/flac)',
+                        'OGG' => 'OGG (audio/ogg)',
                         'MP3' => 'MP3 (audio/mpeg)',
                         'AAC' => 'AAC (audio/aacp)',
                     ])
@@ -59,6 +61,8 @@ class RadioResource extends Resource
                 Forms\Components\Select::make('source_radio')
                     ->label('Source')
                     ->options([
+                        'AzuraCast' => 'AzuraCast',
+                        'SonicPanel' => 'SonicPanel',
                         'Shoutcast' => 'Shoutcast',
                         'Icecast' => 'Icecast',
                         'Other' => 'Other',
@@ -78,7 +82,7 @@ class RadioResource extends Resource
                     ->label('Link')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\MultiSelect::make('genre_ids')
+                Forms\Components\Select::make('genre_ids')
                     ->label('Ciudades')
                     ->relationship('genres', 'name')
                     ->required(),

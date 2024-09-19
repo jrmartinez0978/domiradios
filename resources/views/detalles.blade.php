@@ -15,7 +15,7 @@
                 <h1 class="text-4xl font-bold">{{ $radio->name }}</h1>
                 <p class="text-gray-600 mt-2 text-lg">Frecuencia: {{ $radio->bitrate }}</p>
                 <p class="text-gray-600 text-lg">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
-                <p class="text-gray-600 text-lg">Generos: {{ $radio->tags }}</p>
+                <p class="text-gray-600 text-lg">Géneros: {{ $radio->tags }}</p>
 
                 <!-- Información en tiempo real -->
                 <div class="mt-4">
@@ -104,69 +104,32 @@
     </div>
 </div>
 
-<script>document.addEventListener('DOMContentLoaded', function () {
-    const radioId = '{{ $radio->id }}';  // ID de la emisora actual
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    const favButton = document.getElementById('fav-btn');
-
-    // Función para redirigir a favoritos
-    function redirectToFavorites() {
-        window.location.href = '/favoritos';
-    }
-
-    // Función para actualizar el estado del botón
-    function updateFavButton() {
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        const isFavorite = favorites.includes(radioId);
-
-        if (isFavorite) {
-            favButton.textContent = 'Ver en Favoritos';
-            favButton.classList.remove('bg-green-500');
-            favButton.classList.add('bg-red-500');
-            favButton.onclick = redirectToFavorites;
-        } else {
-            favButton.textContent = 'Agregar a Favoritos';
-            favButton.classList.remove('bg-red-500');
-            favButton.classList.add('bg-green-500');
-            favButton.onclick = toggleFavorite;
-        }
-    }
-
-    // Función para agregar o quitar de favoritos
-    function toggleFavorite() {
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        const isFavorite = favorites.includes(radioId);
-
-        if (isFavorite) {
-            // Eliminar de favoritos
-            favorites = favorites.filter(fav => fav !== radioId);
-        } else {
-            // Agregar a favoritos
-            favorites.push(radioId);
-        }
-
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        updateFavButton();  // Actualizar el botón después de la acción
-    }
-
-    // Inicializar el estado del botón al cargar la página
-    updateFavButton();
-});
-</script>
 <script>
-    // Actualizar la canción y el número de oyentes en tiempo real
-    function fetchRealTimeData() {
-        fetch('/api/radio/current-track/{{ $radio->id }}')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('current-track').textContent = data.currentTrack || 'No disponible';
-                document.getElementById('listeners').textContent = `Oyentes: ${data.listeners}`;
-            })
-            .catch(error => console.error('Error fetching real-time data:', error));
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const radioId = '{{ $radio->id }}';  // ID de la emisora actual
 
-    // Llamar a la función periódicamente cada 10 segundos
-    setInterval(fetchRealTimeData, 10000);
+        // Función para actualizar la canción y oyentes en tiempo real
+        function updateRealTimeData() {
+            fetch(`/api/current-track/${radioId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error al obtener los datos:', data.error);
+                        return;
+                    }
+
+                    document.getElementById('current-track').innerText = data.currentTrack || 'Sin información';
+                    document.getElementById('listeners').innerText = `Oyentes: ${data.listeners}`;
+                })
+                .catch(error => console.error('Error al obtener los datos:', error));
+        }
+
+        // Actualizar los datos cada 10 segundos
+        setInterval(updateRealTimeData, 10000);
+
+        // Llamar a la función por primera vez al cargar la página
+        updateRealTimeData();
+    });
 
     // Reproductor de audio
     document.addEventListener('DOMContentLoaded', function () {
@@ -189,9 +152,6 @@
             isPlaying = !isPlaying;
         });
     });
-
-    </script>
+</script>
 
 @endsection
-
-
