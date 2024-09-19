@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Radio;
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class RadioController extends Controller
 {
@@ -74,80 +75,79 @@ class RadioController extends Controller
     }
 
     public function getCurrentTrack($id)
-{
-    $radio = Radio::findOrFail($id);
-    $listeners = null; // Inicializamos los listeners
-    $incrementStep = 2; // Incremento positivo
-    $decrementStep = 3; // Decremento negativo
+    {
+        $radio = Radio::findOrFail($id);
+        $listeners = null; // Inicializamos los listeners
+        $incrementStep = 2; // Incremento positivo
+        $decrementStep = 3; // Decremento negativo
 
-    // URL basada en el tipo de fuente de streaming
-    switch ($radio->source_radio) {
-        case 'SonicPanel':
-            $url = $radio->link_radio . '/cp/get_info.php?p=' . $radio->port;
-            break;
-        case 'Shoutcast':
-            $url = $radio->link_radio . '/stats?sid=1&json=1';
-            break;
-        case 'Icecast':
-            $url = $radio->link_radio . '/status-json.xsl';
-            break;
-        case 'AzuraCast':
-            $url = $radio->link_radio . '/api/nowplaying';
-            break;
-        default:
-            return response()->json(['error' => 'Tipo de fuente no soportado'], 400);
-    }
-
-    try {
-        // Obtenemos la información de la API del servidor
-        $data = file_get_contents($url);
-        $json = json_decode($data, true);
-
-        // Obtener la canción y los oyentes en función del tipo de fuente
-        if ($radio->source_radio === 'SonicPanel') {
-            $currentTrack = $json['title'] ?? 'Sin información';
-            $listeners = $json['listeners'] ?? null;
-        } elseif ($radio->source_radio === 'Shoutcast') {
-            $currentTrack = $json['songtitle'] ?? 'Sin información';
-            $listeners = $json['currentlisteners'] ?? null;
-        } elseif ($radio->source_radio === 'Icecast') {
-            $currentTrack = $json['icestats']['source']['title'] ?? 'Sin información';
-            $listeners = $json['icestats']['source']['listeners'] ?? null;
-        } elseif ($radio->source_radio === 'AzuraCast') {
-            $currentTrack = $json['now_playing']['song']['title'] ?? 'Sin información';
-            $listeners = $json['listeners']['current'] ?? null;
+        // URL basada en el tipo de fuente de streaming
+        switch ($radio->source_radio) {
+            case 'SonicPanel':
+                $url = $radio->link_radio . '/cp/get_info.php?p=' . $radio->port;
+                break;
+            case 'Shoutcast':
+                $url = $radio->link_radio . '/stats?sid=1&json=1';
+                break;
+            case 'Icecast':
+                $url = $radio->link_radio . '/status-json.xsl';
+                break;
+            case 'AzuraCast':
+                $url = $radio->link_radio . '/api/nowplaying';
+                break;
+            default:
+                return response()->json(['error' => 'Tipo de fuente no soportado'], 400);
         }
 
-        // Si no se pueden obtener los listeners, generar uno aleatorio
-        if (is_null($listeners)) {
-            // Verificar si ya existe un número guardado en la sesión para seguir la secuencia
-            if (session()->has('listeners_' . $radio->id)) {
-                $listeners = session('listeners_' . $radio->id);
-                // Subir o bajar el número de oyentes de manera aleatoria
-                $direction = rand(0, 1) ? 'up' : 'down';
-                if ($direction === 'up') {
-                    $listeners += $incrementStep;
-                } else {
-                    $listeners -= $decrementStep;
-                }
-                // Evitar que baje de 1 o supere 100
-                $listeners = max(1, min(100, $listeners));
-            } else {
-                // Si no existe un número en la sesión, generar uno aleatorio
-                $listeners = rand(1, 100);
+        try {
+            // Obtenemos la información de la API del servidor
+            $data = file_get_contents($url);
+            $json = json_decode($data, true);
+
+            // Obtener la canción y los oyentes en función del tipo de fuente
+            if ($radio->source_radio === 'SonicPanel') {
+                $currentTrack = $json['title'] ?? 'Sin información';
+                $listeners = $json['listeners'] ?? null;
+            } elseif ($radio->source_radio === 'Shoutcast') {
+                $currentTrack = $json['songtitle'] ?? 'Sin información';
+                $listeners = $json['currentlisteners'] ?? null;
+            } elseif ($radio->source_radio === 'Icecast') {
+                $currentTrack = $json['icestats']['source']['title'] ?? 'Sin información';
+                $listeners = $json['icestats']['source']['listeners'] ?? null;
+            } elseif ($radio->source_radio === 'AzuraCast') {
+                $currentTrack = $json['now_playing']['song']['title'] ?? 'Sin información';
+                $listeners = $json['listeners']['current'] ?? null;
             }
+
+            // Si no se pueden obtener los listeners, generar uno aleatorio
+            if (is_null($listeners)) {
+                // Verificar si ya existe un número guardado en la sesión para seguir la secuencia
+                if (session()->has('listeners_' . $radio->id)) {
+                    $listeners = session('listeners_' . $radio->id);
+                    // Subir o bajar el número de oyentes de manera aleatoria
+                    $direction = rand(0, 1) ? 'up' : 'down';
+                    if ($direction === 'up') {
+                        $listeners += $incrementStep;
+                    } else {
+                        $listeners -= $decrementStep;
+                    }
+                    // Evitar que baje de 1 o supere 100
+                    $listeners = max(1, min(100, $listeners));
+                } else {
+                    // Si no existe un número en la sesión, generar uno aleatorio
+                    $listeners = rand(1, 100);
+                }
+            }
+
+            // Guardar el número de oyentes en la sesión para futuras solicitudes
+            session(['listeners_' . $radio->id => $listeners]);
+
+            return response()->json([
+                'currentTrack' => $currentTrack,
+                'listeners' => $listeners,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la información'], 500);
         }
-
-        // Guardar el número de oyentes en la sesión para futuras solicitudes
-        session(['listeners_' . $radio->id => $listeners]);
-
-        return response()->json([
-            'currentTrack' => $currentTrack,
-            'listeners' => $listeners,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Error al obtener la información'], 500);
     }
-}
-
 }

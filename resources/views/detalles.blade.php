@@ -103,8 +103,57 @@
         </div>
     </div>
 </div>
+<script>document.addEventListener('DOMContentLoaded', function () { // Agregar a favoritos
+    const radioId = '{{ $radio->id }}';  // ID de la emisora actual
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    const favButton = document.getElementById('fav-btn');
 
-<script>
+    // Función para redirigir a favoritos
+    function redirectToFavorites() {
+        window.location.href = '/favoritos';
+    }
+
+    // Función para actualizar el estado del botón
+    function updateFavButton() {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const isFavorite = favorites.includes(radioId);
+
+        if (isFavorite) {
+            favButton.textContent = 'Ver en Favoritos';
+            favButton.classList.remove('bg-green-500');
+            favButton.classList.add('bg-red-500');
+            favButton.onclick = redirectToFavorites;
+        } else {
+            favButton.textContent = 'Agregar a Favoritos';
+            favButton.classList.remove('bg-red-500');
+            favButton.classList.add('bg-green-500');
+            favButton.onclick = toggleFavorite;
+        }
+    }
+
+    // Función para agregar o quitar de favoritos
+    function toggleFavorite() {
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const isFavorite = favorites.includes(radioId);
+
+        if (isFavorite) {
+            // Eliminar de favoritos
+            favorites = favorites.filter(fav => fav !== radioId);
+        } else {
+            // Agregar a favoritos
+            favorites.push(radioId);
+        }
+
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        updateFavButton();  // Actualizar el botón después de la acción
+    }
+
+    // Inicializar el estado del botón al cargar la página
+    updateFavButton();
+});
+</script>
+
+<script> // Actualizar la canción y oyentes en tiempo real
     document.addEventListener('DOMContentLoaded', function () {
         const radioId = '{{ $radio->id }}';  // ID de la emisora actual
 
@@ -123,35 +172,29 @@
                 })
                 .catch(error => console.error('Error al obtener los datos:', error));
         }
-
-        // Actualizar los datos cada 10 segundos
-        setInterval(updateRealTimeData, 10000);
-
-        // Llamar a la función por primera vez al cargar la página
-        updateRealTimeData();
-    });
-
-    // Reproductor de audio
-    document.addEventListener('DOMContentLoaded', function () {
-        const playButton = document.getElementById('play-btn');
-        const audioPlayer = document.getElementById('audio-player');
-        let isPlaying = false;
-
-        playButton.addEventListener('click', function () {
-            if (isPlaying) {
-                audioPlayer.pause();
-                playButton.textContent = 'Reproducir';
-                playButton.classList.remove('bg-red-600');
-                playButton.classList.add('bg-green-600');
-            } else {
-                audioPlayer.play();
-                playButton.textContent = 'Detener';
-                playButton.classList.remove('bg-green-600');
-                playButton.classList.add('bg-red-600');
-            }
-            isPlaying = !isPlaying;
-        });
+        updateRealTimeData();  // Inicializar la actualización en tiempo real
+        setInterval(updateRealTimeData, 10000);  // Actualizar cada 10 segundos
     });
 </script>
 
+<script> // Reproductor de audio
+    document.addEventListener('DOMContentLoaded', function () {
+        const audioPlayer = document.getElementById('audio-player');
+        const playButton = document.getElementById('play-btn');
+
+        // Función para reproducir o pausar el audio
+        function toggleAudio() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playButton.textContent = 'Pausar';
+            } else {
+                audioPlayer.pause();
+                playButton.textContent = 'Reproducir';
+            }
+        }
+
+        // Evento para reproducir o pausar el audio al hacer clic en el botón
+        playButton.addEventListener('click', toggleAudio);
+    });
+</script>
 @endsection
