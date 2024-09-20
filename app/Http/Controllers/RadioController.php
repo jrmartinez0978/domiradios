@@ -136,7 +136,21 @@ class RadioController extends Controller
             $response = Http::get($infoUrl);
             $data = $response->body();
 
-            if ($radio->source_radio === 'Icecast') {
+            if ($radio->source_radio === 'SonicPanel') {
+                $json = json_decode($data, true);
+
+                $currentTrack = $json['title'] ?? 'Sin información';
+                $listeners = $json['listeners'] ?? $this->getFictitiousListeners($id);
+                $uniqueListeners = $json['ulistener'] ?? 0;
+                $bitrate = $json['bitrate'] ?? '';
+                $albumArt = $json['art'] ?? '';
+                $djUsername = $json['djusername'] ?? '';
+                $djProfile = $json['djprofile'] ?? '';
+                $history = $json['history'] ?? [];
+
+                // Puedes utilizar estos datos adicionales en tu vista si lo deseas
+
+            } elseif ($radio->source_radio === 'Icecast') {
                 // Parsear el XML del XSPF
                 $xml = simplexml_load_string($data);
                 if ($xml !== false) {
@@ -151,18 +165,17 @@ class RadioController extends Controller
                 }
                 // Generar número de oyentes ficticio
                 $listeners = $this->getFictitiousListeners($id);
-            } elseif ($radio->source_radio === 'SonicPanel') {
-                $json = json_decode($data, true);
-                $currentTrack = $json['song'] ?? 'Sin información';
-                $listeners = $json['listeners'] ?? $this->getFictitiousListeners($id);
+
             } elseif ($radio->source_radio === 'Shoutcast') {
                 $json = json_decode($data, true);
                 $currentTrack = $json['songtitle'] ?? 'Sin información';
                 $listeners = $json['currentlisteners'] ?? $this->getFictitiousListeners($id);
+
             } elseif ($radio->source_radio === 'AzuraCast') {
                 $json = json_decode($data, true);
                 $currentTrack = $json['now_playing']['song']['title'] ?? 'Sin información';
                 $listeners = $json['listeners']['current'] ?? $this->getFictitiousListeners($id);
+
             } else {
                 $currentTrack = 'Sin información';
                 $listeners = $this->getFictitiousListeners($id);
@@ -171,6 +184,13 @@ class RadioController extends Controller
             return response()->json([
                 'currentTrack' => $currentTrack,
                 'listeners' => $listeners,
+                // Puedes incluir otros datos si lo deseas
+                // 'uniqueListeners' => $uniqueListeners,
+                // 'bitrate' => $bitrate,
+                // 'albumArt' => $albumArt,
+                // 'djUsername' => $djUsername,
+                // 'djProfile' => $djProfile,
+                // 'history' => $history,
             ]);
         } catch (\Exception $e) {
             Log::error('Error al obtener la información para la radio ID ' . $id . ': ' . $e->getMessage());
@@ -185,8 +205,8 @@ class RadioController extends Controller
         $cacheKey = 'listeners_' . $radioId;
         $listeners = Cache::get($cacheKey, rand(1, 100));
 
-        // Cambiar el número de oyentes de forma aleatoria entre -3 y +3
-        $change = rand(-3, 3);
+        // Cambiar el número de oyentes de forma aleatoria entre -3 y +2
+        $change = rand(-3, 2);
         $listeners += $change;
 
         // Asegurarse de que el número de oyentes esté entre 1 y 100
