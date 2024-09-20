@@ -6,8 +6,8 @@ use App\Models\Radio;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http; // Agregar esta línea
-use Illuminate\Support\Facades\Log;  // Agregar esta línea para Log
+use Illuminate\Support\Facades\Http; // Importación necesaria
+use Illuminate\Support\Facades\Log;  // Importación necesaria para Log
 
 class RadioController extends Controller
 {
@@ -152,19 +152,37 @@ class RadioController extends Controller
 
             } elseif ($radio->source_radio === 'Icecast') {
                 // Parsear el XML del XSPF
-                $xml = simplexml_load_string($data);
+                $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
                 if ($xml !== false) {
-                    $trackList = $xml->xpath('/playlist/trackList/track');
-                    if (isset($trackList[0])) {
-                        $currentTrack = (string) $trackList[0]->title ?? 'Sin información';
+                    // Namespace de XSPF
+                    $namespaces = $xml->getNamespaces(true);
+                    $xml->registerXPathNamespace('x', $namespaces['']);
+
+                    // Extraer el título de la canción
+                    $titleNode = $xml->xpath('//x:trackList/x:track/x:title');
+                    if (isset($titleNode[0])) {
+                        $currentTrack = (string) $titleNode[0] ?: 'Sin información';
                     } else {
                         $currentTrack = 'Sin información';
                     }
+
+                    // Extraer el número de oyentes desde el campo 'annotation'
+                    $annotationNode = $xml->xpath('//x:trackList/x:track/x:annotation');
+                    if (isset($annotationNode[0])) {
+                        $annotationText = (string) $annotationNode[0];
+                        // Buscar 'Current Listeners' en el texto de 'annotation'
+                        if (preg_match('/Current Listeners:\s*(\d+)/i', $annotationText, $matches)) {
+                            $listeners = (int) $matches[1];
+                        } else {
+                            $listeners = $this->getFictitiousListeners($id);
+                        }
+                    } else {
+                        $listeners = $this->getFictitiousListeners($id);
+                    }
                 } else {
                     $currentTrack = 'Sin información';
+                    $listeners = $this->getFictitiousListeners($id);
                 }
-                // Generar número de oyentes ficticio
-                $listeners = $this->getFictitiousListeners($id);
 
             } elseif ($radio->source_radio === 'Shoutcast') {
                 $json = json_decode($data, true);
