@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     updateRealTimeData();  // Inicializar la actualización en tiempo real
-    setInterval(updateRealTimeData, 10000);  // Actualizar cada 10 segundos
+    setInterval(updateRealTimeData, 30000);  // Actualizar cada 30 segundos
 });
 </script>
 
