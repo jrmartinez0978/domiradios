@@ -189,16 +189,39 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-// Reproductor de audio
+// Reproductor de audio con intentos de conexión
 document.addEventListener('DOMContentLoaded', function () {
     const audioPlayer = document.getElementById('audio-player');
     const playButton = document.getElementById('play-btn');
+    let connectionAttempts = 0;
+    const maxAttempts = 4;
+
+    // Función para intentar reproducir el audio
+    function tryPlayAudio() {
+        if (connectionAttempts < maxAttempts) {
+            connectionAttempts++;
+            audioPlayer.play().then(() => {
+                playButton.textContent = 'Pausar';
+                playButton.disabled = false;
+                connectionAttempts = 0; // Reiniciar los intentos si se conecta
+            }).catch((error) => {
+                console.error('Error al reproducir el audio:', error);
+                if (connectionAttempts >= maxAttempts) {
+                    playButton.textContent = 'Fuera de línea';
+                    playButton.disabled = true;
+                } else {
+                    setTimeout(tryPlayAudio, 2000); // Esperar 2 segundos antes del próximo intento
+                }
+            });
+        }
+    }
 
     // Función para reproducir o pausar el audio
     function toggleAudio() {
         if (audioPlayer.paused) {
-            audioPlayer.play();
-            playButton.textContent = 'Pausar';
+            playButton.disabled = true;
+            playButton.textContent = 'Conectando...';
+            tryPlayAudio();
         } else {
             audioPlayer.pause();
             playButton.textContent = 'Reproducir';
@@ -207,6 +230,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Evento para reproducir o pausar el audio al hacer clic en el botón
     playButton.addEventListener('click', toggleAudio);
+
+    // Evento para manejar errores durante la reproducción
+    audioPlayer.addEventListener('error', function () {
+        console.error('Error en el reproductor de audio.');
+        audioPlayer.pause();
+        if (connectionAttempts >= maxAttempts) {
+            playButton.textContent = 'Fuera de línea';
+            playButton.disabled = true;
+        } else {
+            playButton.textContent = 'Conectando...';
+            tryPlayAudio();
+        }
+    });
+
+    // Evento para manejar la finalización de la reproducción
+    audioPlayer.addEventListener('ended', function () {
+        playButton.textContent = 'Reproducir';
+    });
 });
 </script>
 @endsection
+
