@@ -103,7 +103,10 @@
         </div>
     </div>
 </div>
-<script>document.addEventListener('DOMContentLoaded', function () { // Agregar a favoritos
+
+<script>
+// Agregar a favoritos
+document.addEventListener('DOMContentLoaded', function () {
     const radioId = '{{ $radio->id }}';  // ID de la emisora actual
     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     const favButton = document.getElementById('fav-btn');
@@ -120,13 +123,13 @@
 
         if (isFavorite) {
             favButton.textContent = 'Ver en Favoritos';
-            favButton.classList.remove('bg-green-500');
-            favButton.classList.add('bg-red-500');
+            favButton.classList.remove('bg-green-600');
+            favButton.classList.add('bg-red-600');
             favButton.onclick = redirectToFavorites;
         } else {
             favButton.textContent = 'Agregar a Favoritos';
-            favButton.classList.remove('bg-red-500');
-            favButton.classList.add('bg-green-500');
+            favButton.classList.remove('bg-red-600');
+            favButton.classList.add('bg-green-600');
             favButton.onclick = toggleFavorite;
         }
     }
@@ -153,48 +156,57 @@
 });
 </script>
 
-<script> // Actualizar la canción y oyentes en tiempo real
-    document.addEventListener('DOMContentLoaded', function () {
-        const radioId = '{{ $radio->id }}';  // ID de la emisora actual
+<script>
+// Actualizar la canción y oyentes en tiempo real
+document.addEventListener('DOMContentLoaded', function () {
+    const radioId = '{{ $radio->id }}';  // ID de la emisora actual
+    const currentTrackUrl = '{{ route('radio.current-track', $radio->id) }}';  // Genera la URL correcta
 
-        // Función para actualizar la canción y oyentes en tiempo real
-        function updateRealTimeData() {
-            fetch(`/api/current-track/${radioId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error al obtener los datos:', data.error);
-                        return;
-                    }
+    // Función para actualizar la canción y oyentes en tiempo real
+    function updateRealTimeData() {
+        fetch(currentTrackUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('current-track').innerText = 'Error al obtener la canción';
+                    document.getElementById('listeners').innerText = 'Oyentes: N/A';
+                    console.error('Error al obtener los datos:', data.error);
+                    return;
+                }
 
-                    document.getElementById('current-track').innerText = data.currentTrack || 'Sin información';
-                    document.getElementById('listeners').innerText = `Oyentes: ${data.listeners}`;
-                })
-                .catch(error => console.error('Error al obtener los datos:', error));
-        }
-        updateRealTimeData();  // Inicializar la actualización en tiempo real
-        setInterval(updateRealTimeData, 10000);  // Actualizar cada 10 segundos
-    });
+                document.getElementById('current-track').innerText = data.currentTrack || 'Sin información';
+                document.getElementById('listeners').innerText = `Oyentes: ${data.listeners}`;
+            })
+            .catch(error => {
+                document.getElementById('current-track').innerText = 'Error al obtener la canción';
+                document.getElementById('listeners').innerText = 'Oyentes: N/A';
+                console.error('Error al obtener los datos:', error);
+            });
+    }
+    updateRealTimeData();  // Inicializar la actualización en tiempo real
+    setInterval(updateRealTimeData, 10000);  // Actualizar cada 10 segundos
+});
 </script>
 
-<script> // Reproductor de audio
-    document.addEventListener('DOMContentLoaded', function () {
-        const audioPlayer = document.getElementById('audio-player');
-        const playButton = document.getElementById('play-btn');
+<script>
+// Reproductor de audio
+document.addEventListener('DOMContentLoaded', function () {
+    const audioPlayer = document.getElementById('audio-player');
+    const playButton = document.getElementById('play-btn');
 
-        // Función para reproducir o pausar el audio
-        function toggleAudio() {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                playButton.textContent = 'Pausar';
-            } else {
-                audioPlayer.pause();
-                playButton.textContent = 'Reproducir';
-            }
+    // Función para reproducir o pausar el audio
+    function toggleAudio() {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playButton.textContent = 'Pausar';
+        } else {
+            audioPlayer.pause();
+            playButton.textContent = 'Reproducir';
         }
+    }
 
-        // Evento para reproducir o pausar el audio al hacer clic en el botón
-        playButton.addEventListener('click', toggleAudio);
-    });
+    // Evento para reproducir o pausar el audio al hacer clic en el botón
+    playButton.addEventListener('click', toggleAudio);
+});
 </script>
 @endsection

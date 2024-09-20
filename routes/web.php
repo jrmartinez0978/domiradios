@@ -33,7 +33,9 @@ Route::get('/favoritos', [RadioController::class, 'favoritos'])->name('favoritos
 // Ruta API para obtener emisoras favoritas (puede usarse en una versión más avanzada si se implementa autenticación)
 Route::post('/api/favoritos', [RadioController::class, 'obtenerFavoritos'])->name('api.favoritos');
 
-Route::get('/api/current-track/{id}', [RadioController::class, 'getCurrentTrack']);
+// En routes/web.php o routes/api.php
+Route::get('/api/radio/current-track/{id}', [RadioController::class, 'getCurrentTrack'])->name('radio.current-track');
+
 
 
 
