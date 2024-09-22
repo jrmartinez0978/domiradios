@@ -78,100 +78,158 @@ class RadioController extends Controller
 
     // Método para obtener la canción actual y oyentes
     public function getCurrentTrack($id)
-    {
-        $radio = Radio::findOrFail($id);
+{
+    $radio = Radio::findOrFail($id);
 
-        $linkRadio = $radio->link_radio; // Enlace completo incluyendo puerto y mount point
+    $linkRadio = $radio->link_radio; // Enlace completo incluyendo puerto y mount point
 
-        try {
-            // Parsear el link_radio para extraer componentes
-            $parsedUrl = parse_url($linkRadio);
-            $scheme = $parsedUrl['scheme'] ?? 'http';
-            $host = $parsedUrl['host'] ?? '';
-            $port = $parsedUrl['port'] ?? '';
-            $path = $parsedUrl['path'] ?? '';
+    Log::info('Processing radio ID ' . $id . ' with link_radio ' . $linkRadio);
 
-            // Construir la URL base
-            $baseUrl = $scheme . '://' . $host;
-            if ($port) {
-                $baseUrl .= ':' . $port;
-            }
+    try {
+        // Parsear el link_radio para extraer componentes
+        $parsedUrl = parse_url($linkRadio);
+        $scheme = $parsedUrl['scheme'] ?? 'http';
+        $host = $parsedUrl['host'] ?? '';
+        $port = $parsedUrl['port'] ?? '';
+        $path = $parsedUrl['path'] ?? '';
 
-            switch ($radio->source_radio) {
-                case 'SonicPanel':
-                    // Construir la URL para obtener información
-                    // URL: baseUrl + '/cp/get_info.php?p=' + port
-                    if (!$port) {
-                        // Intentar extraer el puerto del path
-                        preg_match('/\/(\d+)\//', $path, $matches);
-                        if (isset($matches[1])) {
-                            $port = $matches[1];
-                        } else {
-                            return response()->json(['error' => 'No se pudo extraer el puerto'], 400);
-                        }
+        // Construir la URL base
+        $baseUrl = $scheme . '://' . $host;
+        if ($port) {
+            $baseUrl .= ':' . $port;
+        }
+
+        Log::info('Base URL: ' . $baseUrl);
+
+        switch ($radio->source_radio) {
+            case 'SonicPanel':
+                // Construir la URL para obtener información
+                // URL: baseUrl + '/cp/get_info.php?p=' + port
+                if (!$port) {
+                    // Intentar extraer el puerto del path
+                    preg_match('/\/(\d+)\//', $path, $matches);
+                    if (isset($matches[1])) {
+                        $port = $matches[1];
+                    } else {
+                        Log::error('No se pudo extraer el puerto para SonicPanel');
+                        return response()->json(['error' => 'No se pudo extraer el puerto'], 400);
                     }
-                    $infoUrl = $scheme . '://' . $host . '/cp/get_info.php?p=' . $port;
-                    break;
+                }
+                $infoUrl = $scheme . '://' . $host . '/cp/get_info.php?p=' . $port;
+                Log::info('SonicPanel infoUrl: ' . $infoUrl);
+                break;
 
-                case 'Shoutcast':
-                    // Construir la URL para obtener información
-                    // URL: baseUrl + '/stats?sid=1'
-                    $infoUrl = $baseUrl . '/stats?sid=1';
-                    break;
+            case 'Shoutcast':
+                // URL: baseUrl + '/stats?sid=1'
+                $infoUrl = $baseUrl . '/stats?sid=1';
+                Log::info('Shoutcast infoUrl: ' . $infoUrl);
+                break;
 
-                case 'Icecast':
-                    // Añadir '.xspf' al link_radio para obtener el archivo XSPF
-                    $infoUrl = $linkRadio . '.xspf';
-                    break;
+            case 'Icecast':
+                $infoUrl = $linkRadio . '.xspf';
+                Log::info('Icecast infoUrl: ' . $infoUrl);
+                break;
 
-                case 'AzuraCast':
-                    // URL: baseUrl + '/api/nowplaying'
-                    $infoUrl = $baseUrl . '/api/nowplaying';
-                    break;
+            case 'AzuraCast':
+                $infoUrl = $baseUrl . '/api/nowplaying';
+                Log::info('AzuraCast infoUrl: ' . $infoUrl);
+                break;
 
-                default:
-                    return response()->json(['error' => 'Tipo de fuente no soportado'], 400);
+            default:
+                Log::error('Tipo de fuente no soportado: ' . $radio->source_radio);
+                return response()->json(['error' => 'Tipo de fuente no soportado'], 400);
+        }
+
+        // Realizar la solicitud HTTP
+        $response = Http::get($infoUrl);
+        if ($response->failed()) {
+            throw new \Exception('Failed to retrieve data from ' . $infoUrl);
+        }
+        $data = $response->body();
+        Log::info('Received response: ' . $data);
+
+        if ($radio->source_radio === 'SonicPanel') {
+            Log::info('Parsing data for SonicPanel');
+            $json = json_decode($data, true);
+            if ($json === null) {
+                throw new \Exception('Failed to parse JSON from SonicPanel');
             }
 
-            // Realizar la solicitud HTTP
-            $response = Http::get($infoUrl);
-            $data = $response->body();
+            $currentTrack = $json['title'] ?? 'Sin información';
+            $listeners = $json['listeners'] ?? $this->getFictitiousListeners($id);
+        } elseif ($radio->source_radio === 'Shoutcast') {
+            Log::info('Parsing data for Shoutcast');
+            $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+            if ($xml === false) {
+                Log::error('Failed to parse XML from Shoutcast');
+                throw new \Exception('Failed to parse XML from Shoutcast');
+            }
 
-            if ($radio->source_radio === 'SonicPanel') {
-                // ... (código existente para SonicPanel)
+            $currentTrack = isset($xml->SONGTITLE) ? (string) $xml->SONGTITLE : 'Sin información';
+            $listeners = isset($xml->CURRENTLISTENERS) ? (int) $xml->CURRENTLISTENERS : $this->getFictitiousListeners($id);
+        } elseif ($radio->source_radio === 'Icecast') {
+            Log::info('Parsing data for Icecast');
+            $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+            if ($xml === false) {
+                Log::error('Failed to parse XML from Icecast');
+                throw new \Exception('Failed to parse XML from Icecast');
+            }
 
-            } elseif ($radio->source_radio === 'Icecast') {
-                // ... (código existente para Icecast)
+            // Namespace de XSPF
+            $namespaces = $xml->getNamespaces(true);
+            $xml->registerXPathNamespace('x', $namespaces['']);
 
-            } elseif ($radio->source_radio === 'Shoutcast') {
-                // Parsear el XML de Shoutcast
-                $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
-                if ($xml !== false) {
-                    $currentTrack = (string) $xml->SONGTITLE ?? 'Sin información';
-                    $listeners = (int) $xml->CURRENTLISTENERS ?? $this->getFictitiousListeners($id);
-                } else {
-                    $currentTrack = 'Sin información';
-                    $listeners = $this->getFictitiousListeners($id);
-                }
-
-            } elseif ($radio->source_radio === 'AzuraCast') {
-                // ... (código existente para AzuraCast)
-
+            // Extraer el título de la canción
+            $titleNode = $xml->xpath('//x:trackList/x:track/x:title');
+            if (isset($titleNode[0])) {
+                $currentTrack = (string) $titleNode[0] ?: 'Sin información';
             } else {
                 $currentTrack = 'Sin información';
-                $listeners = $this->getFictitiousListeners($id);
             }
 
-            return response()->json([
-                'currentTrack' => $currentTrack,
-                'listeners' => $listeners,
-                // Puedes incluir otros datos si lo deseas
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error al obtener la información para la radio ID ' . $id . ': ' . $e->getMessage());
-            return response()->json(['error' => 'Error al obtener la información'], 500);
+            // Extraer el número de oyentes desde el campo 'annotation'
+            $annotationNode = $xml->xpath('//x:trackList/x:track/x:annotation');
+            if (isset($annotationNode[0])) {
+                $annotationText = (string) $annotationNode[0];
+                // Buscar 'Current Listeners' en el texto de 'annotation'
+                if (preg_match('/Current Listeners:\s*(\d+)/i', $annotationText, $matches)) {
+                    $listeners = (int) $matches[1];
+                } else {
+                    $listeners = $this->getFictitiousListeners($id);
+                }
+            } else {
+                $listeners = $this->getFictitiousListeners($id);
+            }
+        } elseif ($radio->source_radio === 'AzuraCast') {
+            Log::info('Parsing data for AzuraCast');
+            $json = json_decode($data, true);
+            if ($json === null) {
+                throw new \Exception('Failed to parse JSON from AzuraCast');
+            }
+
+            $currentTrack = $json['now_playing']['song']['title'] ?? 'Sin información';
+            $listeners = $json['listeners']['current'] ?? $this->getFictitiousListeners($id);
+        } else {
+            $currentTrack = 'Sin información';
+            $listeners = $this->getFictitiousListeners($id);
         }
+
+        Log::info('Returning currentTrack: ' . $currentTrack . ', listeners: ' . $listeners);
+
+        return response()->json([
+            'currentTrack' => $currentTrack,
+            'listeners' => $listeners,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error al obtener la información para la radio ID ' . $id . ': ' . $e->getMessage());
+
+        // En lugar de devolver un error, devolver información por defecto
+        return response()->json([
+            'currentTrack' => 'Sin información',
+            'listeners' => $this->getFictitiousListeners($id),
+        ]);
     }
+}
 
     // Método para generar un número de oyentes ficticio y realista
     private function getFictitiousListeners($radioId)
@@ -193,4 +251,5 @@ class RadioController extends Controller
         return $listeners;
     }
 }
+
 
