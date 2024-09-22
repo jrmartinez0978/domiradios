@@ -189,66 +189,69 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-// Reproductor de audio con intentos de conexión
-document.addEventListener('DOMContentLoaded', function () {
-    const audioPlayer = document.getElementById('audio-player');
-    const playButton = document.getElementById('play-btn');
-    let connectionAttempts = 0;
-    const maxAttempts = 4;
+    // Reproductor de audio con intentos de conexión
+    document.addEventListener('DOMContentLoaded', function () {
+        const audioPlayer = document.getElementById('audio-player');
+        const playButton = document.getElementById('play-btn');
+        let connectionAttempts = 0;
+        const maxAttempts = 4;
+        let isTryingToPlay = false;
 
-    // Función para intentar reproducir el audio
-    function tryPlayAudio() {
-        if (connectionAttempts < maxAttempts) {
-            connectionAttempts++;
-            audioPlayer.play().then(() => {
-                playButton.textContent = 'Pausar';
-                playButton.disabled = false;
-                connectionAttempts = 0; // Reiniciar los intentos si se conecta
-            }).catch((error) => {
-                console.error('Error al reproducir el audio:', error);
-                if (connectionAttempts >= maxAttempts) {
-                    playButton.textContent = 'Fuera de línea';
-                    playButton.disabled = true;
-                } else {
+        // Función para reproducir o pausar el audio
+        function toggleAudio() {
+            if (audioPlayer.paused && !isTryingToPlay) {
+                playButton.disabled = true;
+                playButton.textContent = 'Conectando...';
+                connectionAttempts = 0;
+                isTryingToPlay = true;
+                tryPlayAudio();
+            } else {
+                audioPlayer.pause();
+                playButton.textContent = 'Reproducir';
+            }
+        }
+
+        function tryPlayAudio() {
+            if (connectionAttempts < maxAttempts) {
+                connectionAttempts++;
+                audioPlayer.load(); // Reiniciar el reproductor
+                audioPlayer.play().then(() => {
+                    playButton.textContent = 'Pausar';
+                    playButton.disabled = false;
+                    isTryingToPlay = false;
+                    connectionAttempts = 0; // Reiniciar los intentos si se conecta
+                }).catch((error) => {
+                    console.error('Error al reproducir el audio:', error);
                     setTimeout(tryPlayAudio, 2000); // Esperar 2 segundos antes del próximo intento
-                }
-            });
+                });
+            } else {
+                playButton.textContent = 'Fuera de línea';
+                playButton.disabled = true;
+                isTryingToPlay = false;
+                audioPlayer.pause();
+            }
         }
-    }
 
-    // Función para reproducir o pausar el audio
-    function toggleAudio() {
-        if (audioPlayer.paused) {
-            playButton.disabled = true;
-            playButton.textContent = 'Conectando...';
-            tryPlayAudio();
-        } else {
+        // Evento para reproducir o pausar el audio al hacer clic en el botón
+        playButton.addEventListener('click', toggleAudio);
+
+        // Evento para manejar errores durante la reproducción
+        audioPlayer.addEventListener('error', function () {
+            console.error('Error en el reproductor de audio.');
             audioPlayer.pause();
+            if (connectionAttempts >= maxAttempts) {
+                playButton.textContent = 'Fuera de línea';
+                playButton.disabled = true;
+                isTryingToPlay = false;
+            } else if (isTryingToPlay) {
+                setTimeout(tryPlayAudio, 2000); // Intentar nuevamente
+            }
+        });
+
+        // Evento para manejar la finalización de la reproducción
+        audioPlayer.addEventListener('ended', function () {
             playButton.textContent = 'Reproducir';
-        }
-    }
-
-    // Evento para reproducir o pausar el audio al hacer clic en el botón
-    playButton.addEventListener('click', toggleAudio);
-
-    // Evento para manejar errores durante la reproducción
-    audioPlayer.addEventListener('error', function () {
-        console.error('Error en el reproductor de audio.');
-        audioPlayer.pause();
-        if (connectionAttempts >= maxAttempts) {
-            playButton.textContent = 'Fuera de línea';
-            playButton.disabled = true;
-        } else {
-            playButton.textContent = 'Conectando...';
-            tryPlayAudio();
-        }
+        });
     });
-
-    // Evento para manejar la finalización de la reproducción
-    audioPlayer.addEventListener('ended', function () {
-        playButton.textContent = 'Reproducir';
-    });
-});
-</script>
-@endsection
-
+    </script>
+    @endsection
