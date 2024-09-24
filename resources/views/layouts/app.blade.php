@@ -56,8 +56,17 @@
     </div>
 
     <footer class="bg-gray-800 text-white py-4">
-        <div class="max-w-7xl mx-auto px-4">
-            <p class="text-center">© 2024 Domiradios - Todos los derechos reservados</p>
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <!-- Texto alineado a la izquierda -->
+            <p>© 2024 Domiradios - Todos los derechos reservados</p>
+
+            <!-- Navegación alineada a la derecha -->
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="/appdomiradios/terms-and-conditions" class="hover:text-gray-300 transition duration-300">Términos y Condiciones</a></li>
+                    <li><a href="/appdomiradios/privacy-policy" class="hover:text-gray-300 transition duration-300">Política de Privacidad</a></li>
+                </ul>
+            </nav>
         </div>
     </footer>
 
