@@ -1,8 +1,17 @@
 @extends('layouts.default')
 
-@section('title', $radio->name . ' - Escucha en vivo')
-@section('meta_description', strip_tags($radio->description))
-@section('meta_keywords', $radio->tags)
+@section('title', $meta_title)
+
+@section('meta_description')
+    <meta name="description" content="{{ $meta_description }}">
+@endsection
+
+@section('meta_keywords')
+    <meta name="keywords" content="{{ $meta_keywords }}">
+@endsection
+@section('canonical_url')
+<link rel="canonical" href="{{ $canonical_url }}">
+@endsection
 
 @section('content')
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -254,4 +263,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     </script>
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "RadioStation",
+          "name": "{{ $radio->name }}",
+          "url": "{{ url()->current() }}",
+          "logo": "{{ Storage::url($radio->img) }}",
+          "sameAs": [
+            "{{ $radio->url_website }}",
+            "{{ $radio->url_facebook }}",
+            "{{ $radio->url_twitter }}",
+            "{{ $radio->url_instagram }}"
+          ],
+          "areaServed": "{{ $radio->genres->pluck('name')->implode(', ') }}",
+          "description": "{{ strip_tags($radio->description) }}",
+          "genre": "{{ $radio->tags }}"
+        }
+        </script>
+
     @endsection

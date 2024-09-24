@@ -27,22 +27,32 @@ class RadioController extends Controller
     }
 
     // Método para mostrar los detalles de una emisora por su slug
-    public function show($slug)
-    {
-        // Buscar la emisora actual por su slug
-        $radio = Radio::where('slug', $slug)->firstOrFail();
+    // Método para mostrar los detalles de una emisora por su slug
+public function show($slug)
+{
+    // Buscar la emisora actual por su slug
+    $radio = Radio::where('slug', $slug)->firstOrFail();
 
-        // Buscar emisoras relacionadas basadas en la misma ciudad (género)
-        $relatedRadios = Radio::whereHas('genres', function ($query) use ($radio) {
-            $query->whereIn('genres.id', $radio->genres->pluck('id')); // Especificar 'genres.id'
-        })
-        ->where('radios.id', '!=', $radio->id) // Especificar 'radios.id'
-        ->limit(5)
-        ->get();
+    // Buscar emisoras relacionadas basadas en la misma ciudad (género)
+    $relatedRadios = Radio::whereHas('genres', function ($query) use ($radio) {
+        $query->whereIn('genres.id', $radio->genres->pluck('id')); // Especificar 'genres.id'
+    })
+    ->where('id', '!=', $radio->id) // No usar 'radios.id', usar 'id' directamente porque es el modelo 'Radio'
+    ->limit(5)
+    ->get();
 
-        // Retornar la vista con la emisora y las emisoras relacionadas
-        return view('detalles', compact('radio', 'relatedRadios'));
-    }
+    // Generar la URL canónica
+    $canonical_url = route('emisoras.show', ['slug' => $radio->slug]);
+
+    // Retornar la vista con los metadatos para SEO y las emisoras relacionadas
+    return view('detalles', compact('radio', 'relatedRadios'))
+           ->with([
+                'meta_title' => $radio->name . ' - Escucha en vivo',
+                'meta_description' => strip_tags($radio->description),
+                'meta_keywords' => $radio->tags,
+                'canonical_url' => $canonical_url
+           ]);
+}
 
     // Método para mostrar las emisoras por ciudad (géneros)
     public function emisorasPorCiudad($slug)

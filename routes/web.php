@@ -1,18 +1,18 @@
 <?php
-// routes/web.php
 use Illuminate\Support\Facades\Route;
 use App\Livewire\PrivacyPolicy;
 use App\Livewire\TermsAndConditions;
 use App\Http\Controllers\RadioController;
 use App\Models\Radio;
 use Illuminate\Http\Request;
+use App\Http\Controllers\SitemapController;
 
 // Ruta para la página de inicio
 Route::get('/', function () {
     return view('emisoras');
 })->name('inicio');
 
-// routes/web.php
+// Ruta para obtener emisoras favoritas (si no estás usando autenticación)
 Route::post('/api/favoritos', function (Request $request) {
     $ids = $request->input('ids', []);
     $favoritos = Radio::whereIn('id', $ids)->get();
@@ -20,8 +20,10 @@ Route::post('/api/favoritos', function (Request $request) {
     return response()->json($favoritos);
 });
 
+// Ruta para el Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-
+// Rutas para las páginas legales
 Route::get('/appdomiradios/privacy-policy', PrivacyPolicy::class);
 Route::get('/appdomiradios/terms-and-conditions', TermsAndConditions::class);
 
@@ -34,17 +36,14 @@ Route::get('/ciudades/{slug}', [RadioController::class, 'emisorasPorCiudad'])->n
 // Ruta para mostrar la lista de todas las ciudades
 Route::get('/ciudades', [RadioController::class, 'indexCiudades'])->name('ciudades.index');
 
+// Ruta para la página de favoritos
 Route::get('/favoritos', [RadioController::class, 'favoritos'])->name('favoritos');
 
-// Ruta API para obtener emisoras favoritas (puede usarse en una versión más avanzada si se implementa autenticación)
+// Ruta API para obtener emisoras favoritas
 Route::post('/api/favoritos', [RadioController::class, 'obtenerFavoritos'])->name('api.favoritos');
 
-// En routes/web.php o routes/api.php
+// Ruta API para obtener la canción actual y oyentes de una emisora
 Route::get('/api/radio/current-track/{id}', [RadioController::class, 'getCurrentTrack'])->name('radio.current-track');
-
-
-
-
 
 
 
