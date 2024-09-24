@@ -2,15 +2,10 @@
 
 @section('title', $meta_title)
 
-@section('meta_description')
+@section('head')
     <meta name="description" content="{{ $meta_description }}">
-@endsection
-
-@section('meta_keywords')
     <meta name="keywords" content="{{ $meta_keywords }}">
-@endsection
-@section('canonical_url')
-<link rel="canonical" href="{{ $canonical_url }}">
+    <link rel="canonical" href="{{ $canonical_url }}">
 @endsection
 
 @section('content')
