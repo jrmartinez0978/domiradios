@@ -1,6 +1,8 @@
 <?php
 // routes/web.php
 use Illuminate\Support\Facades\Route;
+use App\Livewire\PrivacyPolicy;
+use App\Livewire\TermsAndConditions;
 use App\Http\Controllers\RadioController;
 use App\Models\Radio;
 use Illuminate\Http\Request;
@@ -18,6 +20,10 @@ Route::post('/api/favoritos', function (Request $request) {
     return response()->json($favoritos);
 });
 
+
+
+Route::get('/appdomiradios/privacy-policy', PrivacyPolicy::class);
+Route::get('/appdomiradios/terms-and-conditions', TermsAndConditions::class);
 
 // Ruta para mostrar los detalles de una emisora por su slug
 Route::get('/emisoras/{slug}', [RadioController::class, 'show'])->name('emisoras.show');
