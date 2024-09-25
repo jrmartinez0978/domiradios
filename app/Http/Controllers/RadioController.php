@@ -44,15 +44,19 @@ class RadioController extends Controller
         // Generar la URL canónica
         $canonical_url = route('emisoras.show', ['slug' => $radio->slug]);
 
+        // Si los tags están guardados como una cadena de texto, se separan por comas
+        $meta_keywords = $radio->tags; // Asumimos que tags es una cadena como 'rock, pop, baladas'
+
         // Retornar la vista con los metadatos para SEO y las emisoras relacionadas
         return view('detalles', compact('radio', 'relatedRadios'))
                ->with([
                     'meta_title' => $radio->name . ' - Escucha en vivo',
                     'meta_description' => strip_tags($radio->description),
-                    'meta_keywords' => implode(', ', $radio->tags->pluck('name')->toArray()), // Añadir los géneros como keywords
+                    'meta_keywords' => $meta_keywords,  // Usar los tags como keywords directamente
                     'canonical_url' => $canonical_url
                ]);
     }
+
 
     // Método para mostrar las emisoras por ciudad (géneros)
     public function emisorasPorCiudad($slug)
