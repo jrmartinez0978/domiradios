@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Carbon;
 use App\Models\Radio;
 use App\Models\Genre;
 use Illuminate\Http\Request;
@@ -26,7 +27,6 @@ class RadioController extends Controller
         return response()->json($favoritos);
     }
 
-
     // Método para mostrar los detalles de una emisora por su slug
     public function show($slug)
     {
@@ -49,11 +49,10 @@ class RadioController extends Controller
                ->with([
                     'meta_title' => $radio->name . ' - Escucha en vivo',
                     'meta_description' => strip_tags($radio->description),
-                    'meta_keywords' => $radio->tags,
+                    'meta_keywords' => implode(', ', $radio->genres->pluck('name')->toArray()), // Añadir los géneros como keywords
                     'canonical_url' => $canonical_url
                ]);
     }
-
 
     // Método para mostrar las emisoras por ciudad (géneros)
     public function emisorasPorCiudad($slug)
@@ -63,11 +62,20 @@ class RadioController extends Controller
 
         // Obtener las emisoras relacionadas a esa ciudad
         $radios = Radio::whereHas('genres', function ($query) use ($genre) {
-            $query->where('genres.id', $genre->id); // Especificar 'genres.id'
+            $query->where('genres.id', $genre->id);
         })->get();
 
-        // Retornar la vista con las emisoras de la ciudad
-        return view('emisoras_por_ciudad', compact('radios', 'genre'));
+        // Generar la URL canónica
+        $canonical_url = route('ciudades.show', ['slug' => $genre->slug]);
+
+        // Retornar la vista con las emisoras de la ciudad y los metadatos para SEO
+        return view('emisoras_por_ciudad', compact('radios', 'genre'))
+               ->with([
+                    'meta_title' => 'Emisoras en ' . $genre->name . ' - Directorio de Emisoras',
+                    'meta_description' => 'Descubre las emisoras de radio en ' . $genre->name . ' y sus géneros.',
+                    'meta_keywords' => 'emisoras, radio, ' . $genre->name,
+                    'canonical_url' => $canonical_url
+               ]);
     }
 
     // Método para mostrar todas las ciudades (géneros)
@@ -76,19 +84,38 @@ class RadioController extends Controller
         // Obtener todos los géneros (ciudades)
         $genres = Genre::all();
 
-        // Retornar la vista con todas las ciudades (géneros)
-        return view('ciudades', compact('genres'));
+        // Generar la URL canónica
+        $canonical_url = route('ciudades.index');
+
+        // Retornar la vista con todas las ciudades y los metadatos SEO
+        return view('ciudades', compact('genres'))
+               ->with([
+                    'meta_title' => 'Ciudades con Emisoras - Directorio de Emisoras',
+                    'meta_description' => 'Encuentra emisoras de radio por ciudad en nuestro directorio completo.',
+                    'meta_keywords' => 'emisoras, radio, ciudades',
+                    'canonical_url' => $canonical_url
+               ]);
     }
 
     // Método para mostrar todas las emisoras
     public function index()
     {
-        $radios = Radio::all(); // Obtener todas las emisoras
-        return view('emisoras', compact('radios')); // Retornar la vista 'emisoras' con los datos de las radios
-    }
+        $radios = Radio::all();
 
-    // Método para obtener la canción actual y oyentes
-    public function getCurrentTrack($id)
+        // Generar la URL canónica
+        $canonical_url = route('emisoras.index');
+
+        // Retornar la vista 'emisoras' con los datos de las radios y los metadatos SEO
+        return view('emisoras', compact('radios'))
+               ->with([
+                    'meta_title' => 'Todas las Emisoras - Directorio de Emisoras',
+                    'meta_description' => 'Descubre todas las emisoras de radio disponibles en nuestro directorio.',
+                    'meta_keywords' => 'emisoras, radio, géneros, estaciones',
+                    'canonical_url' => $canonical_url
+               ]);
+    }
+// Método para obtener la canción actual y oyentes
+public function getCurrentTrack($id)
 {
     $radio = Radio::findOrFail($id);
 
@@ -242,25 +269,25 @@ class RadioController extends Controller
     }
 }
 
-    // Método para generar un número de oyentes ficticio y realista
-    private function getFictitiousListeners($radioId)
-    {
-        // Utilizar caché para mantener el conteo entre solicitudes
-        $cacheKey = 'listeners_' . $radioId;
-        $listeners = Cache::get($cacheKey, rand(1, 100));
+// Método para generar un número de oyentes ficticio y realista
+private function getFictitiousListeners($radioId)
+{
+    // Utilizar caché para mantener el conteo entre solicitudes
+    $cacheKey = 'listeners_' . $radioId;
+    $listeners = Cache::get($cacheKey, rand(1, 100));
 
-        // Cambiar el número de oyentes de forma aleatoria entre -3 y +2
-        $change = rand(-3, 2);
-        $listeners += $change;
+    // Cambiar el número de oyentes de forma aleatoria entre -3 y +2
+    $change = rand(-3, 2);
+    $listeners += $change;
 
-        // Asegurarse de que el número de oyentes esté entre 1 y 100
-        $listeners = max(1, min($listeners, 100));
+    // Asegurarse de que el número de oyentes esté entre 1 y 100
+    $listeners = max(1, min($listeners, 100));
 
-        // Guardar el nuevo valor en caché por un tiempo definido (ejemplo: 1 minuto)
-        Cache::put($cacheKey, $listeners, now()->addMinutes(1));
+    // Guardar el nuevo valor en caché por un tiempo definido (ejemplo: 1 minuto)
+    Cache::put($cacheKey, $listeners, now()->addMinutes(1));
 
-        return $listeners;
-    }
+    return $listeners;
+}
 }
 
 

@@ -6,27 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Domiradios - Tu directorio de emisoras dominicanas')</title>
+    <title>{{ $meta_title ?? 'Domiradios - Tu directorio de emisoras dominicanas' }}</title>
 
-    <!-- SEO Meta Tags -->
-<meta name="description" content="@yield('meta_description', 'Directorio de emisoras de radio en vivo. Encuentra y escucha emisoras de radio dominicanas.')" />
-<meta name="keywords" content="@yield('meta_keywords', 'radio, emisoras, dominicanas, en vivo, streaming')" />
-<link rel="canonical" href="@yield('canonical_url', url()->current())">
-
+<meta name="description" content="{{ $meta_description ?? 'Descubre las mejores emisoras de radio de República Dominicana en nuestro directorio.' }}">
+<meta name="keywords" content="{{ $meta_keywords ?? 'emisoras, radio, estaciones, géneros' }}">
+<link rel="canonical" href="{{ $canonical_url ?? url()->current() }}">
 
 <!-- Open Graph Meta Tags -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="{{ $meta_title }}">
-<meta property="og:description" content="{{ $meta_description }}">
-<meta property="og:url" content="{{ $canonical_url }}">
-<meta property="og:image" content="{{ Storage::url($radio->img) }}">
+<meta property="og:title" content="{{ $meta_title ?? 'Domiradios - Escucha emisoras en vivo' }}">
+<meta property="og:description" content="{{ $meta_description ?? 'Descubre emisoras de radio en vivo en nuestro directorio.' }}">
+<meta property="og:url" content="{{ $canonical_url ?? url()->current() }}">
+<meta property="og:image" content="{{ Storage::url($radio->img ?? 'default.png') }}">
 <meta property="og:site_name" content="{{ config('app.name') }}">
 
 <!-- Twitter Card Meta Tags -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ $meta_title }}">
-<meta name="twitter:description" content="{{ $meta_description }}">
-<meta name="twitter:image" content="{{ Storage::url($radio->img) }}">
+<meta name="twitter:title" content="{{ $meta_title ?? 'Domiradios - Escucha emisoras en vivo' }}">
+<meta name="twitter:description" content="{{ $meta_description ?? 'Descubre emisoras de radio en vivo en nuestro directorio.' }}">
+<meta name="twitter:image" content="{{ Storage::url($radio->img ?? 'default.png') }}">
+
 
     <!-- Styles -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">

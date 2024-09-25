@@ -1,13 +1,5 @@
 @extends('layouts.default')
 
-@section('title', $meta_title)
-
-@section('meta_description', $meta_description)
-
-@section('meta_keywords', $meta_keywords)
-
-@section('canonical_url', $canonical_url)
-
 @section('content')
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="bg-white p-6 rounded-lg shadow-md">
