@@ -84,8 +84,7 @@
 <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": [
+      "@type": "ItemList",[
         @foreach($radios as $index => $radio)
         {
           "@type": "ListItem",
