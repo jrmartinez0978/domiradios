@@ -49,7 +49,7 @@ class RadioController extends Controller
                ->with([
                     'meta_title' => $radio->name . ' - Escucha en vivo',
                     'meta_description' => strip_tags($radio->description),
-                    'meta_keywords' => implode(', ', $radio->genres->pluck('name')->toArray()), // Añadir los géneros como keywords
+                    'meta_keywords' => implode(', ', $radio->tags->pluck('name')->toArray()), // Añadir los géneros como keywords
                     'canonical_url' => $canonical_url
                ]);
     }
