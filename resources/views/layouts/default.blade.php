@@ -9,26 +9,30 @@
     <title>@yield('title', 'Domiradios - Tu directorio de emisoras dominicanas')</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="@yield('meta_description', 'Directorio de emisoras de radio en vivo. Encuentra y escucha emisoras de radio dominicanas.')" />
-    <meta name="keywords" content="@yield('meta_keywords', 'radio, emisoras, dominicanas, en vivo, streaming')" />
+<meta name="description" content="@yield('meta_description', 'Directorio de emisoras de radio en vivo. Encuentra y escucha emisoras de radio dominicanas.')" />
+<meta name="keywords" content="@yield('meta_keywords', 'radio, emisoras, dominicanas, en vivo, streaming')" />
+<link rel="canonical" href="@yield('canonical_url', url()->current())">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="@yield('og_title', 'Directorio de Radios en Vivo')" />
-    <meta property="og:description" content="@yield('og_description', 'Encuentra emisoras de radio dominicanas en vivo.')" />
-    <meta property="og:image" content="@yield('og_image', asset('images/default-og-image.jpg'))" />
-    <meta property="og:url" content="@yield('og_url', url()->current())" />
-    <meta property="og:type" content="website" />
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="@yield('twitter_title', 'Directorio de Radios')" />
-    <meta name="twitter:description" content="@yield('twitter_description', 'Encuentra emisoras de radio dominicanas en vivo.')" />
-    <meta name="twitter:image" content="@yield('twitter_image', asset('images/default-twitter-image.jpg'))" />
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ $meta_title }}">
+<meta property="og:description" content="{{ $meta_description }}">
+<meta property="og:url" content="{{ $canonical_url }}">
+<meta property="og:image" content="{{ Storage::url($radio->img) }}">
+<meta property="og:site_name" content="{{ config('app.name') }}">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $meta_title }}">
+<meta name="twitter:description" content="{{ $meta_description }}">
+<meta name="twitter:image" content="{{ Storage::url($radio->img) }}">
 
     <!-- Styles -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
      <!-- Include Font Awesome -->
      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js" async></script>
 
 
     @livewireStyles

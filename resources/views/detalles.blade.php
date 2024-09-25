@@ -2,18 +2,18 @@
 
 @section('title', $meta_title)
 
-@section('head')
-    <meta name="description" content="{{ $meta_description }}">
-    <meta name="keywords" content="{{ $meta_keywords }}">
-    <link rel="canonical" href="{{ $canonical_url }}">
-@endsection
+@section('meta_description', $meta_description)
+
+@section('meta_keywords', $meta_keywords)
+
+@section('canonical_url', $canonical_url)
 
 @section('content')
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex flex-col md:flex-row items-center">
             <div class="w-full md:w-1/3 mb-4 md:mb-0">
-                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-auto rounded-md shadow-lg">
+                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-auto rounded-md shadow-lg lazyload">
             </div>
             <div class="w-full md:w-2/3 md:ml-6">
                 <h1 class="text-4xl font-bold">{{ $radio->name }}</h1>
@@ -99,7 +99,7 @@
             @foreach($relatedRadios as $related)
                 <div class="bg-white p-4 rounded-lg shadow-md">
                     <a href="{{ route('emisoras.show', $related->slug) }}">
-                        <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="w-full h-auto rounded-md mb-4">
+                        <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="w-full h-auto rounded-md mb-4 lazyload">
                         <h3 class="text-center text-s">{{ $related->name }}</h3>
                     </a>
                 </div>
@@ -273,8 +273,17 @@ document.addEventListener('DOMContentLoaded', function () {
           ],
           "areaServed": "{{ $radio->genres->pluck('name')->implode(', ') }}",
           "description": "{{ strip_tags($radio->description) }}",
-          "genre": "{{ $radio->tags }}"
+          "genre": "{{ $radio->tags }}",
+          "location": {
+              "@type": "Place",
+              "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "{{ $radio->genres->pluck('name')->implode(', ') }}",
+                  "addressCountry": "DO"
+              }
+          }
         }
-        </script>
+    </script>
+
 
     @endsection

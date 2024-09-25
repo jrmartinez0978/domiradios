@@ -17,7 +17,7 @@
             <!-- Imagen cuadrada de la emisora -->
             <div class="aspect-w-1 aspect-h-1">
                 <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}">
-                    <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md">
+                    <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md lazyload">
                 </a>
             </div>
             <!-- Título con enlace a la página de detalles -->
