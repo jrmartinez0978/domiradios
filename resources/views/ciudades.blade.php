@@ -2,7 +2,14 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <h1 class="text-3xl font-bold mb-6 text-center">Ciudades</h1>
+<h1 class="text-3xl font-bold mb-6 text-center">Emisoras Por Ciudades Dominicanas</h1>
+<p class="mb-4 mt-4">
+  Las mejores <strong>emisoras por ciudades dominicanas</strong> y <strong>
+    radios de República Dominicana</strong> por ciudad. Escucha en vivo
+    tus emisoras favoritas en Santo Domingo, Santiago, La Romana y más.
+    Disfruta de música, noticias y programas locales con nuestro listado completo de
+    <strong>emisoras por ciudad en República Dominicana</strong>.
+</p>
 
     <!-- Grid de ciudades -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6">
