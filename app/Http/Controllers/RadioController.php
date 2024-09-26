@@ -104,7 +104,8 @@ class RadioController extends Controller
     // Método para mostrar todas las emisoras
     public function index()
     {
-        $radios = Radio::all();
+        $radios = Radio::paginate(10);  // Paginar las emisoras a 10 por página
+
 
         // Generar la URL canónica
         $canonical_url = route('emisoras.index');
