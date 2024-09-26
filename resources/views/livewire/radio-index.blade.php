@@ -3,7 +3,7 @@
         <!-- Barra de búsqueda -->
         <input
             type="text"
-            wire:model.debounce.500ms="search"
+            wire:model.live="search"
             class="w-full border border-gray-300 p-2 rounded mb-4"
             placeholder="Buscar emisoras por nombre...">
     </div>
@@ -31,13 +31,15 @@
 
                     <!-- Reproductor de audio con botón único Play/Stop -->
                     <div class="mt-4">
-                        <audio id="player-{{ $radio->id }}" src="{{ $radio->link_radio }}"></audio>
-                        <button
-                            id="play-btn-{{ $radio->id }}"
-                            class="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800"
-                            onclick="togglePlay({{ $radio->id }})">
-                            Reproducir
-                        </button>
+                        <audio id="player-{{ $radio->id }}" data-id="{{ $radio->id }}" src="{{ $radio->link_radio }}"></audio>
+                    <button
+                        id="play-btn-{{ $radio->id }}"
+                        class="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800"
+                        onclick="togglePlay({{ $radio->id }})">
+                        Reproducir
+                    </button>
+
+
                     </div>
                 </div>
             @endforeach
@@ -51,11 +53,11 @@
         <p>No se encontraron emisoras.</p>
     @endif
 </div>
-@push('scripts')
 <script>
-    document.addEventListener('livewire:load', function () {
-        let currentPlaying = null; // Guarda el reproductor que está actualmente sonando
+    let currentPlaying = null; // Variable global para mantener el estado entre actualizaciones
+    let players = {}; // Objeto para almacenar los reproductores y sus estados
 
+    function initializeAudioPlayers() {
         window.togglePlay = function (id) {
             const player = document.getElementById('player-' + id);
             const playBtn = document.getElementById('play-btn-' + id);
@@ -64,9 +66,11 @@
             if (currentPlaying && currentPlaying !== player) {
                 currentPlaying.pause();
                 const previousBtn = document.getElementById('play-btn-' + currentPlaying.dataset.id);
-                previousBtn.textContent = 'Reproducir';
-                previousBtn.classList.remove('bg-red-700');
-                previousBtn.classList.add('bg-green-700');
+                if (previousBtn) {
+                    previousBtn.textContent = 'Reproducir';
+                    previousBtn.classList.remove('bg-red-700');
+                    previousBtn.classList.add('bg-green-700');
+                }
             }
 
             // Si el reproductor actual está sonando, lo detiene
@@ -76,23 +80,78 @@
                 playBtn.classList.remove('bg-red-700');
                 playBtn.classList.add('bg-green-700');
                 currentPlaying = null;
+                clearTimeout(players[id]?.timeout); // Limpiar cualquier timeout pendiente
             } else {
-                // Reproduce la emisora y actualiza el botón
-                player.play();
+                // Reproduce la emisora con intentos de reconexión
+                attemptPlay(player, playBtn, id, 1);
+            }
+        };
+    }
+
+    function attemptPlay(player, playBtn, id, attempt) {
+        const maxAttempts = 4;
+        const timeout = 5000; // 5 segundos
+
+        // Intentar reproducir
+        let playPromise = player.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                // Éxito: actualiza el botón
                 playBtn.textContent = 'Detener';
                 playBtn.classList.remove('bg-green-700');
                 playBtn.classList.add('bg-red-700');
-                currentPlaying = player; // Guarda el reproductor actual como el que está sonando
-            }
-        };
+                currentPlaying = player;
+
+                // Limpiar cualquier estado de intentos previos
+                if (players[id]) {
+                    clearTimeout(players[id].timeout);
+                    delete players[id];
+                }
+            }).catch((error) => {
+                if (attempt < maxAttempts) {
+                    // Intentar nuevamente después de 5 segundos
+                    if (!players[id]) {
+                        players[id] = {};
+                    }
+                    players[id].timeout = setTimeout(() => {
+                        attemptPlay(player, playBtn, id, attempt + 1);
+                    }, timeout);
+                } else {
+                    // Después de 4 intentos fallidos, mostrar "Fuera de línea"
+                    playBtn.textContent = 'Fuera de línea';
+                    playBtn.disabled = true; // Desactivar el botón
+                    playBtn.classList.remove('bg-green-700');
+                    playBtn.classList.add('bg-gray-500');
+
+                    // Limpiar cualquier estado de intentos
+                    if (players[id]) {
+                        clearTimeout(players[id].timeout);
+                        delete players[id];
+                    }
+                }
+            });
+        } else {
+            // Para navegadores que no soportan promesas en player.play()
+            playBtn.textContent = 'Detener';
+            playBtn.classList.remove('bg-green-700');
+            playBtn.classList.add('bg-red-700');
+            currentPlaying = player;
+        }
+    }
+
+    // Inicializar al cargar la página
+    document.addEventListener('livewire:load', function () {
+        initializeAudioPlayers();
     });
 
-    // Ejecutar la función después de cada actualización de Livewire
+    // Re-inicializar después de cada actualización de Livewire
     document.addEventListener('livewire:update', function () {
-        // Reasignar eventos si es necesario
+        initializeAudioPlayers();
     });
 </script>
-@endpush
+
+
 <!-- Microdatos estructurados para SEO con Schema.org -->
 <script type="application/ld+json">
     {

@@ -97,7 +97,6 @@
 
     @livewireScripts
     @vite('resources/js/app.js') <!-- Incluir el JavaScript compilado -->
-    @stack('scripts')
 </body>
 </html>
 
