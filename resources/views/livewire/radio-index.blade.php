@@ -54,6 +54,8 @@
 </div>
 
 <script>
+
+{
     let currentPlaying = null; // Guarda el reproductor que está actualmente sonando
     let intentos = {}; // Guarda el número de intentos por cada reproductor
 
@@ -121,6 +123,15 @@
             currentPlaying = player;
         }
     }
+}
+
+document.addEventListener('livewire:load', function () {
+    inicializarEventos();
+});
+
+document.addEventListener('livewire:updated', function () {
+    inicializarEventos();
+});
 </script>
 
 <!-- Microdatos estructurados para SEO con Schema.org -->
