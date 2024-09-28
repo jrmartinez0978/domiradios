@@ -3,16 +3,18 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use Livewire\WithPagination; // Importar el trait
+use Livewire\WithPagination;
 use App\Models\Radio;
 
 class RadioIndex extends Component
 {
-    use WithPagination; // Usar el trait
+    use WithPagination;
 
-    public $search = '';
+    public $search = '';  // Variable para la búsqueda
 
-    // Resetea la página al actualizar la búsqueda
+    protected $paginationTheme = 'tailwind'; // Configuración para Tailwind CSS
+
+    // Reseteamos la página cuando cambia el término de búsqueda
     public function updatingSearch()
     {
         $this->resetPage();
@@ -20,12 +22,16 @@ class RadioIndex extends Component
 
     public function render()
     {
-        $radios = Radio::where('name', 'like', '%' . $this->search . '%')
-                       ->paginate(10); // Paginación de 10 en 10
+        // Filtrar emisoras por nombre utilizando LIKE y paginar
+        $radios = Radio::where('name', 'like', '%' . $this->search . '%')->paginate(10); // Ajusta el número de elementos por página según tus necesidades
 
-        return view('livewire.radio-index', compact('radios'));
+        return view('livewire.radio-index', [
+            'radios' => $radios,
+        ]);
     }
 }
+
+
 
 
 
