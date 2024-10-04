@@ -252,16 +252,19 @@
         {
           "@type": "ListItem",
           "position": {{ $index + 1 }},
-          "url": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}",
-          "name": "{{ $radio->name }}",
-          "image": "{{ Storage::url($radio->img) }}",
-          "description": "Escucha {{ $radio->name }} en {{ $radio->genres->pluck('name')->implode(', ') }}",
-          "genre": "{{ $radio->tags }}"
+          "item": {
+            "@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}",
+            "name": "{{ $radio->name }}",
+            "image": "{{ Storage::url($radio->img) }}",
+            "description": "Escucha {{ $radio->name }} en {{ $radio->genres->pluck('name')->implode(', ') }}",
+            "genre": "{{ $radio->tags }}"
+          }
         }@if(!$loop->last),@endif
         @endforeach
       ]
     }
-</script>
+    </script>
+
 
 
 
