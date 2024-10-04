@@ -253,6 +253,7 @@
           "@type": "ListItem",
           "position": {{ $index + 1 }},
           "item": {
+            "@type": "RadioStation",
             "@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}",
             "name": "{{ $radio->name }}",
             "image": "{{ Storage::url($radio->img) }}",
@@ -264,6 +265,7 @@
       ]
     }
     </script>
+
 
 
 
