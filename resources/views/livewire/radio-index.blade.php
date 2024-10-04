@@ -242,30 +242,6 @@
 </script>
 
 
-<!-- Microdatos estructurados para SEO con Schema.org -->
-<script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": [
-        @foreach($radios as $index => $radio)
-        {
-          "@type": "ListItem",
-          "position": {{ $index + 1 }},
-          "item": {
-            "@type": "RadioStation",
-            "@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}",
-            "name": "{{ $radio->name }}",
-            "image": "{{ Storage::url($radio->img) }}",
-            "description": "Escucha {{ $radio->name }} en {{ $radio->genres->pluck('name')->implode(', ') }}",
-            "genre": "{{ $radio->tags }}"
-          }
-        }@if(!$loop->last),@endif
-        @endforeach
-      ]
-    }
-    </script>
-
 
 
 
