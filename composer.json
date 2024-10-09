@@ -7,10 +7,12 @@
     "require": {
         "php": "^8.2",
         "filament/filament": "3.2.57",
+        "filament/widgets": "^3.2",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "mokhosh/filament-rating": "^1.2",
+        "spatie/laravel-server-monitor": "^1.10",
         "spatie/laravel-sitemap": "^7.2"
     },
     "require-dev": {
