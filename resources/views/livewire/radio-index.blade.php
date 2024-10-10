@@ -4,13 +4,13 @@
         <input
             type="text"
             wire:model.live.500ms="search"
-            class="w-full border border-gray-300 p-2 rounded mb-4"
+            class="w-full border border-gray-300 p-2 rounded mb-2 mt-2"
             placeholder="Buscar emisoras por nombre...">
     </div>
 
     @if($radios->count())
         <!-- Adaptación responsiva para la cuadrícula de tarjetas -->
-        <div id="radio-list" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div id="radio-list" class="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
             @foreach($radios as $radio)
                 <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                     <!-- Imagen cuadrada de la emisora -->
