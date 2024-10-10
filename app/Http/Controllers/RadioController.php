@@ -9,8 +9,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http; // Importación necesaria
 use Illuminate\Support\Facades\Log;  // Importación necesaria para Log
+use App\Models\Visita;
+
+
 
 class RadioController extends Controller
+
+
+
+
 {
     // Método para mostrar la vista de favoritos
     public function favoritos()
@@ -291,6 +298,14 @@ private function getFictitiousListeners($radioId)
     Cache::put($cacheKey, $listeners, now()->addMinutes(1));
 
     return $listeners;
+}
+
+public function reproducirEmisora($radioId)
+{
+    // Lógica para reproducir la emisora...
+
+    // Registrar la visita
+    Visita::create(['radio_id' => $radioId]);
 }
 }
 

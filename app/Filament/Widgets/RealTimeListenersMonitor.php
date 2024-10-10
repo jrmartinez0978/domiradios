@@ -2,61 +2,67 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\LineChartWidget;
+use Filament\Widgets\Widget;
 use App\Models\Radio;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
-class RealTimeListenersMonitor extends LineChartWidget
+class RealTimeListenersMonitor extends Widget
 {
-    protected static ?string $heading = 'Monitor en tiempo real de Oyentes';
+    protected ?string $heading = 'Monitor en tiempo real de Oyentes por Ciudad';
 
-    protected function getData(): array
+
+    protected static string $view = 'filament.widgets.real-time-listeners-monitor';
+
+    public function getListenersData()
     {
-        // Obtener las radios del modelo Radio
-        $radios = Radio::all();
+        // Obtener todas las ciudades (géneros) únicas asociadas a las radios
+        $cities = Radio::with('genres')->get()->pluck('genres')->flatten()->unique('id');
 
-        $labels = [];
-        $listenersData = [];
+        $data = [];
 
-        foreach ($radios as $radio) {
-            // Generar la URL según la fuente del streaming
-            $url = $this->generateStreamingUrl($radio);
+        foreach ($cities as $city) {
+            $cityName = $city->name;
+            $data[$cityName] = [];
 
-            // Si la URL es null, omitir este radio
-            if (is_null($url)) {
-                continue;
-            }
+            $radiosInCity = Radio::whereHas('genres', function ($query) use ($city) {
+                $query->where('genres.id', $city->id);
+            })->get();
 
-            try {
-                // Obtener la información en tiempo real
-                $response = Http::get($url);
-                $data = $response->body();
+            foreach ($radiosInCity as $radio) {
+                // Generar la URL según la fuente del streaming
+                $url = $this->generateStreamingUrl($radio);
 
-                $listenersCount = $this->parseListenersCount($radio->source_radio, $data, $radio->id);
+                // Si la URL es null, omitir esta radio
+                if (is_null($url)) {
+                    continue;
+                }
 
-                $labels[] = $radio->name;
-                $listenersData[] = $listenersCount;
-            } catch (\Exception $e) {
-                // En caso de error, muestra 0 oyentes
-                $labels[] = $radio->name;
-                $listenersData[] = 0;
+                try {
+                    // Obtener la información en tiempo real
+                    $response = Http::get($url);
+                    $dataResponse = $response->body();
+
+                    $listenersCount = $this->parseListenersCount($radio->source_radio, $dataResponse, $radio->id);
+
+                } catch (\Exception $e) {
+                    // En caso de error, muestra 0 oyentes
+                    $listenersCount = 0;
+                }
+
+                // Agregar la información de la emisora a la ciudad correspondiente
+                $data[$cityName][] = [
+                    'radio_name' => $radio->name,
+                    'listeners' => $listenersCount,
+                ];
             }
         }
 
-        // Retornar los datos del gráfico de líneas
-        return [
-            'datasets' => [
-                [
-                    'label' => 'Oyentes en Tiempo Real',
-                    'data' => $listenersData,
-                    'borderColor' => '#4CAF50', // Color de la línea
-                    'fill' => false,
-                ],
-            ],
-            'labels' => $labels,
-        ];
+        return $data;
     }
+
+    // Los demás métodos permanecen iguales...
+    // generateStreamingUrl(), parseListenersCount(), getFictitiousListeners()
 
     // Generar la URL según la fuente de la emisora
     protected function generateStreamingUrl(Radio $radio): ?string
@@ -197,3 +203,4 @@ class RealTimeListenersMonitor extends LineChartWidget
         return $listeners;
     }
 }
+
