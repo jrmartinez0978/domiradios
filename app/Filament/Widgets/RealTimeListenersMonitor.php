@@ -23,6 +23,11 @@ class RealTimeListenersMonitor extends LineChartWidget
             // Generar la URL según la fuente del streaming
             $url = $this->generateStreamingUrl($radio);
 
+            // Si la URL es null, omitir este radio
+            if (is_null($url)) {
+                continue;
+            }
+
             try {
                 // Obtener la información en tiempo real
                 $response = Http::get($url);
@@ -34,6 +39,7 @@ class RealTimeListenersMonitor extends LineChartWidget
                 $listenersData[] = $listenersCount;
             } catch (\Exception $e) {
                 // En caso de error, muestra 0 oyentes
+                $labels[] = $radio->name;
                 $listenersData[] = 0;
             }
         }
@@ -53,9 +59,15 @@ class RealTimeListenersMonitor extends LineChartWidget
     }
 
     // Generar la URL según la fuente de la emisora
-    protected function generateStreamingUrl(Radio $radio): string
+    protected function generateStreamingUrl(Radio $radio): ?string
     {
         $linkRadio = $radio->link_radio;
+
+        // Validar datos básicos
+        if (empty($linkRadio) || empty($radio->source_radio)) {
+            // Si faltan datos esenciales, omitir esta radio
+            return null;
+        }
 
         // Parsear el linkRadio para extraer componentes
         $parsedUrl = parse_url($linkRadio);
@@ -70,38 +82,46 @@ class RealTimeListenersMonitor extends LineChartWidget
             $baseUrl .= ':' . $port;
         }
 
-        switch ($radio->source_radio) {
-            case 'SonicPanel':
+        // Normalizar el valor de source_radio
+        $sourceRadio = strtolower(trim($radio->source_radio));
+
+        switch ($sourceRadio) {
+            case 'sonicpanel':
                 if (!$port) {
                     // Intentar extraer el puerto del path
                     preg_match('/\/(\d+)\//', $path, $matches);
                     if (isset($matches[1])) {
                         $port = $matches[1];
                     } else {
-                        throw new \Exception('No se pudo extraer el puerto para SonicPanel');
+                        // No se pudo extraer el puerto, omitir esta radio
+                        return null;
                     }
                 }
                 return $scheme . '://' . $host . '/cp/get_info.php?p=' . $port;
 
-            case 'Shoutcast':
+            case 'shoutcast':
                 return $baseUrl . '/stats?sid=1';
 
-            case 'Icecast':
+            case 'icecast':
                 return $linkRadio . '.xspf';
 
-            case 'AzuraCast':
+            case 'azuracast':
                 return $baseUrl . '/api/nowplaying';
 
             default:
-                throw new \Exception('Fuente de streaming no soportada');
+                // Fuente de streaming no soportada, omitir esta radio
+                return null;
         }
     }
 
     // Método para analizar el número de oyentes según la fuente
     protected function parseListenersCount($sourceRadio, $data, $radioId)
     {
+        // Normalizar el valor de sourceRadio
+        $sourceRadio = strtolower(trim($sourceRadio));
+
         switch ($sourceRadio) {
-            case 'SonicPanel':
+            case 'sonicpanel':
                 $json = json_decode($data, true);
                 if ($json === null) {
                     throw new \Exception('Error al analizar JSON de SonicPanel');
@@ -109,7 +129,7 @@ class RealTimeListenersMonitor extends LineChartWidget
                 $listeners = $json['listeners'] ?? $this->getFictitiousListeners($radioId);
                 break;
 
-            case 'Shoutcast':
+            case 'shoutcast':
                 $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
                 if ($xml === false) {
                     throw new \Exception('Error al analizar XML de Shoutcast');
@@ -117,7 +137,7 @@ class RealTimeListenersMonitor extends LineChartWidget
                 $listeners = isset($xml->CURRENTLISTENERS) ? (int) $xml->CURRENTLISTENERS : $this->getFictitiousListeners($radioId);
                 break;
 
-            case 'Icecast':
+            case 'icecast':
                 $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
                 if ($xml === false) {
                     throw new \Exception('Error al analizar XML de Icecast');
@@ -141,7 +161,7 @@ class RealTimeListenersMonitor extends LineChartWidget
                 }
                 break;
 
-            case 'AzuraCast':
+            case 'azuracast':
                 $json = json_decode($data, true);
                 if ($json === null) {
                     throw new \Exception('Error al analizar JSON de AzuraCast');
