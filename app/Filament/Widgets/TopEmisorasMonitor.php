@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class TopEmisorasMonitor extends BarChartWidget
 {
-    protected static ?string $heading = 'Top 10 Emisoras Más Visitadas';
+    protected static ?string $heading = 'Emisoras Mas Ecuchadas';
 
     protected static ?int $refreshInterval = 60; // Actualizar cada 60 segundos
 
@@ -78,7 +78,7 @@ class TopEmisorasMonitor extends BarChartWidget
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Top 10 Emisoras Más Visitadas en los Últimos 7 Días',
+                    'text' => 'Top 10 En Los Últimos 7 Días',
                     'font' => [
                         'size' => 16,
                     ],
