@@ -15,9 +15,6 @@ use App\Models\Visita;
 
 class RadioController extends Controller
 
-
-
-
 {
     // Método para mostrar la vista de favoritos
     public function favoritos()
@@ -300,13 +297,21 @@ private function getFictitiousListeners($radioId)
     return $listeners;
 }
 
-public function reproducirEmisora($radioId)
-{
-    // Lógica para reproducir la emisora...
+public function registerPlay(Request $request)
+    {
+        $radioId = $request->input('radio_id');
 
-    // Registrar la visita
-    Visita::create(['radio_id' => $radioId]);
-}
+        // Validar que el radio_id existe
+        if (!Radio::where('id', $radioId)->exists()) {
+            return response()->json(['error' => 'Emisora no encontrada'], 404);
+        }
+
+        // Registrar la visita
+        Visita::create(['radio_id' => $radioId]);
+
+        return response()->json(['message' => 'Visita registrada']);
+    }
+
 }
 
 

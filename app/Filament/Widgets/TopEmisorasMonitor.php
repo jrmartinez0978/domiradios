@@ -2,18 +2,18 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\LineChartWidget;
+use Filament\Widgets\BarChartWidget;
 use App\Models\Radio;
 use App\Models\Visita;
 use Illuminate\Support\Facades\DB;
 
-class TopEmisorasMonitor extends LineChartWidget
+class TopEmisorasMonitor extends BarChartWidget
 {
     protected static ?string $heading = 'Top 10 Emisoras Más Visitadas';
 
     protected static ?int $refreshInterval = 60; // Actualizar cada 60 segundos
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'medium';
 
     protected function getData(): array
     {
@@ -21,72 +21,101 @@ class TopEmisorasMonitor extends LineChartWidget
         $startDate = now()->subDays(6)->startOfDay();
         $endDate = now()->endOfDay();
 
-        // Obtener las visitas por emisora en el rango de fechas
-        $visitas = Visita::select('radio_id', DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupBy('radio_id', 'date')
-            ->get();
-
-        // Obtener los IDs de las 10 emisoras más visitadas en total en el rango de fechas
-        $topEmisorasIds = Visita::select('radio_id', DB::raw('count(*) as total'))
+        // Obtener las visitas totales por emisora en el rango de fechas
+        $visitas = Visita::select('radio_id', DB::raw('count(*) as total'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('radio_id')
             ->orderByDesc('total')
             ->limit(10)
-            ->pluck('radio_id')
-            ->toArray();
+            ->get();
 
-        // Obtener los nombres de las emisoras
-        $emisoras = Radio::whereIn('id', $topEmisorasIds)->pluck('name', 'id')->toArray();
+        // Obtener los nombres de las emisoras, total de visitas y asignar colores
+        $emisoras = [];
+        $totales = [];
+        $backgroundColors = [];
+        $colores = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+            '#9966FF', '#FF9F40', '#E7E9ED', '#8A2BE2',
+            '#00CED1', '#DC143C',
+        ];
+        $contador = 1;
 
-        // Inicializar el arreglo de datos
-        $datasets = [];
-        $labels = [];
-
-        // Generar las etiquetas de fechas para los últimos 7 días
-        $dates = [];
-        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $dates[] = $date->format('Y-m-d');
-            $labels[] = $date->format('d M');
-        }
-
-        // Crear un arreglo para almacenar las visitas por emisora y fecha
-        $dataByEmisora = [];
-        foreach ($topEmisorasIds as $radioId) {
-            $dataByEmisora[$radioId] = array_fill_keys($dates, 0);
-        }
-
-        // Rellenar el arreglo con los datos de visitas
-        foreach ($visitas as $visita) {
-            if (in_array($visita->radio_id, $topEmisorasIds)) {
-                $dataByEmisora[$visita->radio_id][$visita->date] = $visita->total;
-            }
-        }
-
-        // Convertir los datos en datasets para el gráfico
-        foreach ($dataByEmisora as $radioId => $visitasPorFecha) {
-            $datasets[] = [
-                'label' => $emisoras[$radioId] ?? 'Desconocido',
-                'data' => array_values($visitasPorFecha),
-                'borderColor' => $this->getRandomColor(),
-                'fill' => false,
-            ];
+        foreach ($visitas as $index => $visita) {
+            $radio = Radio::find($visita->radio_id);
+            $emisoras[] = "{$contador}. " . ($radio->name ?? 'Desconocido');
+            $totales[] = $visita->total;
+            $backgroundColors[] = $colores[$index % count($colores)];
+            $contador++;
         }
 
         return [
-            'datasets' => $datasets,
-            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Número de Visitas',
+                    'data' => $totales,
+                    'backgroundColor' => $backgroundColors,
+                ],
+            ],
+            'labels' => $emisoras,
         ];
     }
 
-    // Método para obtener un color aleatorio para el dataset
-    private function getRandomColor()
+    protected function getOptions(): array
     {
-        $colors = [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-            '#9966FF', '#FF9F40', '#E7E9ED', '#8A2BE2',
-            '#00CED1', '#DC143C', '#FFD700', '#00FA9A',
+        return [
+            'indexAxis' => 'y', // Gráfico de barras horizontales
+            'scales' => [
+                'x' => [
+                    'beginAtZero' => true,
+                ],
+                'y' => [
+                    'barThickness' => 7, // Ajusta este valor para el grosor de las barras
+                ],
+            ],
+            'plugins' => [
+                'legend' => [
+                    'display' => false,
+                ],
+                'title' => [
+                    'display' => true,
+                    'text' => 'Top 10 Emisoras Más Visitadas en los Últimos 7 Días',
+                    'font' => [
+                        'size' => 16,
+                    ],
+                ],
+                // Configuración de DataLabels (si la estás utilizando)
+                'tooltip' => [
+                    'enabled' => true,
+                ],
+                'datalabels' => [
+                    'anchor' => 'end',
+                    'align' => 'right',
+                    'color' => '#555',
+                    'font' => [
+                        'weight' => 'bold',
+                    ],
+                    'formatter' => function ($value, $context) {
+                        return $value;
+                    },
+                ],
+            ],
         ];
-        return $colors[array_rand($colors)];
+    }
+
+    protected function getChartHeight(): ?int
+    {
+        return 400; // Ajusta este valor para cambiar la altura del gráfico
+    }
+
+    // Incluimos el método para registrar el plugin DataLabels si es necesario
+    protected function getExtraConfig(): array
+    {
+        return [
+            'plugins' => [
+                'datalabels',
+            ],
+        ];
     }
 }
+
+

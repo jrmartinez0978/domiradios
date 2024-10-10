@@ -185,13 +185,18 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-    // Reproductor de audio con intentos de conexión
+    // Reproductor de audio con intentos de conexión y registro de visitas
     document.addEventListener('DOMContentLoaded', function () {
         const audioPlayer = document.getElementById('audio-player');
         const playButton = document.getElementById('play-btn');
+        const radioId = '{{ $radio->id }}';  // ID de la emisora actual
         let connectionAttempts = 0;
         const maxAttempts = 4;
         let isTryingToPlay = false;
+        let hasRegisteredPlay = false;
+
+        // Obtener el token CSRF
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         // Función para reproducir o pausar el audio
         function toggleAudio() {
@@ -201,6 +206,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 connectionAttempts = 0;
                 isTryingToPlay = true;
                 tryPlayAudio();
+
+                // Registrar la visita si aún no se ha hecho
+                if (!hasRegisteredPlay) {
+                    registerPlay();
+                    hasRegisteredPlay = true;
+                }
             } else {
                 audioPlayer.pause();
                 playButton.textContent = 'Reproducir';
@@ -228,6 +239,25 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // Función para registrar la visita al hacer clic en reproducir
+        function registerPlay() {
+            fetch('{{ route('radio.register-play') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({ radio_id: radioId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Visita registrada:', data);
+            })
+            .catch(error => {
+                console.error('Error al registrar la visita:', error);
+            });
+        }
+
         // Evento para reproducir o pausar el audio al hacer clic en el botón
         playButton.addEventListener('click', toggleAudio);
 
@@ -249,8 +279,10 @@ document.addEventListener('DOMContentLoaded', function () {
             playButton.textContent = 'Reproducir';
         });
     });
-    </script>
-    <script type="application/ld+json">
+</script>
+
+
+<script type="application/ld+json">
         {
           "@context": "https://schema.org",
           "@type": "RadioStation",

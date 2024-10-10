@@ -2,23 +2,18 @@
 
 namespace App\Providers;
 
+use Filament\Facades\Filament;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class FilamentServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+    public function boot()
     {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        //
+        Filament::serving(function () {
+            Filament::registerScripts([
+                'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0',
+            ], true);
+        });
     }
 }
+

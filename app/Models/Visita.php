@@ -13,3 +13,4 @@ class Visita extends Model
         return $this->belongsTo(Radio::class);
     }
 }
+

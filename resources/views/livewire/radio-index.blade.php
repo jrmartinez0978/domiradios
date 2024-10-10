@@ -62,6 +62,10 @@
         let reconnectAttempts = 0;
         const maxReconnectAttempts = 2;
         let reconnectTimeout = null;
+        let hasRegisteredPlay = false; // Variable para evitar múltiples registros
+
+        // Obtener el token CSRF
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         /**
          * Resetea el botón a su estado inicial.
@@ -104,6 +108,28 @@
         }
 
         /**
+         * Función para registrar la visita al hacer clic en reproducir
+         * @param {string} radioId - El ID de la emisora
+         */
+        function registerPlay(radioId) {
+            fetch('{{ route('radio.register-play') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({ radio_id: radioId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Visita registrada:', data);
+            })
+            .catch(error => {
+                console.error('Error al registrar la visita:', error);
+            });
+        }
+
+        /**
          * Intenta reconectar la emisora.
          */
         function attemptReconnect() {
@@ -113,6 +139,7 @@
                 currentAudio = null;
                 currentButton = null;
                 reconnectAttempts = 0;
+                hasRegisteredPlay = false; // Reiniciar el registro de reproducción
                 return;
             }
 
@@ -123,6 +150,12 @@
                     currentAudio.play().then(() => {
                         setButtonToStop(currentButton);
                         reconnectAttempts = 0;
+
+                        // Registrar la visita si aún no se ha hecho
+                        if (!hasRegisteredPlay) {
+                            registerPlay(currentAudio.radioId);
+                            hasRegisteredPlay = true;
+                        }
                     }).catch((error) => {
                         setButtonToConnecting(currentButton);
                         attemptReconnect();
@@ -139,6 +172,9 @@
             const radioId = button.getAttribute('data-play-id');
             const streamUrl = button.getAttribute('data-stream-url');
 
+            // Reiniciar la variable hasRegisteredPlay
+            hasRegisteredPlay = false;
+
             // Si otra emisora está sonando, pausarla y resetear su botón
             if (currentAudio && currentAudio.radioId !== radioId) {
                 currentAudio.pause();
@@ -149,6 +185,7 @@
                 currentAudio = null;
                 currentButton = null;
                 reconnectAttempts = 0;
+                hasRegisteredPlay = false; // Reiniciar el registro de reproducción
             }
 
             // Si la misma emisora está sonando, pausarla y resetear el botón
@@ -159,6 +196,7 @@
                 currentButton = null;
                 reconnectAttempts = 0;
                 clearTimeout(reconnectTimeout);
+                hasRegisteredPlay = false; // Reiniciar el registro de reproducción
                 return;
             }
 
@@ -179,6 +217,12 @@
                     currentAudio.play().then(() => {
                         setButtonToStop(currentButton);
                         reconnectAttempts = 0;
+
+                        // Registrar la visita si aún no se ha hecho
+                        if (!hasRegisteredPlay) {
+                            registerPlay(radioId);
+                            hasRegisteredPlay = true;
+                        }
                     }).catch((error) => {
                         // Error al reproducir, intentar reconectar
                         setButtonToConnecting(currentButton);
@@ -219,6 +263,12 @@
             currentAudio.play().then(() => {
                 setButtonToStop(button);
                 reconnectAttempts = 0;
+
+                // Registrar la visita si aún no se ha hecho
+                if (!hasRegisteredPlay) {
+                    registerPlay(radioId);
+                    hasRegisteredPlay = true;
+                }
             }).catch((error) => {
                 setButtonToConnecting(button);
                 attemptReconnect();
@@ -240,6 +290,7 @@
         });
     });
 </script>
+
 
 
 

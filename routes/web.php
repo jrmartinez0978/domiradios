@@ -20,6 +20,8 @@ Route::post('/api/favoritos', function (Request $request) {
     return response()->json($favoritos);
 });
 
+Route::post('/radio/register-play', [RadioController::class, 'registerPlay'])->name('radio.register-play');
+
 // Ruta para el Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
