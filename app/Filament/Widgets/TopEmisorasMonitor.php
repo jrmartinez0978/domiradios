@@ -13,7 +13,7 @@ class TopEmisorasMonitor extends BarChartWidget
 
     protected static ?int $refreshInterval = 60; // Actualizar cada 60 segundos
 
-    protected int|string|array $columnSpan = 'medium';
+    protected int|string|array $columnSpan = 'Small';
 
     protected function getData(): array
     {
