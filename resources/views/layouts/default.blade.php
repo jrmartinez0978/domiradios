@@ -59,17 +59,19 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <header class="bg-white shadow">
+    <header class="bg-stone-300 shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold text-gray-900">
                 <a href="{{ url('/') }}" class="hover:text-blue-500">
-                    @yield('header', 'Domiradios | Emisoras Dominicanas')
+                    <span class="text-blue-500 hover:text-red-500">Domiradios | </span>
+                    <span class="text-red-500 hover:text-white">Emisoras</span>
+                    <span class="text-white hover:text-blue-500">Dominicanas</span>
                 </a>
             </h1>
         </div>
     </header>
 <nav>
-    <ul class="flex justify-center bg-gray-800 text-white py-4">
+    <ul class="flex justify-center bg-gray-200 text-gray-600 py-2">
         <li><a href="/" class="px-6 hover:text-gray-300 transition duration-300">Inicio</a></li>
         <li><a href="/ciudades" class="px-6 hover:text-gray-300 transition duration-300">Ciudades</a></li>
         <li><a href="/favoritos" class="px-6 hover:text-gray-300 transition duration-300">Favoritos</a></li>
@@ -79,7 +81,7 @@
         @yield('content')
     </main>
 
-    <footer class="bg-gray-800 text-white py-4">
+    <footer class="bg-gray-200 text-gray-600 py-2">
         <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <!-- Texto alineado a la izquierda -->
             <p>© 2024 Domiradios - Todos los derechos reservados</p>
