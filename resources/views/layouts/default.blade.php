@@ -59,29 +59,34 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <header class="bg-stone-300 shadow">
+    <header class="bg-blue-200 shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-900">
-                <a href="{{ url('/') }}" class="hover:text-blue-500">
-                    <span class="text-blue-500 hover:text-red-500">Domiradios | </span>
-                    <span class="text-red-500 hover:text-white">Emisoras</span>
-                    <span class="text-white hover:text-blue-500">Dominicanas</span>
-                </a>
-            </h1>
+            <div class="bg-stone-200 rounded-full px-6 py-2 inline-block border border-gray-600">
+                <h1 class="text-3xl font-bold text-gray-900">
+                    <a href="{{ url('/') }}" class="hover:text-blue-500">
+                        <span class="text-blue-500 hover:text-red-500">Domiradios | </span>
+                        <span class="text-red-500 hover:text-blue-500">Emisoras</span>
+                        <span class="text-blue-500 hover:text-red-500">Dominicanas</span>
+                    </a>
+                </h1>
+            </div>
         </div>
     </header>
-<nav>
-    <ul class="flex justify-center bg-gray-200 text-gray-600 py-2">
-        <li><a href="/" class="px-6 hover:text-gray-300 transition duration-300">Inicio</a></li>
-        <li><a href="/ciudades" class="px-6 hover:text-gray-300 transition duration-300">Ciudades</a></li>
-        <li><a href="/favoritos" class="px-6 hover:text-gray-300 transition duration-300">Favoritos</a></li>
-    </ul>
-</nav>
+
+
+    <nav class="border border-blue-300">
+        <ul class="flex justify-center bg-gray-300 text-blue-400 py-2">
+            <li><a href="/" class="px-6 hover:text-red-300 transition duration-300">INICIO</a></li>
+            <li><a href="/ciudades" class="px-6 hover:text-red-300 transition duration-300">CIUDADES</a></li>
+            <li><a href="/favoritos" class="px-6 hover:text-red-300 transition duration-300">FAVORITOS</a></li>
+        </ul>
+    </nav>
+
     <main>
         @yield('content')
     </main>
 
-    <footer class="bg-gray-200 text-gray-600 py-2">
+    <footer class="border border-blue-300 bg-gray-200 text-gray-600 py-2">
         <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <!-- Texto alineado a la izquierda -->
             <p>© 2024 Domiradios - Todos los derechos reservados</p>
