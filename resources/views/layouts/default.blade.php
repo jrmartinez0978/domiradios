@@ -58,29 +58,76 @@
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5MBJX3P"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+    <!-- Header -->
+<header class="shadow-md font-sans tracking-wide relative z-50">
+    <!-- Sección superior con dirección y contacto -->
+    <section class="py-2 bg-blue-500 text-white text-right px-4 sm:px-6 lg:px-10">
+        <p class="text-sm">
+            <strong class="mx-3">Tu</strong>Directorio
+            <strong class="mx-3">De Emisoras</strong>Dominicanas
+        </p>
+    </section>
 
-    <header class="bg-blue-200 shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="bg-stone-200 rounded-full px-6 py-2 inline-block border border-gray-600">
-                <h1 class="text-3xl font-bold text-gray-900">
-                    <a href="{{ url('/') }}" class="hover:text-blue-500">
-                        <span class="text-blue-500 hover:text-red-500">Domiradios | </span>
-                        <span class="text-red-500 hover:text-blue-500">Emisoras</span>
-                        <span class="text-blue-500 hover:text-red-500">Dominicanas</span>
+    <!-- Contenedor principal del header -->
+    <div class="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-4 bg-white">
+        <!-- Logo y Título adaptados -->
+        <a href="{{ url('/') }}" class="flex items-center">
+            <!-- Logo (opcional) -->
+            <!-- <img src="https://tusitio.com/logo.png" alt="logo" class="w-36" /> -->
+            <!-- Título -->
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 ml-2">
+                <span class="text-blue-500 hover:text-red-500">Domiradios | </span>
+                <span class="text-red-500 hover:text-blue-500">Emisoras</span>
+                <span class="text-blue-500 hover:text-red-500">Dominicanas</span>
+            </h1>
+        </a>
+
+        <!-- Botón para abrir el menú móvil -->
+        <button id="menuToggle" class="lg:hidden focus:outline-none">
+            <svg class="w-7 h-7" fill="#000" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M3 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 5h14a1 1 0 010 2H3a1 1 0 110-2z"
+                    clip-rule="evenodd"></path>
+            </svg>
+        </button>
+
+        <!-- Menú de navegación -->
+        <nav id="navMenu" class="hidden lg:flex lg:items-center w-full lg:w-auto">
+            <ul class="flex flex-col lg:flex-row lg:gap-x-5 mt-4 lg:mt-0">
+                <!-- Enlaces de navegación -->
+                <li class="border-b lg:border-0">
+                    <a href="{{ url('/') }}" class="block px-4 py-2 lg:py-0 text-blue-500 hover:text-blue-700 font-bold">
+                        Inicio
                     </a>
-                </h1>
-            </div>
-        </div>
-    </header>
+                </li>
+                <li class="border-b lg:border-0">
+                    <a href="{{ url('/ciudades') }}" class="block px-4 py-2 lg:py-0 text-gray-700 hover:text-blue-500 font-bold">
+                        Ciudades
+                    </a>
+                </li>
+                <li class="border-b lg:border-0">
+                    <a href="{{ url('/favoritos') }}" class="block px-4 py-2 lg:py-0 text-gray-700 hover:text-blue-500 font-bold">
+                        Favoritos
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
 
+<!-- JavaScript para el menú móvil -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
 
-    <nav class="border border-blue-300">
-        <ul class="flex justify-center bg-gray-300 text-blue-400 py-2">
-            <li><a href="/" class="px-6 hover:text-red-300 transition duration-300">INICIO</a></li>
-            <li><a href="/ciudades" class="px-6 hover:text-red-300 transition duration-300">CIUDADES</a></li>
-            <li><a href="/favoritos" class="px-6 hover:text-red-300 transition duration-300">FAVORITOS</a></li>
-        </ul>
-    </nav>
+        menuToggle.addEventListener('click', function () {
+            navMenu.classList.toggle('hidden');
+        });
+    });
+</script>
+<!-- Fin del header -->
+
 
     <main>
         @yield('content')
@@ -103,6 +150,7 @@
 
 
     @livewireScripts
+    @stack('modals')
     @vite('resources/js/app.js') <!-- Incluir el JavaScript compilado -->
 </body>
 </html>

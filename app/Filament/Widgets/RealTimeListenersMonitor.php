@@ -13,6 +13,7 @@ class RealTimeListenersMonitor extends Widget
 
 
     protected static string $view = 'filament.widgets.real-time-listeners-monitor';
+    protected static ?int $sort = 2; // Colocar encima, orden más bajo
 
     public function getListenersData()
     {

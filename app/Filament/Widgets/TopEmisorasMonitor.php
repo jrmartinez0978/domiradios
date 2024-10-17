@@ -1,5 +1,5 @@
 <?php
-
+// codigo original que funciona
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\BarChartWidget;
@@ -9,19 +9,19 @@ use Illuminate\Support\Facades\DB;
 
 class TopEmisorasMonitor extends BarChartWidget
 {
-    protected static ?string $heading = 'Emisoras Mas Ecuchadas';
+    protected static ?string $heading = 'Emisoras Más Escuchadas';
+    protected static ?int $sort = 3; // Colocar encima, orden más bajo
 
-    protected static ?int $refreshInterval = 60; // Actualizar cada 60 segundos
+    protected static ?int $refreshInterval = 15; // Actualizar cada 15 segundos
 
     protected int|string|array $columnSpan = 'Small';
 
+    // Obtener los datos para el gráfico
     protected function getData(): array
     {
-        // Obtener el rango de fechas para los últimos 7 días
         $startDate = now()->subDays(6)->startOfDay();
         $endDate = now()->endOfDay();
 
-        // Obtener las visitas totales por emisora en el rango de fechas
         $visitas = Visita::select('radio_id', DB::raw('count(*) as total'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('radio_id')
@@ -29,7 +29,6 @@ class TopEmisorasMonitor extends BarChartWidget
             ->limit(10)
             ->get();
 
-        // Obtener los nombres de las emisoras, total de visitas y asignar colores
         $emisoras = [];
         $totales = [];
         $backgroundColors = [];
@@ -60,6 +59,7 @@ class TopEmisorasMonitor extends BarChartWidget
         ];
     }
 
+    // Opciones del gráfico
     protected function getOptions(): array
     {
         return [
@@ -83,39 +83,20 @@ class TopEmisorasMonitor extends BarChartWidget
                         'size' => 16,
                     ],
                 ],
-                // Configuración de DataLabels (si la estás utilizando)
-                'tooltip' => [
-                    'enabled' => true,
-                ],
-                'datalabels' => [
-                    'anchor' => 'end',
-                    'align' => 'right',
-                    'color' => '#555',
-                    'font' => [
-                        'weight' => 'bold',
-                    ],
-                    'formatter' => function ($value, $context) {
-                        return $value;
-                    },
-                ],
             ],
         ];
     }
 
-    protected function getChartHeight(): ?int
+    // Método para borrar los datos
+    public function borrarDatos()
     {
-        return 400; // Ajusta este valor para cambiar la altura del gráfico
+        Visita::truncate(); // Borrar todos los registros de visitas
+
+        // Emitir un evento para recargar el gráfico
+        $this->emit('refreshChart');
     }
 
-    // Incluimos el método para registrar el plugin DataLabels si es necesario
-    protected function getExtraConfig(): array
-    {
-        return [
-            'plugins' => [
-                'datalabels',
-            ],
-        ];
-    }
+    // Listener para actualizar el gráfico en tiempo real
+    protected $listeners = ['refreshChart' => 'getData'];
 }
-
 
