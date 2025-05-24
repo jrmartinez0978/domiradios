@@ -8,17 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\SitemapController;
 
 // Ruta para la página de inicio
-Route::get('/', function () {
-    return view('emisoras');
-})->name('inicio');
-
-// Ruta para obtener emisoras favoritas (si no estás usando autenticación)
-Route::post('/api/favoritos', function (Request $request) {
-    $ids = $request->input('ids', []);
-    $favoritos = Radio::whereIn('id', $ids)->get();
-
-    return response()->json($favoritos);
-});
+Route::get('/', [RadioController::class, 'index'])->name('emisoras.index');
 
 Route::post('/radio/register-play', [RadioController::class, 'registerPlay'])->name('radio.register-play');
 
