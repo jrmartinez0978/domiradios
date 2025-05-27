@@ -361,6 +361,57 @@ document.addEventListener('DOMContentLoaded', function () {
         audioPlayer.addEventListener('ended', function () {
             playButton.textContent = 'Reproducir';
         });
+        
+        // Configurar MediaSession API para mostrar información en la pantalla de bloqueo
+        if ('mediaSession' in navigator) {
+            audioPlayer.addEventListener('play', updateMediaSession);
+            
+            // Actualizar la información de MediaSession
+            function updateMediaSession() {
+                let track = document.getElementById('current-track').textContent;
+                if (track === 'Cargando canción...') {
+                    track = '{{ $radio->name }} - En vivo';
+                }
+                
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: track,
+                    artist: '{{ $radio->name }}',
+                    album: '{{ Str::of($radio->tags)->explode(',')->first() }}',
+                    artwork: [
+                        { src: '{{ url(Storage::url($radio->img)) }}', sizes: '96x96', type: 'image/png' },
+                        { src: '{{ url(Storage::url($radio->img)) }}', sizes: '128x128', type: 'image/png' },
+                        { src: '{{ url(Storage::url($radio->img)) }}', sizes: '192x192', type: 'image/png' },
+                        { src: '{{ url(Storage::url($radio->img)) }}', sizes: '256x256', type: 'image/png' },
+                        { src: '{{ url(Storage::url($radio->img)) }}', sizes: '384x384', type: 'image/png' },
+                        { src: '{{ url(Storage::url($radio->img)) }}', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+                
+                // Configurar los controladores de acciones para MediaSession
+                navigator.mediaSession.setActionHandler('play', () => { 
+                    audioPlayer.play();
+                    playButton.textContent = 'Pausar';
+                });
+                
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    audioPlayer.pause();
+                    playButton.textContent = 'Reproducir';
+                });
+            }
+            
+            // Actualizar la metadata cada vez que cambie la canción actual
+            const trackObserver = new MutationObserver(() => {
+                if (audioPlayer.paused === false) {
+                    updateMediaSession();
+                }
+            });
+            
+            trackObserver.observe(document.getElementById('current-track'), {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+        }
     });
 </script>
 

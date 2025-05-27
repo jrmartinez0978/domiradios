@@ -322,6 +322,9 @@
 
                 currentAudio.addEventListener('playing', function() {
                     setButtonToStop(currentButton);
+                    
+                    // Actualizar MediaSession para la pantalla de bloqueo
+                    updateMediaSession(radioId);
                 });
 
                 currentAudio.addEventListener('pause', function() {
@@ -373,6 +376,49 @@
             }
         });
 
+        // Función para actualizar la MediaSession API (control en pantalla de bloqueo)
+        function updateMediaSession(radioId) {
+            if ('mediaSession' in navigator) {
+                // Buscar la información de la radio por su ID
+                const radioCard = document.querySelector(`[data-play-id="${radioId}"]`).closest('article');
+                const radioName = radioCard.querySelector('[itemprop="name"]').textContent.trim();
+                const radioImage = radioCard.querySelector('[itemprop="image"]').getAttribute('src');
+                const radioGenre = radioCard.querySelector('.radio-genre') ? 
+                                   radioCard.querySelector('.radio-genre').textContent.trim() : 
+                                   'Radio en vivo';
+                
+                // Establecer los metadatos de la sesión multimedia
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: radioName + ' - En vivo',
+                    artist: radioName,
+                    album: radioGenre,
+                    artwork: [
+                        { src: radioImage, sizes: '96x96', type: 'image/png' },
+                        { src: radioImage, sizes: '128x128', type: 'image/png' },
+                        { src: radioImage, sizes: '192x192', type: 'image/png' },
+                        { src: radioImage, sizes: '256x256', type: 'image/png' },
+                        { src: radioImage, sizes: '384x384', type: 'image/png' },
+                        { src: radioImage, sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+                
+                // Configurar los controladores de acciones para MediaSession
+                navigator.mediaSession.setActionHandler('play', () => { 
+                    if (currentAudio && currentButton) {
+                        currentAudio.play();
+                        setButtonToStop(currentButton);
+                    }
+                });
+                
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    if (currentAudio && currentButton) {
+                        currentAudio.pause();
+                        resetButton(currentButton);
+                    }
+                });
+            }
+        }
+        
         // Manejar actualizaciones de Livewire para mantener la funcionalidad de los botones
         Livewire.hook('message.processed', (message, component) => {
             // No es necesario hacer nada aquí ya que usamos delegación de eventos
