@@ -7,8 +7,16 @@ use App\Models\Radio;
 use Illuminate\Http\Request;
 use App\Http\Controllers\SitemapController;
 
-// Ruta para la página de inicio
+// Ruta para la página de inicio (todas las emisoras)
 Route::get('/', [RadioController::class, 'index'])->name('emisoras.index');
+
+// Ruta para búsqueda de emisoras
+Route::get('/buscar', [RadioController::class, 'buscar'])->name('buscar');
+
+// Ruta para agregar a favoritos
+Route::post('/favoritos/agregar/{id}', function($id) {
+    return response()->json(['success' => true]);
+})->name('agregar.favorito');
 
 Route::post('/radio/register-play', [RadioController::class, 'registerPlay'])->name('radio.register-play');
 
@@ -16,8 +24,16 @@ Route::post('/radio/register-play', [RadioController::class, 'registerPlay'])->n
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Rutas para las páginas legales
-Route::get('/appdomiradios/privacy-policy', PrivacyPolicy::class);
-Route::get('/appdomiradios/terms-and-conditions', TermsAndConditions::class);
+Route::get('/terminos', function() { return view('livewire.terms-and-conditions'); })->name('terminos');
+Route::get('/privacidad', function() { return view('livewire.privacy-policy'); })->name('privacidad');
+
+// Ruta para la página de contacto
+Route::get('/contacto', [App\Http\Controllers\ContactoController::class, 'index'])->name('contacto');
+Route::post('/contacto', [App\Http\Controllers\ContactoController::class, 'store'])->name('contacto.store');
+
+// Rutas para valoración de emisoras
+Route::post('/emisoras/rate', [App\Http\Controllers\RatingController::class, 'rateRadio'])->name('emisoras.rate');
+Route::get('/emisoras/user-rating/{radio}', [App\Http\Controllers\RatingController::class, 'getUserRating'])->name('emisoras.user-rating');
 
 // Ruta para mostrar los detalles de una emisora por su slug
 Route::get('/emisoras/{slug}', [RadioController::class, 'show'])->name('emisoras.show');

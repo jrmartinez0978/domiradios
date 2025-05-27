@@ -53,76 +53,78 @@
 
     @livewireStyles
 </head>
-<body class="antialiased bg-gray-100">
+<body class="antialiased bg-gray-50">
+    <!-- Añadimos estilos para las animaciones -->
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out forwards;
+        }
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5MBJX3P"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <!-- Header -->
-<header class="shadow-md font-sans tracking-wide relative z-50">
-    <!-- Sección superior con dirección y contacto -->
-    <section class="py-2 bg-blue-500 text-white text-right px-4 sm:px-6 lg:px-10">
-        <p class="text-sm">
-            <strong class="mx-3">Tu</strong>Directorio
-            <strong class="mx-3">De Emisoras</strong>Dominicanas
-        </p>
-    </section>
-
-    <!-- Contenedor principal del header -->
-    <div class="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-4 bg-white">
-        <!-- Logo y Título adaptados -->
-        <a href="{{ url('/') }}" class="flex items-center">
-            <!-- Logo (opcional) -->
-            <!-- <img src="https://tusitio.com/logo.png" alt="logo" class="w-36" /> -->
-            <!-- Título -->
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 ml-2">
-                <span class="text-blue-500 hover:text-red-500">Domiradios | </span>
-                <span class="text-red-500 hover:text-blue-500">Emisoras</span>
-                <span class="text-blue-500 hover:text-red-500">Dominicanas</span>
-            </h1>
-        </a>
-
-        <!-- Botón para abrir el menú móvil -->
-        <button id="menuToggle" class="lg:hidden focus:outline-none">
-            <svg class="w-7 h-7" fill="#000" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                    d="M3 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 5h14a1 1 0 010 2H3a1 1 0 110-2z"
-                    clip-rule="evenodd"></path>
-            </svg>
-        </button>
-
-        <!-- Menú de navegación -->
-        <nav id="navMenu" class="hidden lg:flex lg:items-center w-full lg:w-auto">
-            <ul class="flex flex-col lg:flex-row lg:gap-x-5 mt-4 lg:mt-0">
-                <!-- Enlaces de navegación -->
-                <li class="border-b lg:border-0">
-                    <a href="{{ url('/') }}" class="block px-4 py-2 lg:py-0 text-blue-500 hover:text-blue-700 font-bold">
-                        Inicio
-                    </a>
-                </li>
-                <li class="border-b lg:border-0">
-                    <a href="{{ url('/ciudades') }}" class="block px-4 py-2 lg:py-0 text-gray-700 hover:text-blue-500 font-bold">
-                        Ciudades
-                    </a>
-                </li>
-                <li class="border-b lg:border-0">
-                    <a href="{{ url('/favoritos') }}" class="block px-4 py-2 lg:py-0 text-gray-700 hover:text-blue-500 font-bold">
-                        Favoritos
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</header>
-
-<!-- JavaScript para el menú móvil -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const menuToggle = document.getElementById('menuToggle');
-        const navMenu = document.getElementById('navMenu');
+    {{-- <header class="relative bg-cover bg-center header-bg text-white overflow-hidden">
+      <div class="backdrop-brightness-90">
+        <div class="container max-w-6xl py-16 xl:py-24 text-center">
+          <h1 class="text-5xl xl:text-7xl font-extrabold drop-shadow-lg">
+            Domiradios
+          </h1>
+          <p class="mt-4 text-lg xl:text-2xl opacity-95">
+            Directorio dominicano de emisoras
+          </p>
+          {{-- @livewire('search-emisoras') --}} {{-- Mantenido tu componente existente, temporalmente comentado --}}
+        </div>
+      </div>
+    </header> --}}
 
         menuToggle.addEventListener('click', function () {
+            // Toggle para la clase hidden
             navMenu.classList.toggle('hidden');
+            
+            // Animación del botón
+            this.classList.toggle('bg-emerald-100');
+            
+            // Si el menú está visible, añadir animación de entrada
+            if (!navMenu.classList.contains('hidden')) {
+                navMenu.classList.add('animate-fadeIn');
+                // Animación para cada elemento del menú
+                const menuItems = navMenu.querySelectorAll('li');
+                menuItems.forEach((item, index) => {
+                    item.style.animationDelay = `${index * 0.05}s`;
+                    item.classList.add('animate-slideIn');
+                });
+            } else {
+                navMenu.classList.remove('animate-fadeIn');
+                const menuItems = navMenu.querySelectorAll('li');
+                menuItems.forEach(item => {
+                    item.classList.remove('animate-slideIn');
+                });
+            }
+        });
+        
+        // Cerrar el menú al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            if (!navMenu.classList.contains('hidden') && 
+                !navMenu.contains(event.target) && 
+                !menuToggle.contains(event.target)) {
+                navMenu.classList.add('hidden');
+                menuToggle.classList.remove('bg-emerald-100');
+            }
         });
     });
 </script>
@@ -133,20 +135,20 @@
         @yield('content')
     </main>
 
-    <footer class="border border-blue-300 bg-gray-200 text-gray-600 py-2">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-            <!-- Texto alineado a la izquierda -->
-            <p>© 2024 Domiradios - Todos los derechos reservados</p>
-
-            <!-- Navegación alineada a la derecha -->
-            <nav>
-                <ul class="flex space-x-4">
-                    <li><a href="/appdomiradios/terms-and-conditions" class="hover:text-gray-300 transition duration-300">Términos y Condiciones</a></li>
-                    <li><a href="/appdomiradios/privacy-policy" class="hover:text-gray-300 transition duration-300">Política de Privacidad</a></li>
-                </ul>
-            </nav>
+    {{-- <footer class="bg-brand-blue text-white text-sm">
+      <div class="container max-w-6xl py-12 grid gap-10 md:grid-cols-3">
+        {{-- bloque 1 --}}
+        <div>
+          <h4 class="font-semibold mb-3 text-lg">Domiradios</h4>
+          <p>© {{ date('Y') }} Domiradios. Todos los derechos reservados.</p>
         </div>
-    </footer>
+        {{-- bloques 2‑3 con links estáticos --}}
+        <x-domiradios.footer-links />
+      </div>
+      <div class="text-center py-4 bg-brand-red text-xs">
+        Hecho con ❤️ en RD
+      </div>
+    </footer> --}}
 
 
     @livewireScripts

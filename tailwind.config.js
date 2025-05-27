@@ -7,7 +7,13 @@ module.exports = {
     './resources/**/*.html',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'brand-red':  '#E21C25',
+        'brand-blue': '#003A70',
+        'brand-gray': '#F5F7FA',
+      },
+    },
   },
   plugins: [],
 }

@@ -1,6 +1,15 @@
-@section('title', 'Terms and Conditions')
-<div class="max-w-3xl mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-6">TERMS AND CONDITIONS</h1>
+@extends('layouts.app')
+
+@section('title', 'Términos y Condiciones - Domiradios')
+@section('meta_description', 'Términos y condiciones de uso de Domiradios. Información sobre los derechos y obligaciones al utilizar nuestro servicio.')
+
+@section('content')
+<div class="container max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 md:p-8 border border-gray-100">
+        <h1 class="text-3xl font-bold mb-3 text-gray-800 flex items-center">
+            <span class="text-brand-blue mr-3"><i class="fas fa-gavel"></i></span>
+            Términos y Condiciones
+        </h1>
 
     <h2 class="text-2xl font-semibold mt-8 mb-4">Introduction</h2>
     <p class="mb-4">

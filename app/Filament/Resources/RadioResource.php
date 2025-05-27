@@ -133,44 +133,139 @@ class RadioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->label('Name')->searchable(),
-                Tables\Columns\ImageColumn::make('img')->label('Image')->sortable(),
-                Tables\Columns\TextColumn::make('type_radio')->label('Format')->searchable(),
-                Tables\Columns\TextColumn::make('source_radio')->label('Source')->searchable(),
-                Tables\Columns\TextColumn::make('link_radio')->label('Link')->searchable(),
-                Tables\Columns\IconColumn::make('isFeatured')->label('Featured')->boolean(),
-                Tables\Columns\IconColumn::make('isActive')->label('Active')->boolean(),
+                Tables\Columns\TextColumn::make('name')->label('Nombre')->searchable(),
+                Tables\Columns\ImageColumn::make('img')->label('Imagen')->sortable(),
+                Tables\Columns\TextColumn::make('type_radio')->label('Formato')->searchable(),
+                Tables\Columns\TextColumn::make('bitrate')->label('Frecuencia')->searchable(),
+                Tables\Columns\TextColumn::make('source_radio')
+                    ->label('Origen')
+                    ->searchable()
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'user_submitted' => 'warning',
+                        default => 'primary',
+                    }),
+                Tables\Columns\IconColumn::make('isFeatured')->label('Destacada')->boolean(),
+                Tables\Columns\IconColumn::make('isActive')
+                    ->label('Activa')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
 
                 // Columna de clasificación (rating) en la tabla
-                RatingColumn::make('rating')
-                    ->stars(5),  // Número de estrellas en la tabla
+                RatingColumn::make('rating')->stars(5),
+                
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Fecha creación')
+                    ->dateTime('d/m/Y')
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('genre')
                     ->relationship('genres', 'name')
-                    ->label('Filter by Genre'),
+                    ->label('Filtrar por Ciudad/Género'),
+                Tables\Filters\SelectFilter::make('source_radio')
+                    ->options([
+                        'user_submitted' => 'Emisoras enviadas por usuarios',
+                        'AzuraCast' => 'AzuraCast',
+                        'SonicPanel' => 'SonicPanel',
+                        'Shoutcast' => 'Shoutcast',
+                        'Icecast' => 'Icecast',
+                        'Other' => 'Otros',
+                    ])
+                    ->label('Filtrar por Origen'),
                 Tables\Filters\Filter::make('featured')
-                    ->label('Featured Radios')
+                    ->label('Emisoras Destacadas')
                     ->query(fn (Builder $query): Builder => $query->where('isFeatured', true)),
+                Tables\Filters\Filter::make('inactive')
+                    ->label('Emisoras Pendientes de Activación')
+                    ->query(fn (Builder $query): Builder => $query->where('isActive', false)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                
+                // Botón para activar una emisora (visible solo cuando está inactiva)
+                Tables\Actions\Action::make('activateRadio')
+                    ->label('Activar Emisora')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (Radio $record): bool => !$record->isActive && $record->source_radio === 'user_submitted')
+                    ->action(function (Radio $record) {
+                        $record->isActive = true;
+                        $record->save();
+                        
+                        // Opcional: Enviar un correo al usuario notificando la activación
+                        // Mail::to('usuario@example.com')->send(new \App\Mail\RadioActivated($record));
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Activar esta emisora')
+                    ->modalDescription('¿Estás seguro de que deseas activar esta emisora? Una vez activada, estará visible para todos los usuarios.')
+                    ->modalSubmitActionLabel('Sí, activar emisora'),
+                
+                // Botón para destacar/quitar destacado
                 Tables\Actions\Action::make('toggleFeatured')
-                    ->label('Toggle Featured')
+                    ->label(fn (Radio $record): string => $record->isFeatured ? 'Quitar destacado' : 'Destacar')
+                    ->icon('heroicon-o-star')
+                    ->color(fn (Radio $record): string => $record->isFeatured ? 'warning' : 'primary')
                     ->action(function (Radio $record) {
                         $record->isFeatured = !$record->isFeatured;
                         $record->save();
                     }),
+                
+                // Botón para activar/desactivar (general)
                 Tables\Actions\Action::make('toggleActive')
-                    ->label('Toggle Active')
+                    ->label(fn (Radio $record): string => $record->isActive ? 'Desactivar' : 'Activar')
+                    ->icon(fn (Radio $record): string => $record->isActive ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                    ->color(fn (Radio $record): string => $record->isActive ? 'danger' : 'success')
                     ->action(function (Radio $record) {
                         $record->isActive = !$record->isActive;
                         $record->save();
                     }),
+                
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
+                Tables\Actions\BulkAction::make('activateBulk')
+                    ->label('Activar Emisoras Seleccionadas')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->action(function ($records) {
+                        foreach ($records as $record) {
+                            $record->isActive = true;
+                            $record->save();
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Activar emisoras seleccionadas')
+                    ->modalDescription('¿Estás seguro de que deseas activar todas las emisoras seleccionadas? Estarán visibles para todos los usuarios.')
+                    ->modalSubmitActionLabel('Sí, activar emisoras'),
+                    
+                Tables\Actions\BulkAction::make('featureBulk')
+                    ->label('Destacar Emisoras Seleccionadas')
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
+                    ->action(function ($records) {
+                        foreach ($records as $record) {
+                            $record->isFeatured = true;
+                            $record->save();
+                        }
+                    }),
+                    
+                Tables\Actions\BulkAction::make('deactivateBulk')
+                    ->label('Desactivar Emisoras Seleccionadas')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->action(function ($records) {
+                        foreach ($records as $record) {
+                            $record->isActive = false;
+                            $record->save();
+                        }
+                    })
+                    ->requiresConfirmation(),
+                    
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }

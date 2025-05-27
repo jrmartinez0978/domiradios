@@ -1,46 +1,97 @@
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="bg-white shadow sm:rounded-lg p-6">
-        <!-- Barra de búsqueda -->
-        <input
-            type="text"
-            wire:model.live.500ms="search"
-            class="w-full border border-gray-300 p-2 rounded mb-2 mt-2"
-            placeholder="Buscar emisoras por nombre...">
-    </div>
+<div>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <!-- Barra de búsqueda Livewire -->
+            <input
+                type="text"
+                wire:model.live.500ms="search"
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring focus:ring-brand-blue/30 focus:border-brand-blue transition"
+                placeholder="Buscar emisoras por nombre...">
+        </div>
 
-    @if($radios->count())
+        @if($radios->count())
         <!-- Adaptación responsiva para la cuadrícula de tarjetas -->
         <div id="radio-list" class="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
             @foreach($radios as $radio)
-                <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                    <!-- Imagen cuadrada de la emisora -->
-                    <div class="aspect-w-1 aspect-h-1">
-                        <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}">
-                            <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-full object-cover rounded-md lazyload">
+                <article class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative" itemscope itemtype="http://schema.org/RadioStation">
+                    <!-- Badge superior para destacados -->
+                    @if($radio->isFeatured)
+                    <div class="absolute top-2 right-2 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-10 shadow-md backdrop-blur-sm bg-opacity-90 transform hover:scale-105 transition-all duration-300 animate-pulse-slow">
+                        <i class="fas fa-star text-yellow-300 mr-1"></i> Destacada
+                    </div>
+                    @endif
+                    
+                    <!-- Imagen cuadrada de la emisora con efecto hover -->
+                    <div class="aspect-w-1 aspect-h-1 overflow-hidden group">
+                        <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}" aria-label="Ver detalles de {{ $radio->name }}">
+                            <meta itemprop="url" content="{{ route('emisoras.show', ['slug' => $radio->slug]) }}">
+                            <img 
+                                src="{{ Storage::url($radio->img) }}" 
+                                alt="{{ $radio->name }} - Emisora de radio {{ $radio->bitrate }}" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 lazyload"
+                                itemprop="image"
+                                loading="lazy"
+                            >
                         </a>
                     </div>
-                    <!-- Título con enlace a la página de detalles -->
-                    <h2 class="text-xl font-bold mt-4">
-                        <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}" class="hover:text-blue-500 transition-colors">
-                            {{ $radio->name }}
-                        </a>
-                    </h2>
-                    <p class="text-sm text-gray-600">Frecuencia: {{ $radio->bitrate }}</p>
-                    <p class="text-sm text-gray-600">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
-                    <p class="text-sm text-gray-600">Género: {{ explode(',', $radio->tags)[0] }}</p>
-
-                    <!-- Reproductor de audio con botón Play/Stop -->
-                    <div class="mt-4">
-                        <div class="mb-4">
+                    
+                    <!-- Contenido de la tarjeta -->
+                    <div class="p-4">
+                        <!-- Título con enlace a la página de detalles -->
+                        <h2 class="text-xl font-bold mb-2 line-clamp-1" itemprop="name">
+                            <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}" class="hover:text-brand-blue transition-colors">
+                                {{ $radio->name }}
+                            </a>
+                        </h2>
+                        
+                        <!-- Valoración con estrellas -->
+                        <div class="flex items-center mb-3">
+                            <div class="flex">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fa fa-star {{ $i <= $radio->rating ? 'text-yellow-400' : 'text-gray-300' }} text-sm"></i>
+                                @endfor
+                            </div>
+                            <span class="text-sm text-gray-600 ml-1" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+                                <meta itemprop="ratingValue" content="{{ $radio->rating }}">
+                                <meta itemprop="bestRating" content="5">
+                                <meta itemprop="worstRating" content="1">
+                                <span itemprop="ratingCount">{{ number_format($radio->rating, 1) }}</span>
+                            </span>
+                        </div>
+                        
+                        <!-- Datos de la emisora con iconos -->
+                        <div class="space-y-1 mb-3">
+                            <p class="text-sm text-gray-600 flex items-center" itemprop="frequency">
+                                <i class="fas fa-broadcast-tower text-brand-blue mr-2"></i> {{ $radio->bitrate }}
+                            </p>
+                            <p class="text-sm text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt text-brand-red mr-2"></i> 
+                                <span itemprop="location">{{ $radio->genres->pluck('name')->implode(', ') }}</span>
+                            </p>
+                            <p class="text-sm text-gray-600 flex items-center">
+                                <i class="fas fa-music text-brand-blue mr-2"></i> 
+                                <span itemprop="genre">{{ Str::of($radio->tags)->explode(',')->first() }}</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Botón de reproducción con gradiente -->
+                        <div class="mt-4">
                             <button
                                 data-play-id="{{ $radio->id }}"
                                 data-stream-url="{{ $radio->link_radio }}"
-                                class="play-btn w-full bg-green-700 text-white py-2 rounded hover:bg-green-800">
-                                Reproducir
+                                class="play-btn w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center font-medium"
+                                itemprop="audio"
+                                itemscope 
+                                itemtype="http://schema.org/AudioObject"
+                            >
+                                <meta itemprop="contentUrl" content="{{ $radio->link_radio }}">
+                                <span class="flex items-center justify-center">
+                                    <i class="fas fa-play mr-2"></i> Reproducir
+                                </span>
                             </button>
                         </div>
                     </div>
-                </div>
+                </article>
             @endforeach
         </div>
 
@@ -49,8 +100,11 @@
             {{ $radios->links() }} <!-- Enlaces de paginación de Livewire -->
         </div>
     @else
-        <p>No se encontraron emisoras.</p>
+        <div class="text-center py-12">
+            <p class="text-gray-500">No se encontraron emisoras que coincidan con tu búsqueda.</p>
+        </div>
     @endif
+    </div>
 </div>
 
 <!-- JavaScript para manejar la reproducción de radios -->
@@ -68,13 +122,22 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         /**
-         * Resetea el botón a su estado inicial.
+         * Resetea el botón a su estado inicial (Reproducir).
          * @param {HTMLElement} button - El botón a resetear.
          */
         function resetButton(button) {
-            button.textContent = 'Reproducir';
-            button.classList.remove('bg-red-700', 'bg-gray-500', 'bg-yellow-500', 'hover:bg-gray-600', 'hover:bg-red-800', 'hover:bg-yellow-600');
-            button.classList.add('bg-green-700', 'hover:bg-green-800');
+            // Limpiamos todas las clases de estado posibles
+            button.classList.remove(
+                'bg-gradient-to-r', 'from-red-500', 'to-red-600', 'from-yellow-500', 'to-orange-500', 
+                'from-gray-500', 'to-gray-600', 'from-emerald-500', 'to-green-600',
+                'hover:shadow-red-200', 'hover:shadow-yellow-200', 'hover:shadow-gray-200', 'hover:shadow-green-200'
+            );
+            
+            // Aplicamos el estilo para "Reproducir"
+            button.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-green-600', 'hover:shadow-green-200');
+            
+            // Actualizamos el contenido
+            button.innerHTML = '<span class="flex items-center justify-center"><i class="fas fa-play mr-2"></i> Reproducir</span>';
         }
 
         /**
@@ -82,9 +145,18 @@
          * @param {HTMLElement} button - El botón a cambiar.
          */
         function setButtonToStop(button) {
-            button.textContent = 'Detener';
-            button.classList.remove('bg-green-700', 'hover:bg-green-800', 'bg-gray-500', 'bg-yellow-500', 'hover:bg-gray-600', 'hover:bg-yellow-600');
-            button.classList.add('bg-red-700', 'hover:bg-red-800');
+            // Limpiamos todas las clases de estado posibles
+            button.classList.remove(
+                'bg-gradient-to-r', 'from-red-500', 'to-red-600', 'from-yellow-500', 'to-orange-500', 
+                'from-gray-500', 'to-gray-600', 'from-emerald-500', 'to-green-600',
+                'hover:shadow-red-200', 'hover:shadow-yellow-200', 'hover:shadow-gray-200', 'hover:shadow-green-200'
+            );
+            
+            // Aplicamos el estilo para "Detener"
+            button.classList.add('bg-gradient-to-r', 'from-red-500', 'to-red-600', 'hover:shadow-red-200');
+            
+            // Actualizamos el contenido
+            button.innerHTML = '<span class="flex items-center justify-center"><i class="fas fa-stop mr-2"></i> Detener</span>';
         }
 
         /**
@@ -92,9 +164,18 @@
          * @param {HTMLElement} button - El botón a cambiar.
          */
         function setButtonToConnecting(button) {
-            button.textContent = 'Conectando';
-            button.classList.remove('bg-green-700', 'hover:bg-green-800', 'bg-red-700', 'hover:bg-red-800', 'bg-gray-500');
-            button.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+            // Limpiamos todas las clases de estado posibles
+            button.classList.remove(
+                'bg-gradient-to-r', 'from-red-500', 'to-red-600', 'from-yellow-500', 'to-orange-500', 
+                'from-gray-500', 'to-gray-600', 'from-emerald-500', 'to-green-600',
+                'hover:shadow-red-200', 'hover:shadow-yellow-200', 'hover:shadow-gray-200', 'hover:shadow-green-200'
+            );
+            
+            // Aplicamos el estilo para "Conectando"
+            button.classList.add('bg-gradient-to-r', 'from-yellow-500', 'to-orange-500', 'hover:shadow-yellow-200');
+            
+            // Actualizamos el contenido con un indicador de carga
+            button.innerHTML = '<span class="flex items-center justify-center"><i class="fas fa-circle-notch fa-spin mr-2"></i> Conectando</span>';
         }
 
         /**
@@ -102,9 +183,18 @@
          * @param {HTMLElement} button - El botón a cambiar.
          */
         function setButtonToOffline(button) {
-            button.textContent = 'Fuera de línea';
-            button.classList.remove('bg-green-700', 'hover:bg-green-800', 'bg-red-700', 'hover:bg-red-800', 'bg-yellow-500', 'hover:bg-yellow-600');
-            button.classList.add('bg-gray-500', 'hover:bg-gray-600');
+            // Limpiamos todas las clases de estado posibles
+            button.classList.remove(
+                'bg-gradient-to-r', 'from-red-500', 'to-red-600', 'from-yellow-500', 'to-orange-500', 
+                'from-gray-500', 'to-gray-600', 'from-emerald-500', 'to-green-600',
+                'hover:shadow-red-200', 'hover:shadow-yellow-200', 'hover:shadow-gray-200', 'hover:shadow-green-200'
+            );
+            
+            // Aplicamos el estilo para "Fuera de línea"
+            button.classList.add('bg-gradient-to-r', 'from-gray-500', 'to-gray-600', 'hover:shadow-gray-200');
+            
+            // Actualizamos el contenido
+            button.innerHTML = '<span class="flex items-center justify-center"><i class="fas fa-exclamation-circle mr-2"></i> Fuera de línea</span>';
         }
 
         /**

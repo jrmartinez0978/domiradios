@@ -1,7 +1,11 @@
-@extends('layouts.default')
+@extends('layouts.app')
 
+@section('title', 'Domiradios - Emisoras de República Dominicana')
 
+@section('hero', true)
 
 @section('content')
-    <livewire:radio-index />
+    <div class="container max-w-7xl mx-auto px-4">
+        <livewire:radio-index />
+    </div>
 @endsection

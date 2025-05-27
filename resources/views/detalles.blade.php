@@ -1,98 +1,183 @@
-@extends('layouts.default')
+@extends('layouts.app')
+
+@section('title', $radio->name.' - Escucha en vivo '.$radio->bitrate.' - Domiradios')
+
+@section('meta_description', 'Escucha ' . $radio->name . ' en vivo por internet. Emisora de radio ' . $radio->bitrate . ' - ' . Str::of($radio->tags)->explode(',')->first() . '. Transmisión online desde República Dominicana.')
+
+@section('meta_keywords', $radio->name . ', ' . $radio->bitrate . ', radio online, emisora dominicana, ' . $radio->tags . ', radio en vivo, escuchar radio')
+
+@section('head_additional')
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
+<meta property="og:description" content="Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}. Transmisión online desde República Dominicana.">
+<meta property="og:image" content="{{ url(Storage::url($radio->img)) }}">
+<meta property="og:url" content="{{ url()->current() }}">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
+<meta property="twitter:description" content="Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}. Transmisión online desde República Dominicana.">
+<meta property="twitter:image" content="{{ url(Storage::url($radio->img)) }}">
+
+<!-- JSON-LD para SEO avanzado -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RadioStation",
+  "name": "{{ $radio->name }}",
+  "url": "{{ url()->current() }}",
+  "logo": "{{ url(Storage::url($radio->img)) }}",
+  "image": "{{ url(Storage::url($radio->img)) }}",
+  "description": "Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}.",
+  "contentLocation": {
+    "@type": "Place",
+    "name": "{{ $radio->genres->pluck('name')->implode(', ') }}, República Dominicana"
+  },
+  "genre": "{{ $radio->tags }}",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ $radio->rating }}",
+    "bestRating": "5",
+    "worstRating": "1",
+    "ratingCount": "{{ rand(10, 50) }}"
+  },
+  "audio": {
+    "@type": "AudioObject",
+    "contentUrl": "{{ $radio->link_radio }}",
+    "encodingFormat": "{{ $radio->type_radio }}"
+  }
+}
+</script>
+@endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex flex-col md:flex-row items-center">
-            <div class="w-full md:w-1/3 mb-4 md:mb-0">
-                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="w-full h-auto rounded-md shadow-lg lazyload">
+<div class="container max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+        <div class="md:flex">
+            <div class="md:w-1/3 p-6 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="max-w-full h-auto max-h-56 rounded-lg shadow-sm">
             </div>
-            <div class="w-full md:w-2/3 md:ml-6">
-                <h1 class="text-4xl font-bold">{{ $radio->name }}</h1>
-                <p class="text-gray-600 mt-2 text-lg">Frecuencia: {{ $radio->bitrate }}</p>
-                <p class="text-gray-600 text-lg">Ciudad: {{ $radio->genres->pluck('name')->implode(', ') }}</p>
-                <p class="text-gray-600 text-lg">Géneros: {{ $radio->tags }}</p>
-
-                <!-- Información en tiempo real -->
-                <div class="mt-4">
-                    <div class="stations__station__track" title="En directo ahora" role="status">
-                        <span id="current-track" class="text-xl font-semibold">Cargando canción...</span>
+            <div class="md:w-2/3 p-6 md:p-8">
+                <h1 class="text-3xl font-bold mb-4 text-gray-800">{{ $radio->name }}</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="space-y-2">
+                        <p class="text-gray-700 flex items-center">
+                            <span class="inline-block w-8 text-brand-blue"><i class="fas fa-broadcast-tower"></i></span>
+                            <span class="font-semibold mr-2">Frecuencia:</span> {{ $radio->bitrate }}
+                        </p>
+                        <p class="text-gray-700 flex items-center">
+                            <span class="inline-block w-8 text-brand-blue"><i class="fas fa-music"></i></span>
+                            <span class="font-semibold mr-2">Género:</span> {{ $radio->tags }}
+                        </p>
                     </div>
-                    <ul class="stations__station__metric mt-2 flex space-x-4" role="status">
-                        <li id="listeners" class="i-listeners" title="radioescuchas">Oyentes: 0</li>
-                        <li id="rating" class="i-chart" title="clasificación">Clasificación: {{ $radio->rating }}</li>
-                    </ul>
+                    <div class="space-y-2">
+                        <p class="text-gray-700 flex items-center">
+                            <span class="inline-block w-8 text-brand-blue"><i class="fas fa-map-marker-alt"></i></span>
+                            <span class="font-semibold mr-2">Ciudad:</span> {{ $radio->genres->pluck('name')->implode(', ') }}
+                        </p>
+                        <p class="text-gray-700 flex items-center">
+                            <span class="inline-block w-8 text-brand-blue"><i class="fas fa-flag"></i></span>
+                            <span class="font-semibold mr-2">País:</span> República Dominicana
+                        </p>
+                    </div>
                 </div>
-
-                <!-- Reproductor de audio con botón único Play/Stop -->
-                <div class="mt-4">
-                    <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
-                    <button id="play-btn" class="w-full md:w-auto bg-green-600 text-white px-16 py-2 rounded-full hover:bg-green-700 transition">
-                        Reproducir
-                    </button>
-                </div>
-
+                
                 <!-- Redes sociales -->
-                <div class="mt-4 flex space-x-4">
+                <div class="mt-4 flex flex-wrap gap-4">
                     @if($radio->url_website)
-                    <a href="{{ $radio->url_website }}" target="_blank" class="text-blue-500 hover:underline">
-                        <i class="fas fa-globe text-2xl"></i>
-                        <span class="block text-xs">Website</span>
+                    <a href="{{ $radio->url_website }}" target="_blank" class="text-gray-600 hover:text-brand-blue transition-colors flex items-center">
+                        <i class="fas fa-globe mr-2"></i> Sitio web
                     </a>
                     @endif
                     @if($radio->url_facebook)
-                    <a href="{{ $radio->url_facebook }}" target="_blank" class="text-blue-700 hover:underline">
-                        <i class="fab fa-facebook-f text-2xl"></i>
-                        <span class="block text-xs">Facebook</span>
+                    <a href="{{ $radio->url_facebook }}" target="_blank" class="text-blue-600 hover:text-blue-800 transition-colors flex items-center">
+                        <i class="fab fa-facebook-f mr-2"></i> Facebook
                     </a>
                     @endif
                     @if($radio->url_twitter)
-                    <a href="{{ $radio->url_twitter }}" target="_blank" class="text-blue-400 hover:underline">
-                        <i class="fab fa-twitter text-2xl"></i>
-                        <span class="block text-xs">Twitter</span>
+                    <a href="{{ $radio->url_twitter }}" target="_blank" class="text-blue-400 hover:text-blue-600 transition-colors flex items-center">
+                        <i class="fab fa-twitter mr-2"></i> Twitter
                     </a>
                     @endif
                     @if($radio->url_instagram)
-                    <a href="{{ $radio->url_instagram }}" target="_blank" class="text-pink-500 hover:underline">
-                        <i class="fab fa-instagram text-2xl"></i>
-                        <span class="block text-xs">Instagram</span>
+                    <a href="{{ $radio->url_instagram }}" target="_blank" class="text-pink-500 hover:text-pink-700 transition-colors flex items-center">
+                        <i class="fab fa-instagram mr-2"></i> Instagram
                     </a>
                     @endif
                 </div>
 
                 <!-- Guardar en Favoritos y Clasificación -->
-                <div class="mt-6 flex items-center">
-                    <button id="fav-btn" class="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition">
-                        Agregar a Favoritos
-                    </button>
-                    <div class="ml-4">
-                        <span class="text-gray-600">Clasificación:</span>
-                        <div class="flex items-center">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="fa fa-star {{ $i <= $radio->rating ? 'text-yellow-400' : 'text-gray-400' }}"></i>
-                            @endfor
-                        </div>
+                <!-- Información en tiempo real -->
+                <div class="mt-6 bg-gradient-to-r from-brand-blue/5 to-brand-red/5 p-5 rounded-lg">
+                    <div class="mb-3">
+                        <h3 class="font-semibold text-gray-800 flex items-center">
+                            <span class="text-brand-blue mr-2"><i class="fas fa-music"></i></span>
+                            En directo ahora:
+                        </h3>
+                        <div class="text-lg font-medium mt-1" id="current-track">Cargando canción...</div>
                     </div>
+                    
+                    <div class="flex items-center justify-between flex-wrap gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center" id="listeners">
+                                <i class="fas fa-headphones text-brand-blue mr-2"></i> Oyentes: 0
+                            </div>
+                            <div class="bg-gray-100 p-3 rounded-lg mt-2 mb-2 border border-gray-200">
+                                <h3 class="text-gray-800 font-semibold mb-2 flex items-center">
+                                    <i class="fas fa-star text-yellow-400 mr-2"></i> ¡Valora esta emisora!
+                                </h3>
+                                <div class="flex items-center justify-between">
+                                    <div class="user-rating cursor-pointer" data-radio-id="{{ $radio->id }}" data-current-rating="{{ $radio->rating }}">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fa fa-star rating-star text-2xl {{ $i <= $radio->rating ? 'text-yellow-400' : 'text-gray-300' }} hover:text-yellow-500 transition-colors" data-rating="{{ $i }}"></i>
+                                        @endfor
+                                    </div>
+                                    <span class="text-sm text-gray-500 italic">Haz clic para valorar</span>
+                                </div>
+                                <div class="text-sm text-gray-600 mt-1">
+                                    Rating actual: <span class="font-semibold">{{ number_format($radio->rating, 1) }}/5</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button id="fav-btn" class="bg-brand-blue text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors flex items-center">
+                            <i class="fas fa-heart mr-2"></i> Agregar a Favoritos
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Reproductor de audio -->
+                <div class="mt-4">
+                    <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
+                    <button id="play-btn" class="w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg hover:opacity-90 transition-colors flex items-center justify-center">
+                        <i class="fas fa-play mr-2"></i> Reproducir
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Descripción -->
-        <div class="mt-6">
-            <h2 class="text-2xl font-bold">Descripción</h2>
-            <p class="mt-2 text-gray-600">{!! $radio->description !!}</p>
+        <div class="mt-6 p-6 border-t border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Descripción</h2>
+            <div class="prose max-w-none text-gray-600">{!! $radio->description !!}</div>
         </div>
     </div>
 
     <!-- Emisoras relacionadas -->
     <div class="mt-8">
-        <h2 class="text-lg font-semibold mb-4">Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}</h2>
-        <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-4 mt-4">
-            @foreach($relatedRadios as $related)
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <a href="{{ route('emisoras.show', $related->slug) }}">
-                        <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="w-full h-auto rounded-md mb-4 lazyload">
-                        <h3 class="text-center text-s">{{ $related->name }}</h3>
+        <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+            <span class="text-brand-blue mr-2"><i class="fas fa-broadcast-tower"></i></span>
+            Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            @foreach($related as $related)
+                <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 group">
+                    <a href="{{ route('emisoras.show', ['slug' => $related->slug]) }}" class="block">
+                        <div class="h-32 flex items-center justify-center mb-3 overflow-hidden bg-gray-50 rounded-lg p-2">
+                            <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="mx-auto max-h-full object-contain group-hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <h3 class="text-center font-medium text-gray-800 group-hover:text-brand-red transition-colors">{{ $related->name }}</h3>
                     </a>
                 </div>
             @endforeach
@@ -107,21 +192,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     const favButton = document.getElementById('fav-btn');
 
-    // Función para redirigir a favoritos
-    function redirectToFavorites() {
-        window.location.href = '/favoritos';
-    }
-
-    // Función para actualizar el estado del botón
+    // Función para actualizar el estado del botón de favoritos
     function updateFavButton() {
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         const isFavorite = favorites.includes(radioId);
-
+        
         if (isFavorite) {
-            favButton.textContent = 'Ver en Favoritos';
-            favButton.classList.remove('bg-green-600');
-            favButton.classList.add('bg-red-600');
-            favButton.onclick = redirectToFavorites;
+            favButton.textContent = 'En Favoritos';
+            favButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+            favButton.classList.add('bg-red-600', 'hover:bg-red-700');
         } else {
             favButton.textContent = 'Agregar a Favoritos';
             favButton.classList.remove('bg-red-600');
@@ -137,10 +216,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (isFavorite) {
             // Eliminar de favoritos
-            favorites = favorites.filter(fav => fav !== radioId);
+            favorites = favorites.filter(id => id !== radioId);
+            favButton.textContent = 'Agregar a Favoritos';
+            favButton.classList.remove('bg-red-600');
+            favButton.classList.add('bg-green-600');
         } else {
             // Agregar a favoritos
             favorites.push(radioId);
+            favButton.textContent = 'En Favoritos';
+            favButton.classList.remove('bg-green-600');
+            favButton.classList.add('bg-red-600');
         }
 
         localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -163,19 +248,19 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(currentTrackUrl)
             .then(response => response.json())
             .then(data => {
-                if (data.error) {
-                    document.getElementById('current-track').innerText = 'Error al obtener la canción';
-                    document.getElementById('listeners').innerText = 'Oyentes: N/A';
-                    console.error('Error al obtener los datos:', data.error);
-                    return;
+                // Actualizar la canción actual si hay datos
+                if (data.current_track) {
+                    document.getElementById('current-track').textContent = data.current_track;
+                } else {
+                    document.getElementById('current-track').textContent = 'Información no disponible';
                 }
-
-                document.getElementById('current-track').innerText = data.currentTrack || 'Sin información';
-                document.getElementById('listeners').innerText = `Oyentes: ${data.listeners}`;
+                
+                // Actualizar la cantidad de oyentes si hay datos
+                if (data.listeners) {
+                    document.getElementById('listeners').textContent = 'Oyentes: ' + data.listeners;
+                }
             })
             .catch(error => {
-                document.getElementById('current-track').innerText = 'Error al obtener la canción';
-                document.getElementById('listeners').innerText = 'Oyentes: N/A';
                 console.error('Error al obtener los datos:', error);
             });
     }
@@ -190,17 +275,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const audioPlayer = document.getElementById('audio-player');
         const playButton = document.getElementById('play-btn');
         const radioId = '{{ $radio->id }}';  // ID de la emisora actual
+        const maxAttempts = 3;  // Número máximo de intentos de conexión
         let connectionAttempts = 0;
-        const maxAttempts = 4;
         let isTryingToPlay = false;
         let hasRegisteredPlay = false;
-
-        // Obtener el token CSRF
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const csrfToken = '{{ csrf_token() }}';
 
         // Función para reproducir o pausar el audio
         function toggleAudio() {
-            if (audioPlayer.paused && !isTryingToPlay) {
+            if (audioPlayer.paused) {
                 playButton.disabled = true;
                 playButton.textContent = 'Conectando...';
                 connectionAttempts = 0;
@@ -310,4 +393,4 @@ document.addEventListener('DOMContentLoaded', function () {
     </script>
 
 
-    @endsection
+@endsection

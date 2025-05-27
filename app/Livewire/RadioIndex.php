@@ -22,8 +22,10 @@ class RadioIndex extends Component
 
     public function render()
     {
-        // Filtrar emisoras por nombre utilizando LIKE y paginar
-        $radios = Radio::where('name', 'like', '%' . $this->search . '%')->paginate(15); // Ajusta el número de elementos por página según tus necesidades
+        // Filtrar emisoras activas por nombre utilizando LIKE y paginar
+        $radios = Radio::where('isActive', true)
+            ->where('name', 'like', '%' . $this->search . '%')
+            ->paginate(15); // Ajusta el número de elementos por página según tus necesidades
 
         return view('livewire.radio-index', [
             'radios' => $radios,

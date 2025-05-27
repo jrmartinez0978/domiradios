@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
+
+/* Estilos personalizados para Domiradios */
+.header-bg {
+  background-image: url('/img/header-bg-desktop.png');
+}
+
 @tailwind utilities;

@@ -1,7 +1,16 @@
-@section('title', 'Privacy Policy')
-<div class="max-w-3xl mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-6">Privacy Policy</h1>
-    <p class="text-gray-600 mb-4"><strong>Last updated:</strong> 14th July 2023</p>
+@extends('layouts.app')
+
+@section('title', 'Política de Privacidad - Domiradios')
+@section('meta_description', 'Política de privacidad de Domiradios. Información sobre cómo protegemos tus datos personales.')
+
+@section('content')
+<div class="container max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-md p-6 md:p-8 border border-gray-100">
+        <h1 class="text-3xl font-bold mb-3 text-gray-800 flex items-center">
+            <span class="text-brand-blue mr-3"><i class="fas fa-shield-alt"></i></span>
+            Política de Privacidad
+        </h1>
+        <p class="text-gray-600 mb-6 italic"><strong>Última actualización:</strong> 14 de Julio de 2023</p>
 
     <p class="mb-4">
         This privacy policy sets out how <strong>Domiradios</strong> uses and protects any information that you give.

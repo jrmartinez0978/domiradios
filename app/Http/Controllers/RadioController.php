@@ -24,14 +24,43 @@ class RadioController extends Controller
     // Método para mostrar la vista de favoritos
     public function favoritos()
     {
+        // Aplicamos la vista moderna a los favoritos
         return view('favoritos');
+    }
+    
+    // Método para buscar emisoras
+    public function buscar(Request $request)
+    {
+        $query = $request->input('q');
+        
+        if (empty($query)) {
+            return redirect()->route('emisoras.index');
+        }
+        
+        $radios = Radio::where('isActive', true)
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', "%$query%")
+                  ->orWhere('bitrate', 'like', "%$query%")
+                  ->orWhere('tags', 'like', "%$query%");
+            })
+            ->get();
+        
+        return view('emisoras', compact('radios', 'query'))
+               ->with([
+                    'meta_title' => "Resultados para: $query",
+                    'meta_description' => "Emisoras de radio que coinciden con: $query",
+                    'meta_keywords' => "buscar, emisoras, $query",
+                    'canonical_url' => route('buscar', ['q' => $query])
+               ]);
     }
 
     // Nueva API para obtener emisoras favoritas
     public function obtenerFavoritos(Request $request)
     {
         $ids = $request->input('ids', []);  // Obtener los IDs de emisoras favoritos desde el frontend
-        $favoritos = Radio::whereIn('id', $ids)->get();  // Obtener las emisoras que coincidan con esos IDs
+        $favoritos = Radio::whereIn('id', $ids)
+            ->where('isActive', true)
+            ->get();  // Obtener solo las emisoras activas que coincidan con esos IDs
 
         return response()->json($favoritos);
     }
@@ -39,25 +68,27 @@ class RadioController extends Controller
     // Método para mostrar los detalles de una emisora por su slug
     public function show($slug)
     {
-        // Buscar la emisora actual por su slug
-        $radio = Radio::where('slug', $slug)->firstOrFail();
-
-        // Buscar emisoras relacionadas basadas en los mismos géneros
-        $relatedRadios = Radio::whereHas('genres', function ($query) use ($radio) {
+        // Buscar la emisora por su slug y verificar que esté activa
+        $radio = Radio::where('slug', $slug)
+            ->where('isActive', true)
+            ->firstOrFail();
+        
+        // Obtener emisoras relacionadas basadas en los mismos géneros
+        $related = Radio::whereHas('genres', function ($query) use ($radio) {
             $query->whereIn('genres.id', $radio->genres->pluck('id'));
         })
         ->where('id', '!=', $radio->id)
-        ->limit(5)
+        ->limit(4)
         ->get();
-
+        
         // Generar la URL canónica
         $canonical_url = route('emisoras.show', ['slug' => $radio->slug]);
-
+        
         // Si los tags están guardados como una cadena de texto, se separan por comas
         $meta_keywords = $radio->tags; // Asumimos que tags es una cadena como 'rock, pop, baladas'
-
+        
         // Retornar la vista con los metadatos para SEO y las emisoras relacionadas
-        return view('detalles', compact('radio', 'relatedRadios'))
+        return view('detalles', compact('radio', 'related'))
                ->with([
                     'meta_title' => $radio->name . ' - Escucha en vivo',
                     'meta_description' => strip_tags($radio->description),
@@ -73,10 +104,11 @@ class RadioController extends Controller
         // Buscar el género (ciudad) por su slug
         $genre = Genre::where('slug', $slug)->firstOrFail();
 
-        // Obtener las emisoras relacionadas a esa ciudad
-        $radios = Radio::whereHas('genres', function ($query) use ($genre) {
-            $query->where('genres.id', $genre->id);
-        })->get();
+        // Obtener las emisoras activas relacionadas a esa ciudad
+        $radios = Radio::where('isActive', true)
+            ->whereHas('genres', function ($query) use ($genre) {
+                $query->where('genres.id', $genre->id);
+            })->get();
 
         // Generar la URL canónica
         $canonical_url = route('ciudades.show', ['slug' => $genre->slug]);
@@ -113,13 +145,15 @@ class RadioController extends Controller
     // Método para mostrar todas las emisoras
     public function index()
     {
-        $radios = Radio::all();
+        $emisoras = Radio::where('isActive', true)
+            ->orderBy('name')
+            ->get(); // Solo muestra emisoras activas
 
         // Generar la URL canónica
         $canonical_url = route('emisoras.index');
 
-        // Retornar la vista 'emisoras' con los datos de las radios y los metadatos SEO
-        return view('emisoras', compact('radios'))
+        // Retornar la vista 'welcome' con los datos de las radios y los metadatos SEO
+        return view('emisoras', compact('emisoras'))
                ->with([
                     'meta_title' => 'Todas las Emisoras - Directorio de Emisoras',
                     'meta_description' => 'Descubre todas las emisoras de radio disponibles en nuestro directorio.',
