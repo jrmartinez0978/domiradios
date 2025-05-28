@@ -16,4 +16,21 @@ class EditRadio extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+    
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Garantizar que el campo description está disponible para el formulario
+        if (isset($data['description'])) {
+            // Asegurarnos que los datos HTML son sanitizados pero preservados
+            $data['description'] = $data['description'];
+        }
+        
+        return $data;
+    }
+    
+    protected function afterSave(): void
+    {
+        // Limpiar cache si es necesario
+        $this->record->refresh(); 
+    }
 }

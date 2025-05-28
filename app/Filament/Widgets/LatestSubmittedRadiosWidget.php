@@ -3,13 +3,17 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Radio;
+use App\Filament\Resources\RadioResource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class LatestSubmittedRadiosWidget extends BaseWidget
 {
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 3;
     protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -24,6 +28,12 @@ class LatestSubmittedRadiosWidget extends BaseWidget
                     ->limit(5)
             )
             ->columns([
+                // Agregar el ID como columna para facilitar la búsqueda
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->searchable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable()
@@ -31,8 +41,6 @@ class LatestSubmittedRadiosWidget extends BaseWidget
                 Tables\Columns\ImageColumn::make('img')
                     ->label('Logo')
                     ->circular(),
-                Tables\Columns\TextColumn::make('bitrate')
-                    ->label('Frecuencia'),
                 Tables\Columns\TextColumn::make('tags')
                     ->label('Géneros')
                     ->limit(30),
@@ -49,6 +57,7 @@ class LatestSubmittedRadiosWidget extends BaseWidget
                     ->sortable(),
             ])
             ->actions([
+                // Botón para activar directamente las emisoras
                 Tables\Actions\Action::make('activateRadio')
                     ->label('Activar')
                     ->icon('heroicon-o-check-circle')
@@ -58,10 +67,13 @@ class LatestSubmittedRadiosWidget extends BaseWidget
                         $record->isActive = true;
                         $record->save();
                     }),
-                Tables\Actions\Action::make('viewRadio')
-                    ->label('Ver')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (Radio $record): string => '/admin/resources/radios/'.$record->id.'/edit'),
+                    
+                // Botón para editar la emisora (URL correcta)
+                Tables\Actions\Action::make('editRadio')
+                    ->label('Editar')
+                    ->icon('heroicon-o-pencil')
+                    ->url(fn (Radio $record): string => '/panel/radios/' . $record->id . '/edit')
+                    ->color('warning')
             ])
             ->emptyStateHeading('No hay nuevas emisoras')
             ->emptyStateDescription('Cuando los usuarios envíen emisoras, aparecerán aquí para su revisión.')

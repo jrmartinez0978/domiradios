@@ -10,7 +10,7 @@ use Filament\Widgets\Widget;
 class PendingRadiosWidget extends BaseWidget
 {
     protected static ?string $pollingInterval = '30s';
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 1;
     protected int | string | array $columnSpan = 'full';
 
     protected function getStats(): array

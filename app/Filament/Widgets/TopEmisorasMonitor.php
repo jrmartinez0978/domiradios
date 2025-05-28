@@ -10,7 +10,7 @@ use Mokhosh\FilamentRating\Columns\RatingColumn;
 
 class TopEmisorasMonitor extends BaseWidget
 {
-    protected static ?int $sort = 6;
+    protected static ?int $sort = 7;
     protected int | string | array $columnSpan = 'full';
     protected static ?int $refreshInterval = 15; // Actualizar cada 15 segundos
 
@@ -51,10 +51,11 @@ class TopEmisorasMonitor extends BaseWidget
                     ->falseColor('gray'),
             ])
             ->actions([
-                Tables\Actions\Action::make('viewRadio')
-                    ->label('Ver')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (Radio $record): string => '/admin/resources/radios/'.$record->id.'/edit'),
+                Tables\Actions\Action::make('editRadio')
+                    ->label('Editar')
+                    ->icon('heroicon-o-pencil')
+                    ->url(fn (Radio $record): string => '/panel/radios/'.$record->id.'/edit')
+                    ->color('warning'),
                 Tables\Actions\Action::make('toggleFeatured')
                     ->label(fn (Radio $record): string => $record->isFeatured ? 'Quitar destacado' : 'Destacar')
                     ->icon('heroicon-o-star')

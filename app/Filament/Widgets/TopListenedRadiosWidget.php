@@ -11,7 +11,7 @@ class TopListenedRadiosWidget extends BarChartWidget
 {
     protected static ?string $heading = 'Emisoras Más Escuchadas';
     protected static ?string $pollingInterval = '15s';
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 6;
     protected int|string|array $columnSpan = 'full';
     
     // Personalizar el diseño del widget

@@ -77,11 +77,14 @@ class RadioResource extends Resource
                             $set('type_radio', 'Opus');
                         }
                     }),
-                Forms\Components\RichEditor::make('description')
+                Forms\Components\Textarea::make('description')
                     ->label('Descripción')
-                    ->maxLength(1000)
+                    ->maxLength(5000)
+                    ->autosize() // Ajusta automáticamente la altura según el contenido
+                    ->rows(8) // Altura inicial más grande
                     ->nullable()
-                    ->columnspan('full'),
+                    ->columnSpanFull()
+                    ->helperText('Ingrese una descripción detallada de la emisora. Puede usar HTML básico (<b>negrita</b>, <i>cursiva</i>, <br> para saltos de línea).'),
                 // Implementación del campo de clasificación (rating)
                 Rating::make('rating')
                     ->stars(5)  // Número máximo de estrellas (por defecto 5)
@@ -196,6 +199,8 @@ class RadioResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 
+                // Ya tenemos los botones estándar de Ver/Editar arriba, no necesitamos duplicarlos
+                    
                 // Botón para activar una emisora (visible solo cuando está inactiva)
                 Tables\Actions\Action::make('activateRadio')
                     ->label('Activar Emisora')

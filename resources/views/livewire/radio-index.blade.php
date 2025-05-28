@@ -85,7 +85,7 @@
                                     <i class="fas fa-play mr-2"></i> Reproducir
                                 </span>
                             </a>
-                            <div class="text-xs text-center mt-1 text-gray-500">
+                            <div class="text-[9px] text-center mt-1 font-bold italic drop-shadow-sm text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">
                                 <i class="fas fa-info-circle mr-1"></i> Baja latencia con RTCStream
                             </div>
                         </div>

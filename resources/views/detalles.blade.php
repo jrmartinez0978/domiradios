@@ -110,6 +110,8 @@
                     </a>
                     @endif
                 </div>
+                
+
 
                 <!-- Guardar en Favoritos y Clasificación -->
                 <!-- Información en tiempo real -->
@@ -155,20 +157,38 @@
                 <div class="mt-4">
                     @if($radio->source_radio === 'RTCStream')
                     <!-- RTCStream Player (WebRTC) siguiendo el modelo del ejemplo -->
-                    <div class="rtc-player" id="rtcPlayer">
-                        <h3 class="font-semibold text-gray-700 mb-3">🎧 <span id="playerSlug">{{ Str::afterLast($radio->link_radio, '/') }}</span></h3>
+                    <div class="rtc-player relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-md border border-gray-200" id="rtcPlayer">
+                        <!-- Efectos visuales de fondo -->
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-emerald-500 rounded-full filter blur-3xl opacity-10 -translate-x-1/2 -translate-y-1/2"></div>
+                        <div class="absolute bottom-0 right-0 w-32 h-32 bg-brand-blue rounded-full filter blur-3xl opacity-10 translate-x-1/3 translate-y-1/3"></div>
+                        
+                        <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
+                            <span class="inline-block w-7 h-7 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 mr-3 flex items-center justify-center shadow-sm">
+                                <i class="fas fa-headphones-alt text-white text-xs"></i>
+                            </span> 
+                            <span id="playerSlug" class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">{{ Str::afterLast($radio->link_radio, '/') }}</span>
+                        </h3>
+                        <div class="text-xs mb-4 ml-10 font-bold italic drop-shadow-sm text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">
+                            <i class="fas fa-info-circle mr-1"></i> Baja latencia con RTCStream
+                        </div>
 
-                        <div class="flex gap-3 mb-3">
-                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:opacity-90 transition-all focus:ring focus:ring-brand-blue/30">
+                        <div class="flex gap-3 mb-4">
+                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:shadow-lg hover:opacity-95 transform hover:-translate-y-0.5 transition-all duration-300 focus:ring focus:ring-brand-blue/30">
                                 <i class="fas fa-play mr-2"></i> Escuchar
                             </button>
-                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-gray-300 transition-all" disabled>
+                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-gray-300 hover:shadow-sm transform hover:-translate-y-0.5 transition-all duration-300" disabled>
                                 <i class="fas fa-stop mr-2"></i> Detener
                             </button>
                         </div>
 
-                        <div id="playerStatus" class="player-status status-info text-sm text-center p-2 rounded-lg">Esperando conexión...</div>
-                        <div id="playerTimer" class="text-sm font-mono text-center mt-2">00:00</div>
+                        <div id="playerStatus" class="player-status status-info text-sm text-center p-2 rounded-lg border border-gray-200 bg-white bg-opacity-70 backdrop-blur-sm">Esperando conexión...</div>
+                        
+                        <div class="flex justify-center items-center mt-3">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 border border-gray-200">
+                                <i class="fas fa-clock text-xs text-gray-500 mr-2"></i>
+                                <div id="playerTimer" class="text-xs font-mono text-gray-700">00:00</div>
+                            </div>
+                        </div>
 
                         <audio id="playerAudio" playsinline webkit-playsinline></audio>
                     </div>
@@ -185,10 +205,15 @@
         </div>
 
         <!-- Descripción -->
-        <div class="mt-6 p-6 border-t border-gray-100">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Descripción</h2>
-            <div class="prose max-w-none text-gray-600">{!! $radio->description !!}</div>
+        @if($radio->description)
+        <div class="mt-6 p-6 border-t border-gray-100 bg-white rounded-xl shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
+                <span class="text-brand-blue mr-2"><i class="fas fa-info-circle"></i></span>
+                Acerca de esta emisora
+            </h2>
+            <div class="prose max-w-none text-gray-700">{!! $radio->description !!}</div>
         </div>
+        @endif
     </div>
 
     <!-- Emisoras relacionadas -->

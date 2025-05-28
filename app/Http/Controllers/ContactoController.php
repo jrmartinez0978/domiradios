@@ -17,8 +17,8 @@ class ContactoController extends Controller
 
     public function store(Request $request)
     {
-        // Validación de los campos
-        $request->validate([
+        // Validación básica de los campos
+        $validationRules = [
             'nombre' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'name' => 'required|string|max:255',
@@ -26,8 +26,22 @@ class ContactoController extends Controller
             'ciudad' => 'required|string|max:255',
             'link_radio' => 'required|url|max:255',
             'tags' => 'required|string|max:255',
-            'img' => 'nullable|image|max:2048',
-        ]);
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ];
+
+        // Aplicamos validación básica
+        $request->validate($validationRules);
+        
+        // Verificar si ya existe una emisora con el mismo nombre o URL
+        $existingRadio = Radio::where('name', $request->name)
+            ->orWhere('link_radio', $request->link_radio)
+            ->first();
+            
+        if ($existingRadio) {
+            return back()
+                ->withInput()
+                ->withErrors(['duplicate' => 'Ya existe una emisora con el mismo nombre o URL. Por favor, verifica la información.']);
+        }
 
         // Guardar la imagen si se ha subido
         $imagePath = null;
@@ -56,11 +70,16 @@ class ContactoController extends Controller
         $radio->user_agent_radio = $request->user_agent ?? 'Mozilla/5.0';
         $radio->isActive = false; // Por defecto inactiva hasta que un administrador la apruebe
         $radio->isFeatured = false;
-        $radio->save();
         
-        // Opcionalmente, enviar email de notificación a los administradores
-        // Mail::to('admin@domiradios.com')->send(new \App\Mail\NuevaEmisora($radio));
-
-        return back()->with('success', 'Tu solicitud ha sido enviada correctamente. Revisaremos la información y nos pondremos en contacto contigo pronto.');
+        // Guardar la emisora
+        try {
+            $radio->save();
+            return back()->with('success', 'Tu emisora ha sido enviada correctamente. Revisaremos la información y la activaremos pronto.');
+        } catch (\Exception $e) {
+            // En caso de error, mostrar un mensaje amigable
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente.']);
+        }
     }
 }

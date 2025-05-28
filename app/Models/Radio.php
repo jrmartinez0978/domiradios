@@ -45,5 +45,29 @@ class Radio extends Model
     {
         return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id');
     }
+    
+    /**
+     * Accessor para obtener la descripción usando el nombre en español
+     */
+    public function getDescripcionAttribute()
+    {
+        return $this->attributes['description'] ?? null;
+    }
+    
+    /**
+     * Mutator para guardar la descripción usando el nombre en español
+     */
+    public function setDescripcionAttribute($value)
+    {
+        $this->attributes['description'] = $value;
+    }
+    
+    /**
+     * Accessor para leer el campo description garantizando que tenga el valor correcto
+     */
+    public function getDescriptionAttribute($value)
+    {
+        return $value;
+    }
 }
 
