@@ -221,6 +221,9 @@
     </style>
 
     @livewireStyles
+    
+    <!-- RTCStream Player recursos - Solo CSS global -->
+    <link rel="stylesheet" href="/css/rtc-player.css">
 </head>
 <body class="min-h-screen flex flex-col font-['Inter'] text-slate-900">
     <header class="bg-white shadow-md relative z-10">
@@ -302,10 +305,14 @@
             </div>
         </div>
         <div class="text-center py-4 bg-brand-red text-sm">
-            <a href="https://rtcstreaming.com" target="_blank" class="text-white hover:underline">Directorio de RTCStream</a> | © {{ date('Y') }} Domiradios
+            <a href="https://rtcstreaming.com" target="_blank" class="text-white hover:underline">Directorio de RTCStream</a> | {{ date('Y') }} Domiradios
         </div>
     </footer>
 
+    <script src="/css/tiny-slider.js"></script>
+    <script src="/css/glide.min.js"></script>
+    <script src="/js/index.js"></script>
+    
     @livewireScripts
     @vite('resources/js/app.js') <!-- Incluir el JavaScript compilado -->
 

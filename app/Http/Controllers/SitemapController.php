@@ -16,7 +16,7 @@ class SitemapController extends Controller
         $sitemap = Sitemap::create();
 
         // Añadir la página principal
-        $sitemap->add(Url::create(route('inicio'))
+        $sitemap->add(Url::create(route('emisoras.index'))
             ->setLastModificationDate(Carbon::now())
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
             ->setPriority(1.0));

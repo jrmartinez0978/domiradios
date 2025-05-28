@@ -20,6 +20,7 @@ class RadioController extends Controller
     private const SOURCE_SHOUTCAST = 'Shoutcast';
     private const SOURCE_ICECAST = 'Icecast';
     private const SOURCE_AZURACAST = 'AzuraCast';
+	private const SOURCE_RTCSTREAM    = 'RTCStream';
 
     // Método para mostrar la vista de favoritos
     public function favoritos()
@@ -27,16 +28,16 @@ class RadioController extends Controller
         // Aplicamos la vista moderna a los favoritos
         return view('favoritos');
     }
-    
+
     // Método para buscar emisoras
     public function buscar(Request $request)
     {
         $query = $request->input('q');
-        
+
         if (empty($query)) {
             return redirect()->route('emisoras.index');
         }
-        
+
         $radios = Radio::where('isActive', true)
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%$query%")
@@ -44,7 +45,7 @@ class RadioController extends Controller
                   ->orWhere('tags', 'like', "%$query%");
             })
             ->get();
-        
+
         return view('emisoras', compact('radios', 'query'))
                ->with([
                     'meta_title' => "Resultados para: $query",
@@ -72,7 +73,7 @@ class RadioController extends Controller
         $radio = Radio::where('slug', $slug)
             ->where('isActive', true)
             ->firstOrFail();
-        
+
         // Obtener emisoras relacionadas basadas en los mismos géneros
         $related = Radio::whereHas('genres', function ($query) use ($radio) {
             $query->whereIn('genres.id', $radio->genres->pluck('id'));
@@ -80,13 +81,13 @@ class RadioController extends Controller
         ->where('id', '!=', $radio->id)
         ->limit(4)
         ->get();
-        
+
         // Generar la URL canónica
         $canonical_url = route('emisoras.show', ['slug' => $radio->slug]);
-        
+
         // Si los tags están guardados como una cadena de texto, se separan por comas
         $meta_keywords = $radio->tags; // Asumimos que tags es una cadena como 'rock, pop, baladas'
-        
+
         // Retornar la vista con los metadatos para SEO y las emisoras relacionadas
         return view('detalles', compact('radio', 'related'))
                ->with([
@@ -188,7 +189,7 @@ public function getCurrentTrack($id)
         if ($portFromUrl) {
             $serverBaseUrl .= ':' . $portFromUrl;
         }
-        
+
         Log::info("Radio ID {$id}: Server base URL determined as '{$serverBaseUrl}'. Path: '{$path}'");
 
         $currentTrack = self::DEFAULT_TRACK_INFO;
@@ -213,7 +214,7 @@ public function getCurrentTrack($id)
                 // The 'p' parameter is the port/ID that was extracted.
                 $infoUrl = $scheme . '://' . $host . '/cp/get_info.php?p=' . $sonicPort;
                 Log::info("Radio ID {$id}: SonicPanel infoUrl: " . $infoUrl);
-                
+
                 $response = Http::timeout(5)->get($infoUrl);
                 if ($response->failed()) {
                     Log::error("Radio ID {$id}: HTTP request failed for SonicPanel ({$infoUrl}): Status " . $response->status() . ". Body: " . $response->body());
@@ -378,7 +379,7 @@ public function getCurrentTrack($id)
                 // If $linkRadio is like http://azura.server.com/radio/station_id/stream,
                 // we might need to extract 'station_id' if AzuraCast API requires it.
                 // The current code uses $baseUrl which is $serverBaseUrl.
-                $infoUrl = $serverBaseUrl . '/api/nowplaying'; 
+                $infoUrl = $serverBaseUrl . '/api/nowplaying';
                 Log::info("Radio ID {$id}: AzuraCast infoUrl: " . $infoUrl);
 
                 $response = Http::timeout(5)->get($infoUrl);

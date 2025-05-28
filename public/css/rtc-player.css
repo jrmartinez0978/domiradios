@@ -1,0 +1,53 @@
+/* RTCStream Player CSS - Basado en el ejemplo */
+.rtc-player {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    max-width: 100%;
+}
+
+.rtc-player h3 {
+    margin-top: 0;
+    font-weight: 600;
+}
+
+.rtc-player .player-status {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.rtc-player .player-timer {
+    font-family: monospace;
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Estados del reproductor */
+.status-info { background-color: #e5f2ff; color: #0066cc; }
+.status-error { background-color: #ffe5e5; color: #cc0000; }
+.status-ok { background-color: #e5ffe5; color: #006600; }
+.status-wait { background-color: #fff9e5; color: #996600; }
+
+/* Mini reproductor en tarjetas */
+.rtc-player-mini {
+    width: 100%;
+}
+
+/* Ajustes móviles */
+@media (max-width: 640px) {
+    .rtc-player .flex {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .rtc-player button {
+        width: 100%;
+    }
+}

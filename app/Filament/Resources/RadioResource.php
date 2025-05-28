@@ -56,6 +56,7 @@ class RadioResource extends Resource
                         'OGG' => 'OGG (audio/ogg)',
                         'MP3' => 'MP3 (audio/mpeg)',
                         'AAC' => 'AAC (audio/aacp)',
+                        'Opus' => 'Opus (audio/opus) - Para RTCStream',
                     ])
                     ->required(),
                 Forms\Components\Select::make('source_radio')
@@ -65,9 +66,17 @@ class RadioResource extends Resource
                         'SonicPanel' => 'SonicPanel',
                         'Shoutcast' => 'Shoutcast',
                         'Icecast' => 'Icecast',
+                        'RTCStream' => 'RTCStream (WebRTC/Opus)',
                         'Other' => 'Other',
                     ])
-                    ->required(),
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        // Si el usuario selecciona RTCStream, establecer codec Opus automáticamente
+                        if ($state === 'RTCStream') {
+                            $set('type_radio', 'Opus');
+                        }
+                    }),
                 Forms\Components\RichEditor::make('description')
                     ->label('Descripción')
                     ->maxLength(1000)

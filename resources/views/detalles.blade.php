@@ -7,6 +7,10 @@
 @section('meta_keywords', $radio->name . ', ' . $radio->bitrate . ', radio online, emisora dominicana, ' . $radio->tags . ', radio en vivo, escuchar radio')
 
 @section('head_additional')
+@if($radio->source_radio === 'RTCStream')
+<!-- CSS del reproductor RTCStream -->
+<link rel="stylesheet" href="/css/rtc-player.css">
+@endif
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
@@ -82,7 +86,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Redes sociales -->
                 <div class="mt-4 flex flex-wrap gap-4">
                     @if($radio->url_website)
@@ -117,7 +121,7 @@
                         </h3>
                         <div class="text-lg font-medium mt-1" id="current-track">Cargando canción...</div>
                     </div>
-                    
+
                     <div class="flex items-center justify-between flex-wrap gap-4">
                         <div class="flex items-center space-x-4">
                             <div class="flex items-center" id="listeners">
@@ -140,19 +144,42 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <button id="fav-btn" class="bg-brand-blue text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors flex items-center">
                             <i class="fas fa-heart mr-2"></i> Agregar a Favoritos
                         </button>
                     </div>
                 </div>
-                
+
                 <!-- Reproductor de audio -->
                 <div class="mt-4">
+                    @if($radio->source_radio === 'RTCStream')
+                    <!-- RTCStream Player (WebRTC) siguiendo el modelo del ejemplo -->
+                    <div class="rtc-player" id="rtcPlayer">
+                        <h3 class="font-semibold text-gray-700 mb-3">🎧 <span id="playerSlug">{{ Str::afterLast($radio->link_radio, '/') }}</span></h3>
+
+                        <div class="flex gap-3 mb-3">
+                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:opacity-90 transition-all focus:ring focus:ring-brand-blue/30">
+                                <i class="fas fa-play mr-2"></i> Escuchar
+                            </button>
+                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-gray-300 transition-all" disabled>
+                                <i class="fas fa-stop mr-2"></i> Detener
+                            </button>
+                        </div>
+
+                        <div id="playerStatus" class="player-status status-info text-sm text-center p-2 rounded-lg">Esperando conexión...</div>
+                        <div id="playerTimer" class="text-sm font-mono text-center mt-2">00:00</div>
+
+                        <audio id="playerAudio" playsinline webkit-playsinline></audio>
+                    </div>
+
+                    @else
+                    <!-- Reproductor Estándar HTML5 -->
                     <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
-                    <button id="play-btn" class="w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg hover:opacity-90 transition-colors flex items-center justify-center">
+                    <button id="play-btn" class="w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:opacity-90 transition-all focus:ring focus:ring-brand-blue/30">
                         <i class="fas fa-play mr-2"></i> Reproducir
                     </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -196,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateFavButton() {
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         const isFavorite = favorites.includes(radioId);
-        
+
         if (isFavorite) {
             favButton.textContent = 'En Favoritos';
             favButton.classList.remove('bg-green-600', 'hover:bg-green-700');
@@ -254,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     document.getElementById('current-track').textContent = 'Información no disponible';
                 }
-                
+
                 // Actualizar la cantidad de oyentes si hay datos
                 if (data.listeners) {
                     document.getElementById('listeners').textContent = 'Oyentes: ' + data.listeners;
@@ -361,18 +388,18 @@ document.addEventListener('DOMContentLoaded', function () {
         audioPlayer.addEventListener('ended', function () {
             playButton.textContent = 'Reproducir';
         });
-        
+
         // Configurar MediaSession API para mostrar información en la pantalla de bloqueo
         if ('mediaSession' in navigator) {
             audioPlayer.addEventListener('play', updateMediaSession);
-            
+
             // Actualizar la información de MediaSession
             function updateMediaSession() {
                 let track = document.getElementById('current-track').textContent;
                 if (track === 'Cargando canción...') {
                     track = '{{ $radio->name }} - En vivo';
                 }
-                
+
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: track,
                     artist: '{{ $radio->name }}',
@@ -386,26 +413,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         { src: '{{ url(Storage::url($radio->img)) }}', sizes: '512x512', type: 'image/png' }
                     ]
                 });
-                
+
                 // Configurar los controladores de acciones para MediaSession
-                navigator.mediaSession.setActionHandler('play', () => { 
+                navigator.mediaSession.setActionHandler('play', () => {
                     audioPlayer.play();
                     playButton.textContent = 'Pausar';
                 });
-                
+
                 navigator.mediaSession.setActionHandler('pause', () => {
                     audioPlayer.pause();
                     playButton.textContent = 'Reproducir';
                 });
             }
-            
+
             // Actualizar la metadata cada vez que cambie la canción actual
             const trackObserver = new MutationObserver(() => {
                 if (audioPlayer.paused === false) {
                     updateMediaSession();
                 }
             });
-            
+
             trackObserver.observe(document.getElementById('current-track'), {
                 childList: true,
                 characterData: true,
@@ -415,6 +442,86 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 </script>
 
+@if($radio->source_radio === 'RTCStream')
+<!-- Script RTCStream Player - Versión optimizada -->
+<script src="https://live.rtcstreaming.com:9000/mediasoup-client.min.js"></script>
+<script src="/js/rtc-player-v2.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    // URL directa desde la base de datos
+    const rtcUrl = "{{ $radio->link_radio }}";
+
+    // Comprobar si la URL es válida
+    if (!rtcUrl) {
+      console.error('Error: No hay URL de WebSocket configurada');
+      if (document.getElementById('rtcStatus')) {
+        document.getElementById('rtcStatus').textContent = 'Error: URL no configurada';
+        document.getElementById('rtcStatus').className = 'status error';
+      }
+      return;
+    }
+
+    // Extraer slug para la interfaz
+    const slug = rtcUrl.split('/').pop() || '{{ $radio->slug }}';
+
+    // Configurar metatags para dispositivos móviles
+    ['apple-mobile-web-app-capable', 'apple-mobile-web-app-status-bar-style', 'apple-mobile-web-app-title'].forEach((name, i) => {
+      const content = i === 0 ? 'yes' : i === 1 ? 'black-translucent' : '{{ $radio->name }}';
+      if (!document.querySelector(`meta[name="${name}"]`)) {
+        const meta = document.createElement('meta');
+        meta.name = name;
+        meta.content = content;
+        document.head.appendChild(meta);
+      }
+    });
+
+    // Esperar a que los scripts se carguen completamente
+    const checkScriptsLoaded = setInterval(function() {
+      if (window.RTCStreamPlayer && window.mediasoupClient) {
+        clearInterval(checkScriptsLoaded);
+
+        // Inicializar el reproductor
+        window.RTCStreamPlayer.init({
+          wsUrl: rtcUrl,
+          title: "{{ $radio->name }} - En vivo",
+          artist: "{{ $radio->name }}",
+          autoplay: false,
+          artwork: [
+            { src: "{{ url(Storage::url($radio->img)) }}", sizes: '96x96', type: 'image/png' },
+            { src: "{{ url(Storage::url($radio->img)) }}", sizes: '256x256', type: 'image/png' }
+          ]
+        });
+
+        // Actualizar interfaz
+        const slugDisplay = document.getElementById('playerSlug');
+        if (slugDisplay) slugDisplay.textContent = slug;
+      }
+    }, 100);
+
+    // Timeout de seguridad después de 5 segundos
+    setTimeout(function() {
+      if (!window.RTCStreamPlayer || !window.mediasoupClient) {
+        clearInterval(checkScriptsLoaded);
+        console.error('Error: No se pudieron cargar los scripts necesarios después de 5 segundos');
+        if (document.getElementById('rtcStatus')) {
+          document.getElementById('rtcStatus').textContent = 'Error: No se pudieron cargar los scripts';
+          document.getElementById('rtcStatus').className = 'status error';
+        }
+      }
+    }, 5000);
+
+  } catch (error) {
+    console.error('Error al inicializar RTCStreamPlayer:', error);
+    if (document.getElementById('rtcStatus')) {
+      document.getElementById('rtcStatus').textContent = 'Error: ' + error.message;
+      document.getElementById('rtcStatus').className = 'status error';
+    }
+  }
+});
+</script>
+@endif
 
 <script type="application/ld+json">
         {
