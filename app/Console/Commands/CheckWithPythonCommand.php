@@ -52,7 +52,7 @@ class CheckWithPythonCommand extends Command
         $this->installPythonDependencies($pythonCommand);
         
         // Obtener todas las radios activas
-        $radios = Radio::where('isActive', true)->get();
+        $radios = Radio::where('is_active', true)->get();
         $totalRadios = $radios->count();
         
         $this->info("Verificando {$totalRadios} streams de radio...");

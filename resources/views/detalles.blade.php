@@ -15,14 +15,14 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
 <meta property="og:description" content="Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}. Transmisión online desde República Dominicana.">
-<meta property="og:image" content="{{ url(Storage::url($radio->img)) }}">
+<meta property="og:image" content="{{ $radio->optimized_logo_url }}">
 <meta property="og:url" content="{{ url()->current() }}">
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image">
 <meta property="twitter:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
 <meta property="twitter:description" content="Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}. Transmisión online desde República Dominicana.">
-<meta property="twitter:image" content="{{ url(Storage::url($radio->img)) }}">
+<meta property="twitter:image" content="{{ $radio->optimized_logo_url }}">
 
 <!-- JSON-LD para SEO avanzado -->
 <script type="application/ld+json">
@@ -31,14 +31,15 @@
   "@type": "RadioStation",
   "name": "{{ $radio->name }}",
   "url": "{{ url()->current() }}",
-  "logo": "{{ url(Storage::url($radio->img)) }}",
-  "image": "{{ url(Storage::url($radio->img)) }}",
+  "logo": "{{ $radio->optimized_logo_url }}",
+  "image": "{{ $radio->optimized_logo_url }}",
   "description": "Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}.",
   "contentLocation": {
     "@type": "Place",
     "name": "{{ $radio->genres->pluck('name')->implode(', ') }}, República Dominicana"
   },
   "genre": "{{ $radio->tags }}",
+  "frequency": "{{ $radio->bitrate }}",
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "{{ $radio->rating }}",
@@ -56,11 +57,29 @@
 @endsection
 
 @section('content')
+<div class="container max-w-7xl mx-auto px-4 pt-8">
+    <nav class="text-sm mb-6 text-gray-600" aria-label="Breadcrumb">
+        @php
+        $breadcrumbItems = [
+            ['name' => 'Inicio', 'url' => route('home')],
+            ['name' => 'Ciudades', 'url' => route('ciudades.index')],
+        ];
+        if ($radio->genres->count() > 0) {
+            $firstGenre = $radio->genres->first();
+            if ($firstGenre) { // Asegurarse que $firstGenre no es null
+                $breadcrumbItems[] = ['name' => $firstGenre->name, 'url' => route('emisoras.porciudad', $firstGenre->slug)];
+            }
+        }
+        $breadcrumbItems[] = ['name' => $radio->name];
+        @endphp
+        <x-breadcrumbs :items="$breadcrumbItems" />
+    </nav>
+</div>
 <div class="container max-w-7xl mx-auto px-4 py-8">
     <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
         <div class="md:flex">
             <div class="md:w-1/3 p-6 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <img src="{{ Storage::url($radio->img) }}" alt="{{ $radio->name }}" class="max-w-full h-auto max-h-56 rounded-lg shadow-sm">
+                <img src="{{ $radio->optimized_logo_url }}" alt="{{ $radio->name }}" class="max-w-full h-auto max-h-56 rounded-lg shadow-sm">
             </div>
             <div class="md:w-2/3 p-6 md:p-8">
                 <h1 class="text-3xl font-bold mb-4 text-gray-800">{{ $radio->name }}</h1>

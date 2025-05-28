@@ -27,8 +27,8 @@ class SitemapController extends Controller
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
             ->setPriority(0.8));
 
-        // Añadir cada emisora al sitemap
-        $radios = Radio::all();
+        // Añadir cada emisora activa al sitemap
+        $radios = Radio::where('isActive', true)->get(); // Filtrar por activas
         foreach ($radios as $radio) {
             $sitemap->add(Url::create(route('emisoras.show', ['slug' => $radio->slug]))
                 ->setLastModificationDate($radio->updated_at ?? Carbon::now())
@@ -45,10 +45,25 @@ class SitemapController extends Controller
                 ->setPriority(0.6));
         }
 
+        // Añadir páginas estáticas
+        $sitemap->add(Url::create(route('terminos'))
+            ->setLastModificationDate(Carbon::now()) // O fecha de última modificación real si la tienes
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(0.3));
+
+        $sitemap->add(Url::create(route('privacidad'))
+            ->setLastModificationDate(Carbon::now()) // O fecha de última modificación real si la tienes
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
+            ->setPriority(0.3));
+
+        $sitemap->add(Url::create(route('contacto'))
+            ->setLastModificationDate(Carbon::now()) // O fecha de última modificación real si la tienes
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+            ->setPriority(0.5));
+
         // Puedes añadir más URLs según las necesidades de tu aplicación...
 
         // Enviar el sitemap en formato XML como respuesta
         return $sitemap->toResponse(request());
     }
 }
-

@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /admin/
+Disallow: /livewire/message/
+
+Sitemap: https://domiradios.com.do/sitemap.xml
