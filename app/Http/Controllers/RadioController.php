@@ -420,7 +420,7 @@ public function getCurrentTrack($id)
         Log::info("Radio ID {$id}: Returning currentTrack: '{$currentTrack}', listeners: {$listeners} for source {$radio->source_radio}");
 
         return response()->json([
-            'currentTrack' => $currentTrack,
+            'current_track' => $currentTrack,
             'listeners' => $listeners,
         ]);
 
@@ -428,7 +428,7 @@ public function getCurrentTrack($id)
         Log::error("Radio ID {$id}: Exception in getCurrentTrack: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
         // Fallback to default information on any exception
         return response()->json([
-            'currentTrack' => self::DEFAULT_TRACK_INFO,
+            'current_track' => self::DEFAULT_TRACK_INFO,
             'listeners' => $this->getFictitiousListeners($id),
         ]);
     }
