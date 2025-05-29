@@ -75,7 +75,7 @@ class OptimizeRadioLogos extends Command
                 try {
                     $manager = new ImageManager(new Driver());
                     /** @var \Intervention\Image\Interfaces\ImageInterface $img */
-                    $img = $manager->make($imageContent);
+                    $img = $manager->read($imageContent);
                 } catch (\Exception $e) {
                     throw new \Exception('Error al inicializar imagen con Intervention: ' . $e->getMessage());
                 }
