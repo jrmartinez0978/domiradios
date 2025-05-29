@@ -85,6 +85,18 @@ class RadioResource extends Resource
                     ->nullable()
                     ->columnSpanFull()
                     ->helperText('Ingrese una descripción detallada de la emisora. Puede usar HTML básico (<b>negrita</b>, <i>cursiva</i>, <br> para saltos de línea).'),
+
+                Forms\Components\TextInput::make('address')
+                    ->label('Dirección o Ciudad*')
+                    ->maxLength(255)
+                    ->required()
+                    ->placeholder('Ejemplo: Santo Domingo, República Dominicana')
+                    ->helperText('Incluya ciudad y país para SEO. Este campo es obligatorio.')
+                    ->validationMessages([
+                        'required' => 'La dirección o ciudad es obligatoria.',
+                        'max' => 'La dirección no puede superar los 255 caracteres.'
+                    ]),
+
                 // Implementación del campo de clasificación (rating)
                 Rating::make('rating')
                     ->stars(5)  // Número máximo de estrellas (por defecto 5)

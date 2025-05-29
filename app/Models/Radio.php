@@ -32,6 +32,7 @@ class Radio extends Model
         'isActive',
         'rating',
         'description',
+        'address',
     ];
 
     protected static function boot()
