@@ -137,10 +137,8 @@
                           "genre": "{{ $radio->tags }}",
                           "description": "{{ strip_tags($radio->description) }}",
                           "address": {
-                            "@type": "PostalAddress",
-                            @if(!empty($radio->address))
-                            "streetAddress": "{{ $radio->address }}",
-                            @endif
+                            "@type": "PostalAddress"@if(!empty($radio->address)),
+                            "streetAddress": "{{ $radio->address }}"@endif,
                             "addressLocality": "{{ $radio->genres->pluck('name')->implode(', ') }}",
                             "addressCountry": "República Dominicana"
                           }
@@ -277,20 +275,14 @@
 
                     @else
                     <!-- Reproductor Estándar HTML5 -->
-                    <!-- Player sticky para mobile -->
-                    <div class="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 shadow-lg p-2 md:hidden flex flex-col items-center">
+                    @if($radio->link_radio)
+                    <div class="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 shadow-lg p-2 flex flex-col items-center">
                         <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
                         <button id="play-btn" class="w-full max-w-md bg-gradient-to-r from-brand-blue to-brand-red text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center hover:opacity-90 focus:ring focus:ring-brand-blue/30 transition-all">
                             <i class="fas fa-play mr-3 text-xl"></i> Escuchar en Vivo
                         </button>
                     </div>
-                    <!-- Player estándar para escritorio -->
-                    <div class="md:block hidden">
-                        <audio id="audio-player-desktop" src="{{ $radio->link_radio }}"></audio>
-                        <button id="play-btn-desktop" class="w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:opacity-90 transition-all focus:ring focus:ring-brand-blue/30">
-                            <i class="fas fa-play mr-2"></i> Reproducir
-                        </button>
-                    </div>
+                    @endif
                     @endif
                 </div>
             </div>
