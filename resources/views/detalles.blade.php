@@ -49,10 +49,18 @@
   "logo": "{{ $radio->optimized_logo_url }}",
   "image": "{{ $radio->optimized_logo_url }}",
   "description": "Escucha {{ $radio->name }} en vivo. Emisora de radio {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}.",
+  @if(!empty($radio->address))
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ $radio->address }}",
+    "addressCountry": "República Dominicana"
+  },
+  @else
   "contentLocation": {
     "@type": "Place",
     "name": "{{ $radio->genres->pluck('name')->implode(', ') }}, República Dominicana"
   },
+  @endif
   "genre": "{{ $radio->tags }}",
   "frequency": "{{ $radio->bitrate }}",
   "aggregateRating": {
