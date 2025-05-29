@@ -5,9 +5,10 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Radio;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Facades\Image;
 use Intervention\Image\Encoders\WebpEncoder;
 use Illuminate\Support\Str;
+
 
 class OptimizeRadioLogos extends Command
 {
@@ -68,7 +69,7 @@ class OptimizeRadioLogos extends Command
                 $this->info('Imagen leída correctamente.');
 
                 try {
-                    $img = Image::read($imageContent);
+                    $img = Image::make($imageContent);
                 } catch (\Exception $e) {
                     throw new \Exception('Error al inicializar imagen con Intervention: ' . $e->getMessage());
                 }

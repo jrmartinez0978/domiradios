@@ -6,7 +6,7 @@
         <div class="md:flex">
             <!-- Imagen de la emisora -->
             <div class="md:w-1/3 bg-white p-8 flex items-center justify-center">
-                <img src="{{ asset('storage/'.$radio->img) }}" alt="{{ $radio->nombre }}" class="w-full max-w-xs object-contain" loading="lazy">
+                <img src="{{ asset('storage/'.$radio->img) }}" alt="{{ $radio->nombre }}" class="w-full max-w-xs object-contain">
             </div>
             
             <!-- Información de la emisora -->
