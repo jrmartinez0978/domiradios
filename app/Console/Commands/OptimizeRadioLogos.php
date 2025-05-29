@@ -57,17 +57,49 @@ class OptimizeRadioLogos extends Command
             }
 
             try {
+                $this->info("Procesando radio ID: {$radio->id}, img: {$originalPath}");
                 if (!Storage::disk('public')->exists($optimizedDirPath)) {
                     Storage::disk('public')->makeDirectory($optimizedDirPath);
                 }
                 $imageContent = Storage::disk('public')->get($originalPath);
-                $img = Image::read($imageContent);
-                $img->resize(300, 300, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-                $encodedImage = $img->encode(new WebpEncoder(quality: 90));
-                Storage::disk('public')->put($optimizedFullPath, (string) $encodedImage);
+                if (!$imageContent) {
+                    throw new \Exception('No se pudo leer el archivo de imagen: ' . $originalPath);
+                }
+                $this->info('Imagen leída correctamente.');
+
+                try {
+                    $img = Image::read($imageContent);
+                } catch (\Exception $e) {
+                    throw new \Exception('Error al inicializar imagen con Intervention: ' . $e->getMessage());
+                }
+
+                $this->info('Imagen inicializada para Intervention.');
+
+                try {
+                    $img->resize(300, 300, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                } catch (\Exception $e) {
+                    throw new \Exception('Error al redimensionar la imagen: ' . $e->getMessage());
+                }
+
+                $this->info('Imagen redimensionada.');
+
+                try {
+                    $encodedImage = $img->encode(new WebpEncoder(quality: 90));
+                } catch (\Exception $e) {
+                    throw new \Exception('Error al codificar la imagen a WebP: ' . $e->getMessage());
+                }
+
+                $this->info('Imagen codificada a WebP.');
+
+                try {
+                    Storage::disk('public')->put($optimizedFullPath, (string) $encodedImage);
+                } catch (\Exception $e) {
+                    throw new \Exception('Error al guardar la imagen optimizada: ' . $e->getMessage());
+                }
+
                 $optimizedCount++;
                 $this->info('Optimizado: ' . $originalPath . ' → ' . $optimizedFullPath);
             } catch (\Exception $e) {

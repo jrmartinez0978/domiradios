@@ -332,22 +332,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Función para actualizar la canción y oyentes en tiempo real
     function updateRealTimeData() {
-        fetch(currentTrackUrl)
-            .then(response => response.json())
+        // Fetch con timeout y control de error robusto
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos de timeout
+        fetch(currentTrackUrl, { signal: controller.signal })
+            .then(response => {
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
             .then(data => {
-                // Actualizar la canción actual si hay datos
                 if (data.current_track) {
                     document.getElementById('current-track').textContent = data.current_track;
                 } else {
                     document.getElementById('current-track').textContent = 'Información no disponible';
                 }
-
-                // Actualizar la cantidad de oyentes si hay datos
                 if (data.listeners) {
                     document.getElementById('listeners').textContent = 'Oyentes: ' + data.listeners;
                 }
             })
             .catch(error => {
+                clearTimeout(timeoutId);
+                document.getElementById('current-track').textContent = 'Error de conexión';
+                document.getElementById('listeners').textContent = 'Oyentes: --';
                 console.error('Error al obtener los datos:', error);
             });
     }
@@ -568,6 +575,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (document.getElementById('rtcStatus')) {
           document.getElementById('rtcStatus').textContent = 'Error: No se pudieron cargar los scripts';
           document.getElementById('rtcStatus').className = 'status error';
+        }
+        // Marcar la página como cargada para el navegador (en caso de bloqueos)
+        if (window.stop) window.stop();
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', function() {}, { once: true });
         }
       }
     }, 5000);
