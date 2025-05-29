@@ -1,7 +1,33 @@
+# Configuración para todos los robots
 User-agent: *
 Allow: /
 
+# Directorios y rutas a excluir de la indexación
 Disallow: /admin/
 Disallow: /livewire/message/
+Disallow: /login
+Disallow: /register
+Disallow: /password
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*?*
 
+# Permitir indexación explícita de contenido importante
+Allow: /emisoras
+Allow: /ciudades
+
+# Configuración específica para Googlebot
+User-agent: Googlebot
+Allow: /
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+
+# Sitemap
 Sitemap: https://domiradios.com.do/sitemap.xml
+
+# Tiempo de rastreo recomendado (ayuda a Google a entender la frescura del contenido)
+Crawl-delay: 5
