@@ -1,5 +1,31 @@
 @extends('layouts.app')
 
+@section('title', $radio->nombre . ' - Escucha en vivo | Domiradios')
+@section('description', 'Escucha ' . $radio->nombre . ' en vivo. ' . ($radio->descripcion ? strip_tags(Str::limit($radio->descripcion, 140)) : 'Emisora de radio dominicana online.'))
+
+{{-- Rich Snippet RadioStation --}}
+@push('head')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RadioStation",
+  "name": "{{ $radio->nombre }}",
+  "url": "{{ url()->current() }}",
+  "logo": "{{ asset('storage/'.$radio->img) }}",
+  @if($radio->frecuencia)
+  "broadcastFrequency": "{{ $radio->frecuencia }}",
+  @endif
+  @if($radio->ciudad)
+  "areaServed": {
+    "@type": "City",
+    "name": "{{ $radio->ciudad->nombre }}"
+  },
+  @endif
+  "description": "{{ strip_tags(Str::limit($radio->descripcion, 160)) }}"
+}
+</script>
+@endpush
+
 @section('content')
 <div class="container max-w-6xl py-12">
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">

@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    {{-- SEO Mejorado --}}
+    <title>@yield('title', 'Domiradios - Emisoras de República Dominicana')</title>
+    <meta name="description" content="@yield('description', 'Escucha emisoras de radio dominicanas en vivo. El directorio más completo de radios online en República Dominicana. Música, noticias y deportes en vivo.')">
+    {{-- Datos estructurados Organization y WebSite --}}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Domiradios",
+      "url": "https://domiradios.com.do",
+      "logo": "https://domiradios.com.do/storage/logo.png",
+      "sameAs": [
+        "https://www.facebook.com/domiradios",
+        "https://twitter.com/domiradios"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://domiradios.com.do",
+      "name": "Domiradios",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://domiradios.com.do/buscar?query={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     @if(isset($radios) && count($radios) > 0 && isset($radios[0]->img))
         <link rel="preload" as="image" href="{{ Storage::url('radios/optimized/' . basename(pathinfo($radios[0]->img, PATHINFO_FILENAME)) . '.webp') }}">
     @endif
