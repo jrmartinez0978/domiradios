@@ -28,13 +28,23 @@
                 const stars = ratingElement.querySelectorAll('.rating-star');
                 
                 // Verificar si el usuario ya ha valorado esta emisora
-                fetch(`/emisoras/user-rating/${radioId}`)
-                    .then(response => response.json())
+                // Fetch robusto con timeout de 5s
+                const ratingController = new AbortController();
+                const ratingTimeout = setTimeout(() => ratingController.abort(), 5000);
+                fetch(`/emisoras/user-rating/${radioId}`, { signal: ratingController.signal })
+                    .then(response => {
+                        clearTimeout(ratingTimeout);
+                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.rating > 0) {
-                            // Marcar las estrellas según la valoración del usuario
                             highlightStars(stars, data.rating);
                         }
+                    })
+                    .catch(error => {
+                        clearTimeout(ratingTimeout);
+                        console.error('Error al cargar la valoración del usuario:', error);
                     });
                 
                 // Agregar eventos de hover para previsualizar la valoración
@@ -85,6 +95,9 @@
             
             // Función para enviar la valoración
             function submitRating(radioId, rating, stars, ratingElement) {
+                // Fetch robusto con timeout de 5s
+                const submitController = new AbortController();
+                const submitTimeout = setTimeout(() => submitController.abort(), 5000);
                 fetch('/emisoras/rate', {
                     method: 'POST',
                     headers: {
@@ -94,9 +107,14 @@
                     body: JSON.stringify({
                         radio_id: radioId,
                         rating: rating
-                    })
+                    }),
+                    signal: submitController.signal
                 })
-                .then(response => response.json())
+                .then(response => {
+                    clearTimeout(submitTimeout);
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         // Actualizar el atributo de valoración actual
@@ -110,8 +128,9 @@
                     }
                 })
                 .catch(error => {
+                    clearTimeout(submitTimeout);
+                    showNotification('Error de red o servidor al enviar la valoración.', 'error');
                     console.error('Error al enviar la valoración:', error);
-                    showNotification('Error al enviar la valoración. Por favor, inténtalo de nuevo.', 'error');
                 });
             }
             

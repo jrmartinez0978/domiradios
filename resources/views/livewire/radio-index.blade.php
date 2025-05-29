@@ -219,6 +219,9 @@
          * @param {string} radioId - El ID de la emisora
          */
         function registerPlay(radioId) {
+            // Fetch robusto con timeout de 5s
+            const playController = new AbortController();
+            const playTimeout = setTimeout(() => playController.abort(), 5000);
             fetch('{{ route("radio.register-play") }}', {
                 method: 'POST',
                 headers: {
@@ -226,12 +229,18 @@
                     'X-CSRF-TOKEN': csrfToken,
                 },
                 body: JSON.stringify({ radio_id: radioId }),
+                signal: playController.signal
             })
-            .then(response => response.json())
+            .then(response => {
+                clearTimeout(playTimeout);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
             .then(data => {
                 console.log('Visita registrada:', data);
             })
             .catch(error => {
+                clearTimeout(playTimeout);
                 console.error('Error al registrar la visita:', error);
             });
         }

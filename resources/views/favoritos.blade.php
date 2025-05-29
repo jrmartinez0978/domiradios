@@ -38,15 +38,23 @@
             document.getElementById('no-favorites-message').classList.remove('hidden');
         } else {
             // Llamada AJAX para obtener las emisoras favoritas
+            // Fetch robusto con timeout de 5s
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             fetch('/api/favoritos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ ids: favorites })
+                body: JSON.stringify({ ids: favorites }),
+                signal: controller.signal
             })
-            .then(response => response.json())
+            .then(response => {
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
             .then(data => {
                 if (data.length > 0) {
                     let html = '';
@@ -71,8 +79,11 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                clearTimeout(timeoutId);
+                document.getElementById('favoritos-list').innerHTML = '';
                 document.getElementById('no-favorites-message').classList.remove('hidden');
+                document.getElementById('no-favorites-message').innerHTML = '<div class="text-red-600">No se pudieron cargar tus favoritos. Intenta más tarde.</div>';
+                console.error('Error:', error);
             });
         }
     });

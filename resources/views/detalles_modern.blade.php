@@ -6,7 +6,7 @@
         <div class="md:flex">
             <!-- Imagen de la emisora -->
             <div class="md:w-1/3 bg-white p-8 flex items-center justify-center">
-                <img src="{{ asset('storage/'.$radio->img) }}" alt="{{ $radio->nombre }}" class="w-full max-w-xs object-contain">
+                <img src="{{ asset('storage/'.$radio->img) }}" alt="{{ $radio->nombre }}" class="w-full max-w-xs object-contain" loading="lazy">
             </div>
             
             <!-- Información de la emisora -->
@@ -85,7 +85,7 @@
         <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             @foreach($emisoras_relacionadas as $emisora)
             <article class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                <img src="{{ asset('storage/'.$emisora->img) }}" alt="Logo {{ $emisora->nombre }}" class="w-full aspect-square object-contain rounded-t-2xl p-4" />
+                <img src="{{ asset('storage/'.$emisora->img) }}" alt="Logo {{ $emisora->nombre }}" class="w-full aspect-square object-contain rounded-t-2xl p-4" loading="lazy" />
                 <div class="p-5 flex-1">
                     <h3 class="font-semibold text-xl text-brand-blue">{{ $emisora->nombre }}</h3>
                     <p class="text-xs text-slate-500">
@@ -121,14 +121,22 @@
                 // Aquí iría la lógica para agregar a favoritos
                 // Puedes usar fetch para una petición AJAX
                 
+                // Fetch robusto con timeout de 5s
+                const favController = new AbortController();
+                const favTimeout = setTimeout(() => favController.abort(), 5000);
                 fetch('{{ route("agregar.favorito", $radio->id) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
+                    signal: favController.signal
                 })
-                .then(response => response.json())
+                .then(response => {
+                    clearTimeout(favTimeout);
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         this.innerHTML = '<i class="fas fa-heart"></i> <span>En favoritos</span>';
@@ -137,7 +145,10 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    clearTimeout(favTimeout);
+                    this.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Error al agregar</span>';
+                    this.classList.add('bg-red-600');
+                    console.error('Error al agregar a favoritos:', error);
                 });
             });
         }
