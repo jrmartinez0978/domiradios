@@ -16,7 +16,12 @@
         "sameAs": [
           "https://www.facebook.com/domiradios",
           "https://twitter.com/domiradios"
-        ]
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Santo Domingo",
+          "addressCountry": "República Dominicana"
+        }
       },
       {
         "@context": "https://schema.org",
