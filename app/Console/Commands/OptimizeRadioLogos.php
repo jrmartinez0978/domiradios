@@ -69,7 +69,8 @@ class OptimizeRadioLogos extends Command
                 $this->info('Imagen leída correctamente.');
 
                 try {
-                    $manager = new \Intervention\Image\ImageManager(['driver' => 'gd']); // Usa GD, puedes cambiar a 'imagick' si tu servidor lo soporta
+                    $manager = new ImageManager('gd'); // Usa 'gd' o 'imagick' según tu servidor
+                    /** @var \Intervention\Image\Interfaces\ImageInterface $img */
                     $img = $manager->make($imageContent);
                 } catch (\Exception $e) {
                     throw new \Exception('Error al inicializar imagen con Intervention: ' . $e->getMessage());
