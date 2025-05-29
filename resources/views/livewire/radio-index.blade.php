@@ -68,7 +68,7 @@
                             <meta itemprop="ratingValue" content="{{ $radio->rating }}">
                             <meta itemprop="bestRating" content="5">
                             <meta itemprop="worstRating" content="1">
-                            <span itemprop="ratingCount">{{ number_format($radio->rating, 1) }}</span>
+                            <meta itemprop="ratingCount" content="{{ isset($radio->rating_count) ? (int)$radio->rating_count : 1 }}">
                         </span>
                     </div>
 
