@@ -225,34 +225,18 @@
                     @if($radio->source_radio === 'RTCStream')
                     <!-- RTCStream Player (WebRTC) siguiendo el modelo del ejemplo -->
                     <!-- Player sticky para mobile RTCStream -->
+                    <!-- Mini-player sticky RTCStream para mobile -->
                     <div class="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 shadow-lg p-2 md:hidden flex flex-col items-center">
-                        <div class="rtc-player w-full max-w-md bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-md border border-gray-200">
-                            <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
-                                <span class="inline-block w-7 h-7 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 mr-3 flex items-center justify-center shadow-sm">
-                                    <i class="fas fa-headphones-alt text-white text-xs"></i>
-                                </span>
-                                <span id="playerSlug" class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">{{ Str::afterLast($radio->link_radio, '/') }}</span>
-                            </h3>
-                            <div class="text-xs mb-4 ml-10 font-bold italic drop-shadow-sm text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">
-                                <i class="fas fa-info-circle mr-1"></i> Baja latencia con RTCStream
-                            </div>
-                            <div class="flex gap-3 mb-4">
-                                <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center hover:shadow-lg hover:opacity-95 transition-all focus:ring focus:ring-brand-blue/30">
-                                    <i class="fas fa-play mr-3 text-xl"></i> Escuchar
-                                </button>
-                                <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-bold text-lg flex items-center justify-center hover:bg-gray-300 hover:shadow-sm transition-all" disabled>
-                                    <i class="fas fa-stop mr-3 text-xl"></i> Detener
-                                </button>
-                            </div>
-                            <div id="playerStatus" class="player-status status-info text-sm text-center p-2 rounded-lg border border-gray-200 bg-white bg-opacity-70 backdrop-blur-sm">Esperando conexión...</div>
-                            <div class="flex justify-center items-center mt-3">
-                                <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 border border-gray-200">
-                                    <i class="fas fa-clock text-xs text-gray-500 mr-2"></i>
-                                    <div id="playerTimer" class="text-xs font-mono text-gray-700">00:00</div>
-                                </div>
-                            </div>
-                            <audio id="playerAudio" playsinline webkit-playsinline></audio>
+                        <div class="w-full max-w-md flex items-center justify-between">
+                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center mx-1">
+                                <i class="fas fa-play mr-2 text-xl"></i> Escuchar
+                            </button>
+                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-lg flex items-center justify-center mx-1" disabled>
+                                <i class="fas fa-stop mr-2 text-xl"></i> Detener
+                            </button>
                         </div>
+                        <div id="playerStatus" class="player-status status-info text-xs text-center p-2 mt-1 rounded-lg border border-gray-200 bg-white bg-opacity-80 w-full">Esperando conexión...</div>
+                        <audio id="playerAudio" playsinline webkit-playsinline></audio>
                     </div>
                     <!-- Player RTCStream para escritorio -->
                     <div class="rtc-player relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-md border border-gray-200 md:block hidden" id="rtcPlayer">
