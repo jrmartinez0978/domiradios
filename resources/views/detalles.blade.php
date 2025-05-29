@@ -55,7 +55,34 @@
     "streetAddress": "{{ $radio->address }}",
     "addressCountry": "República Dominicana"
   },
-  @else
+  @endif
+  @if(!empty($radio->telephone))
+  "telephone": "{{ $radio->telephone }}",
+  @endif
+  @if(!empty($radio->email))
+  "email": "{{ $radio->email }}",
+  @endif
+  @if(!empty($radio->opening_hours))
+  "openingHours": "{{ $radio->opening_hours }}",
+  @endif
+  @php
+    $sameAs = [];
+    if (!empty($radio->url_website)) $sameAs[] = $radio->url_website;
+    if (!empty($radio->url_facebook)) $sameAs[] = $radio->url_facebook;
+    if (!empty($radio->url_twitter)) $sameAs[] = $radio->url_twitter;
+    if (!empty($radio->url_instagram)) $sameAs[] = $radio->url_instagram;
+  @endphp
+  @if(count($sameAs))
+  "sameAs": [{!! collect($sameAs)->map(fn($url) => '"'.$url.'"')->implode(',') !!}],
+  @endif
+  @if(!empty($radio->latitude) && !empty($radio->longitude))
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{ $radio->latitude }}",
+    "longitude": "{{ $radio->longitude }}"
+  },
+  @endif
+  @if(empty($radio->address))
   "contentLocation": {
     "@type": "Place",
     "name": "{{ $radio->genres->pluck('name')->implode(', ') }}, República Dominicana"
@@ -63,6 +90,7 @@
   @endif
   "genre": "{{ $radio->tags }}",
   "frequency": "{{ $radio->bitrate }}",
+  @if(!empty($radio->rating))
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "{{ $radio->rating }}",
@@ -70,11 +98,14 @@
     "worstRating": "1",
     "ratingCount": "{{ rand(10, 50) }}"
   },
+  @endif
+  @if(!empty($radio->link_radio))
   "audio": {
     "@type": "AudioObject",
     "contentUrl": "{{ $radio->link_radio }}",
     "encodingFormat": "{{ $radio->type_radio }}"
   }
+  @endif
 }
 </script>
 @endsection
