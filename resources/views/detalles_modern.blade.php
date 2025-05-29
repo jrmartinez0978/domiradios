@@ -20,17 +20,14 @@
     "@type": "City",
     "name": "{{ $radio->ciudad->nombre }}"
   },
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "{{ $radio->ciudad->nombre }}",
-    "addressCountry": "República Dominicana"
-  },
-  @else
-  "address": {
-    "@type": "PostalAddress",
-    "addressCountry": "República Dominicana"
-  },
   @endif
+  "address": {
+    "@type": "PostalAddress",
+    @if($radio->ciudad)
+    "addressLocality": "{{ $radio->ciudad->nombre }}",
+    @endif
+    "addressCountry": "República Dominicana"
+  },
   "description": "{{ strip_tags(Str::limit($radio->descripcion, 160)) }}"
 }
 </script>
