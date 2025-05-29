@@ -14,6 +14,18 @@
         <div id="radio-list" class="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
             @foreach($radios as $radio)
             <article class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative" itemscope itemtype="http://schema.org/RadioStation">
+                <!-- Datos estructurados: address -->
+                <meta itemprop="address" itemscope itemtype="https://schema.org/PostalAddress"
+                    @if(!empty($radio->address) || !empty($radio->city))
+                        content="{{ !empty($radio->address) ? $radio->address : $radio->city }}, República Dominicana"
+                    @else
+                        content="República Dominicana"
+                    @endif
+                >
+                <span itemprop="address" itemscope itemtype="https://schema.org/PostalAddress" hidden>
+                    <meta itemprop="addressLocality" content="{{ !empty($radio->address) ? $radio->address : (!empty($radio->city) ? $radio->city : 'República Dominicana') }}">
+                    <meta itemprop="addressCountry" content="República Dominicana">
+                </span>
                 <!-- Badge superior para destacados -->
                 @if($radio->isFeatured)
                 <div class="absolute top-2 right-2 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-10 shadow-md backdrop-blur-sm bg-opacity-90 transform hover:scale-105 transition-all duration-300 animate-pulse-slow">
