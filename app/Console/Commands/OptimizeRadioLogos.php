@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 use Illuminate\Console\Command;
 use App\Models\Radio;
@@ -72,7 +73,7 @@ class OptimizeRadioLogos extends Command
                 $this->info('Imagen leída correctamente.');
 
                 try {
-                    $manager = new ImageManager('gd'); // Usa 'gd' o 'imagick' según tu servidor
+                    $manager = new ImageManager(new Driver());
                     /** @var \Intervention\Image\Interfaces\ImageInterface $img */
                     $img = $manager->make($imageContent);
                 } catch (\Exception $e) {
