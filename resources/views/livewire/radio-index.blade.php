@@ -30,7 +30,8 @@
                             alt="{{ $radio->name }} - Emisora de radio {{ $radio->bitrate }}"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 lazyload"
                             itemprop="image"
-                            loading="lazy"
+                            width="300" height="300"
+                            @if(isset($loop) && $loop->index >= 6) loading="lazy" @endif
                         >
                     </a>
                 </div>

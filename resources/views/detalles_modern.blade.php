@@ -6,7 +6,7 @@
         <div class="md:flex">
             <!-- Imagen de la emisora -->
             <div class="md:w-1/3 bg-white p-8 flex items-center justify-center">
-                <img src="{{ asset('storage/'.$radio->img) }}" alt="{{ $radio->nombre }}" class="w-full max-w-xs object-contain">
+                <img src="{{ asset('storage/'.$radio->img) }}" alt="{{ $radio->nombre }}" class="w-full max-w-xs object-contain" width="300" height="300">
             </div>
             
             <!-- Información de la emisora -->
@@ -85,7 +85,7 @@
         <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             @foreach($emisoras_relacionadas as $emisora)
             <article class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                <img src="{{ asset('storage/'.$emisora->img) }}" alt="Logo {{ $emisora->nombre }}" class="w-full aspect-square object-contain rounded-t-2xl p-4" loading="lazy" />
+                <img src="{{ asset('storage/'.$emisora->img) }}" alt="Logo {{ $emisora->nombre }}" class="w-full aspect-square object-contain rounded-t-2xl p-4" loading="lazy" width="300" height="300" />
                 <div class="p-5 flex-1">
                     <h3 class="font-semibold text-xl text-brand-blue">{{ $emisora->nombre }}</h3>
                     <p class="text-xs text-slate-500">
