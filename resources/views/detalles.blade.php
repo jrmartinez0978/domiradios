@@ -61,13 +61,13 @@
     <nav class="text-sm mb-6 text-gray-600" aria-label="Breadcrumb">
         @php
         $breadcrumbItems = [
-            ['name' => 'Inicio', 'url' => route('home')],
+            ['name' => 'Inicio', 'url' => route('emisoras.index')],
             ['name' => 'Ciudades', 'url' => route('ciudades.index')],
         ];
         if ($radio->genres->count() > 0) {
             $firstGenre = $radio->genres->first();
             if ($firstGenre) { // Asegurarse que $firstGenre no es null
-                $breadcrumbItems[] = ['name' => $firstGenre->name, 'url' => route('emisoras.porciudad', $firstGenre->slug)];
+                $breadcrumbItems[] = ['name' => $firstGenre->name, 'url' => route('ciudades.show', $firstGenre->slug)];
             }
         }
         $breadcrumbItems[] = ['name' => $radio->name];

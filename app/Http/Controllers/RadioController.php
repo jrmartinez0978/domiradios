@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http; // Importación necesaria
 use Illuminate\Support\Facades\Log;  // Importación necesaria para Log
 use App\Models\Visita;
-
+use App\Traits\HasSeo; // Importar el trait
 
 
 class RadioController extends Controller
 {
+    use HasSeo; // Usar el trait
     private const DEFAULT_TRACK_INFO = 'Sin información';
     private const SOURCE_SONICPANEL = 'SonicPanel';
     private const SOURCE_SHOUTCAST = 'Shoutcast';
@@ -25,7 +26,11 @@ class RadioController extends Controller
     // Método para mostrar la vista de favoritos
     public function favoritos()
     {
-        // Aplicamos la vista moderna a los favoritos
+        $this->setSeoData(
+            'Mis Emisoras Favoritas - Domiradios',
+            'Accede y gestiona tu lista de emisoras de radio dominicanas favoritas.',
+            asset('img/domiradios-logo-og.png')
+        );
         return view('favoritos');
     }
 
@@ -35,24 +40,32 @@ class RadioController extends Controller
         $query = $request->input('q');
 
         if (empty($query)) {
-            return redirect()->route('emisoras.index');
+            // Si la búsqueda está vacía, podríamos redirigir o mostrar un mensaje.
+            // Por ahora, establecemos SEO genérico para la página de búsqueda vacía si se llega aquí.
+            $this->setSeoData(
+                'Buscar Emisoras - Domiradios',
+                'Encuentra tus emisoras dominicanas favoritas.',
+                asset('img/domiradios-logo-og.png')
+            );
+            // Considera redirigir a la página principal o a una página de "no resultados" más específica.
+            // return redirect()->route('emisoras.index'); // Opcional
+        } else {
+             $this->setSeoData(
+                "Resultados para: \"{$query}\" - Domiradios",
+                "Emisoras de radio dominicanas encontradas para tu búsqueda: \"{$query}\". Escucha en vivo.",
+                asset('img/domiradios-logo-og.png')
+            );
         }
 
         $radios = Radio::where('isActive', true)
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%$query%")
-                  ->orWhere('bitrate', 'like', "%$query%")
+                  ->orWhere('bitrate', 'like', "%$query%") // Considera si buscar por bitrate es útil para el usuario
                   ->orWhere('tags', 'like', "%$query%");
             })
             ->get();
 
-        return view('emisoras', compact('radios', 'query'))
-               ->with([
-                    'meta_title' => "Resultados para: $query",
-                    'meta_description' => "Emisoras de radio que coinciden con: $query",
-                    'meta_keywords' => "buscar, emisoras, $query",
-                    'canonical_url' => route('buscar', ['q' => $query])
-               ]);
+        return view('emisoras', compact('radios', 'query'));
     }
 
     // Nueva API para obtener emisoras favoritas
@@ -88,14 +101,23 @@ class RadioController extends Controller
         // Si los tags están guardados como una cadena de texto, se separan por comas
         $meta_keywords = $radio->tags; // Asumimos que tags es una cadena como 'rock, pop, baladas'
 
-        // Retornar la vista con los metadatos para SEO y las emisoras relacionadas
-        return view('detalles', compact('radio', 'related'))
-               ->with([
-                    'meta_title' => $radio->name . ' - Escucha en vivo',
-                    'meta_description' => strip_tags($radio->description),
-                    'meta_keywords' => $meta_keywords,  // Usar los tags como keywords directamente
-                    'canonical_url' => $canonical_url
-               ]);
+        $description = strip_tags($radio->description);
+        // Limitar la longitud de la descripción para meta tags
+        $metaDescription = mb_substr($description, 0, 160);
+        if (mb_strlen($description) > 160) {
+            $metaDescription .= '...';
+        }
+
+        $this->setSeoData(
+            $radio->name . ' - Escucha en Vivo | Domiradios',
+            $metaDescription,
+            $radio->logo ? asset($radio->logo) : asset('img/domiradios-logo-og.png')
+        );
+        // SEOTools puede manejar canonicals y keywords si se configuran globalmente o se añaden aquí.
+        // Ejemplo: SEOTools::setCanonical(route('emisoras.show', ['slug' => $radio->slug]));
+        // Ejemplo: SEOTools::addKeywords(explode(',', $radio->tags ?? ''));
+
+        return view('detalles', compact('radio', 'related'));
     }
 
 
@@ -114,14 +136,14 @@ class RadioController extends Controller
         // Generar la URL canónica
         $canonical_url = route('ciudades.show', ['slug' => $genre->slug]);
 
-        // Retornar la vista con las emisoras de la ciudad y los metadatos para SEO
-        return view('emisoras_por_ciudad', compact('radios', 'genre'))
-               ->with([
-                    'meta_title' => 'Emisoras en ' . $genre->name . ' - Directorio de Emisoras',
-                    'meta_description' => 'Descubre las emisoras de radio en ' . $genre->name . ' y sus géneros.',
-                    'meta_keywords' => 'emisoras, radio, ' . $genre->name,
-                    'canonical_url' => $canonical_url
-               ]);
+        $this->setSeoData(
+            'Emisoras de Radio en ' . $genre->name . ' - Domiradios',
+            'Encuentra y escucha las mejores emisoras de radio en ' . $genre->name . ', República Dominicana. Directorio actualizado.',
+            asset('img/domiradios-logo-og.png')
+        );
+        // SEOTools::setCanonical(route('ciudades.show', ['slug' => $genre->slug]));
+
+        return view('emisoras_por_ciudad', compact('radios', 'genre'));
     }
 
     // Método para mostrar todas las ciudades (géneros)
@@ -133,14 +155,14 @@ class RadioController extends Controller
         // Generar la URL canónica
         $canonical_url = route('ciudades.index');
 
-        // Retornar la vista con todas las ciudades y los metadatos SEO
-        return view('ciudades', compact('genres'))
-               ->with([
-                    'meta_title' => 'Ciudades con Emisoras - Directorio de Emisoras',
-                    'meta_description' => 'Encuentra emisoras de radio por ciudad en nuestro directorio completo.',
-                    'meta_keywords' => 'emisoras, radio, ciudades',
-                    'canonical_url' => $canonical_url
-               ]);
+        $this->setSeoData(
+            'Ciudades con Emisoras de Radio en República Dominicana - Domiradios',
+            'Explora emisoras de radio dominicanas por ciudad. Encuentra tu estación favorita en nuestro directorio.',
+            asset('img/domiradios-logo-og.png')
+        );
+        // SEOTools::setCanonical(route('ciudades.index'));
+
+        return view('ciudades', compact('genres'));
     }
 
     // Método para mostrar todas las emisoras
@@ -153,14 +175,14 @@ class RadioController extends Controller
         // Generar la URL canónica
         $canonical_url = route('emisoras.index');
 
-        // Retornar la vista 'welcome' con los datos de las radios y los metadatos SEO
-        return view('emisoras', compact('emisoras'))
-               ->with([
-                    'meta_title' => 'Todas las Emisoras - Directorio de Emisoras',
-                    'meta_description' => 'Descubre todas las emisoras de radio disponibles en nuestro directorio.',
-                    'meta_keywords' => 'emisoras, radio, géneros, estaciones',
-                    'canonical_url' => $canonical_url
-               ]);
+        $this->setSeoData(
+            'Listado Completo de Emisoras Dominicanas - Domiradios',
+            'Directorio completo de emisoras de radio en República Dominicana. Escucha música, noticias y más en vivo.',
+            asset('img/domiradios-logo-og.png')
+        );
+        // SEOTools::setCanonical(route('emisoras.index'));
+
+        return view('emisoras', compact('emisoras'));
     }
 // Método para obtener la canción actual y oyentes
 public function getCurrentTrack($id)

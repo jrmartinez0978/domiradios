@@ -79,7 +79,7 @@
                         @if($radio->source_radio === 'RTCStream')
                         <div class="rtc-player-mini" id="rtc-player-{{ $radio->id }}">
                             <a href="{{ route('emisoras.show', ['slug' => $radio->slug]) }}" 
-                               class="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center font-medium no-underline"
+                               class="w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center font-medium no-underline"
                             >
                                 <span class="flex items-center justify-center">
                                     <i class="fas fa-play mr-2"></i> Reproducir
@@ -93,7 +93,7 @@
                         <button
                             data-play-id="{{ $radio->id }}"
                             data-stream-url="{{ $radio->link_radio }}"
-                            class="play-btn w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center font-medium"
+                            class="play-btn w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center font-medium"
                             itemprop="audio"
                             itemscope
                             itemtype="http://schema.org/AudioObject"

@@ -8,6 +8,8 @@
 
     <title>@yield('title', 'Domiradios - Directorio de Emisoras de Radio Dominicanas en Vivo')</title>
 
+    {!! Artesaos\SEOTools\Facades\SEOTools::generate() !!}
+
     <!-- Scripts adicionales -->
     @stack('scripts')
     
@@ -282,7 +284,7 @@
                     </h1>
                     
                     <div class="mt-6 max-w-3xl mx-auto">
-                        @livewire('search-emisoras')
+                        @livewire('search-emisoras', ['searchMode' => 'localFilter', 'genres' => $genres])
                     </div>
                 </div>
             </div>
