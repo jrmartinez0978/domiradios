@@ -689,32 +689,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endif
 
-<script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "RadioStation",
-          "name": "{{ $radio->name }}",
-          "url": "{{ url()->current() }}",
-          "logo": "{{ Storage::url($radio->img) }}",
-          "sameAs": [
-            "{{ $radio->url_website }}",
-            "{{ $radio->url_facebook }}",
-            "{{ $radio->url_twitter }}",
-            "{{ $radio->url_instagram }}"
-          ],
-          "areaServed": "{{ $radio->genres->pluck('name')->implode(', ') }}",
-          "description": "{{ strip_tags($radio->description) }}",
-          "genre": "{{ $radio->tags }}",
-          "location": {
-              "@type": "Place",
-              "address": {
-                  "@type": "PostalAddress",
-                  "addressLocality": "{{ $radio->genres->pluck('name')->implode(', ') }}",
-                  "addressCountry": "DO"
-              }
-          }
-        }
-    </script>
+
 
 
 @endsection
