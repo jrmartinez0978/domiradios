@@ -6,9 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Domiradios - Directorio de Emisoras de Radio Dominicanas en Vivo')</title>
-
-    {!! Artesaos\SEOTools\Facades\SEOTools::generate() !!}
+    {{-- SEO Tags --}}
+    @hasSection('static_seo_tags')
+        @yield('static_seo_tags')
+    @else
+        <title>@yield('title', 'Domiradios - Directorio de Emisoras de Radio Dominicanas en Vivo')</title>
+        {!! Artesaos\SEOTools\Facades\SEOTools::generate() !!}
+    @endif
 
     <!-- Scripts adicionales -->
     @stack('scripts')

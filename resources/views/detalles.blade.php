@@ -1,4 +1,19 @@
+@php
+    Log::info('[detalles.blade.php] Vista detalles renderizándose. isset($staticSeoHtml): ' . (isset($staticSeoHtml) ? 'Sí' : 'No'));
+    if (isset($staticSeoHtml)) {
+        Log::info('[detalles.blade.php] $staticSeoHtml no está vacío: ' . (!empty($staticSeoHtml) ? 'Sí' : 'No'));
+        Log::info('[detalles.blade.php] $staticSeoHtml (primeros 100): ' . substr($staticSeoHtml, 0, 100));
+    } else {
+        Log::info('[detalles.blade.php] $staticSeoHtml no está definida.');
+    }
+@endphp
 @extends('layouts.app')
+
+@if(isset($staticSeoHtml) && $staticSeoHtml)
+    @section('static_seo_tags')
+        {!! $staticSeoHtml !!}
+    @endsection
+@else
 
 @section('title', $radio->name.' - Escucha en vivo '.$radio->bitrate.' - Domiradios')
 
@@ -55,6 +70,7 @@
 }
 </script>
 @endsection
+@endif
 
 @section('content')
 <div class="container max-w-7xl mx-auto px-4 pt-8">

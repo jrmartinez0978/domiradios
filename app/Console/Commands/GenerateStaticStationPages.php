@@ -73,75 +73,100 @@ class GenerateStaticStationPages extends Command
                 ->limit(4)
                 ->get();
                 
-                // Establecer datos SEO usando el RadioController
-                // Esto asegura que se use la misma lógica que en la vista dinámica.
                 $description = strip_tags($radio->description);
-                $metaDescription = mb_substr($description, 0, 160);
-                if (mb_strlen($description) > 160) {
+                $metaDescription = mb_substr($description, 0, 155); // Ajustado a 155 para dejar espacio para "..."
+                if (mb_strlen($description) > 155) {
                     $metaDescription .= '...';
                 }
 
-                // Establecer la URL para OpenGraph usando route()
                 $stationUrl = route('emisoras.show', ['slug' => $radio->slug]);
-                \Artesaos\SEOTools\Facades\OpenGraph::setUrl($stationUrl);
-
-                $logo_url = $radio->logo ? asset($radio->logo) : (config('app.url') ? rtrim(config('app.url'), '/') . '/img/domiradios-logo-og.png' : '/img/domiradios-logo-og.png');
-
-                // El quinto argumento es la URL explícita para el trait HasSeo
-                $radioController->setSeoData(
-                    $radio->name . ' - Escucha en Vivo | Domiradios',
-                    $metaDescription,
-                    $logo_url,
-                    [], // Keywords, array vacío por ahora
-                    $stationUrl 
-                );
+                $ogImageUrl = $radio->optimized_logo_url; // Usar el logo optimizado que ya es una URL absoluta
                 
-                // Es importante que la URL canónica se establezca correctamente.
-                \Artesaos\SEOTools\Facades\SEOTools::setCanonical($stationUrl); // Reutilizar la URL de la estación
-
-                // Asegurémonos de que el nombre del sitio esté explícitamente configurado
-                // Es importante que la URL canónica se establezca correctamente.
-                // SEOTools::setCanonical($stationUrl);
-                // OpenGraph::setUrl($stationUrl);
-
-                // ---- INICIO: AISLAMIENTO DE PROBLEMA ----
-                // Comentamos temporalmente las configuraciones de OG y Twitter aquí
-                // para ver si el problema está en la configuración base o en estas sobreescrituras.
-                // \Artesaos\SEOTools\Facades\OpenGraph::setTitle($radio->name . ' - Escucha en Vivo | Domiradios');
-                // \Artesaos\SEOTools\Facades\OpenGraph::setDescription($metaDescription);
-                // \Artesaos\SEOTools\Facades\SEOTools::twitter()->setSite(config('seotools.twitter.defaults.site', '@domiradios')); // O tu handle de Twitter
-                // ---- FIN: AISLAMIENTO DE PROBLEMA ----
-
-                // ---- INICIO: Depuración Extrema OpenGraph ----
-                \Artesaos\SEOTools\Facades\OpenGraph::setType('website'); // Tipo básico
-                if (config('app.name')) {
-                    \Artesaos\SEOTools\Facades\OpenGraph::setSiteName(config('app.name'));
-                } else {
-                    \Artesaos\SEOTools\Facades\OpenGraph::setSiteName('Domiradios'); // Fallback extremo
+                // Fallback si optimized_logo_url está vacío o no es una URL completa
+                if (empty($ogImageUrl) || !filter_var($ogImageUrl, FILTER_VALIDATE_URL)) {
+                    $ogImageUrl = config('app.url', 'http://localhost') . '/img/domiradios-logo-og.png';
                 }
-                // Asegurarse de que la URL de la imagen OG sea absoluta o una ruta válida si APP_URL no está completo
-                $ogImageUrl = $logo_url;
-                if (!str_starts_with($ogImageUrl, 'http') && config('app.url')) {
-                    $ogImageUrl = rtrim(config('app.url'), '/') . (str_starts_with($ogImageUrl, '/') ? $ogImageUrl : '/' . $ogImageUrl);
-                }
-                if (filter_var($ogImageUrl, FILTER_VALIDATE_URL)) {
-                    \Artesaos\SEOTools\Facades\OpenGraph::addImage($ogImageUrl, ['secure_url' => str_replace('http://', 'https://', $ogImageUrl)]);
-                } else {
-                     // Añadir una imagen de fallback absoluta si todo lo demás falla
-                    \Artesaos\SEOTools\Facades\OpenGraph::addImage(config('app.url', 'http://localhost') . '/img/domiradios-logo-og.png'); 
-                }
-                // ---- FIN: Depuración Extrema OpenGraph ----
 
-                // Si tienes keywords específicas por emisora, también puedes añadirlas:
-                // if (!empty($radio->tags)) {
-                //    \Artesaos\SEOTools\Facades\SEOTools::addKeywords(explode(',', $radio->tags));
-                // }
+                $siteName = config('app.name', 'Domiradios');
+                $twitterSite = config('seotools.twitter.defaults.site', '@Domiradios'); // Asegúrate que esto exista en config/seotools.php o usa un string directo
+                $title = htmlspecialchars($radio->name . ' - Escucha en Vivo | ' . $siteName, ENT_QUOTES, 'UTF-8');
+                $escapedMetaDescription = htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8');
+                $escapedOgImageUrl = htmlspecialchars($ogImageUrl, ENT_QUOTES, 'UTF-8');
+                $escapedStationUrl = htmlspecialchars($stationUrl, ENT_QUOTES, 'UTF-8');
+                $escapedRadioName = htmlspecialchars($radio->name, ENT_QUOTES, 'UTF-8');
 
-                // Renderizar la vista 'detalles'
-                // La vista 'detalles' y su layout 'app.blade.php' usarán {!! \Artesaos\SEOTools\Facades\SEOTools::generate() !!}
+                $staticSeoHtml = "<title>{$title}</title>\n";
+                $staticSeoHtml .= "    <meta name=\"description\" content=\"{$escapedMetaDescription}\">\n";
+                if (!empty($radio->tags)) {
+                    $staticSeoHtml .= "    <meta name=\"keywords\" content=\"" . htmlspecialchars($radio->tags, ENT_QUOTES, 'UTF-8') . "\">\n";
+                }
+                $staticSeoHtml .= "    <link rel=\"canonical\" href=\"{$escapedStationUrl}\" />\n";
+
+                // OpenGraph
+                $staticSeoHtml .= "    <meta property=\"og:title\" content=\"{$title}\" />\n";
+                $staticSeoHtml .= "    <meta property=\"og:description\" content=\"{$escapedMetaDescription}\" />\n";
+                $staticSeoHtml .= "    <meta property=\"og:url\" content=\"{$escapedStationUrl}\" />\n";
+                $staticSeoHtml .= "    <meta property=\"og:image\" content=\"{$escapedOgImageUrl}\" />\n";
+                if (str_starts_with($ogImageUrl, 'http://')) {
+                    $staticSeoHtml .= "    <meta property=\"og:image:secure_url\" content=\"" . htmlspecialchars(str_replace('http://', 'https://', $ogImageUrl), ENT_QUOTES, 'UTF-8') . "\" />\n";
+                }
+                $staticSeoHtml .= "    <meta property=\"og:type\" content=\"website\" />\n";
+                $staticSeoHtml .= "    <meta property=\"og:site_name\" content=\"" . htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') . "\" />\n";
+
+                // Twitter Card
+                $staticSeoHtml .= "    <meta name=\"twitter:card\" content=\"summary_large_image\" />\n";
+                $staticSeoHtml .= "    <meta name=\"twitter:title\" content=\"{$title}\" />\n";
+                $staticSeoHtml .= "    <meta name=\"twitter:description\" content=\"{$escapedMetaDescription}\" />\n";
+                $staticSeoHtml .= "    <meta name=\"twitter:image\" content=\"{$escapedOgImageUrl}\" />\n";
+                if ($twitterSite) {
+                    $staticSeoHtml .= "    <meta name=\"twitter:site\" content=\"" . htmlspecialchars($twitterSite, ENT_QUOTES, 'UTF-8') . "\" />\n";
+                }
+
+                // JSON-LD
+                $jsonLdDescription = "Escucha {$escapedRadioName} en vivo. Emisora de radio {$radio->bitrate} - " . htmlspecialchars(\Illuminate\Support\Str::of($radio->tags)->explode(',')->first(), ENT_QUOTES, 'UTF-8') . ".";
+                $genresJson = htmlspecialchars($radio->genres->pluck('name')->implode(', '), ENT_QUOTES, 'UTF-8');
+                
+                $jsonLd = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'RadioStation',
+                    'name' => $escapedRadioName,
+                    'url' => $escapedStationUrl,
+                    'logo' => $escapedOgImageUrl,
+                    'image' => $escapedOgImageUrl,
+                    'description' => $jsonLdDescription,
+                    'contentLocation' => [
+                        '@type' => 'Place',
+                        'name' => $genresJson . ', República Dominicana'
+                    ],
+                    'genre' => htmlspecialchars($radio->tags, ENT_QUOTES, 'UTF-8'),
+                    // 'frequency' => $radio->bitrate, // Omitido por no ser una frecuencia real
+                    'audio' => [
+                        '@type' => 'AudioObject',
+                        'contentUrl' => htmlspecialchars($radio->link_radio, ENT_QUOTES, 'UTF-8'),
+                        'encodingFormat' => htmlspecialchars($radio->type_radio, ENT_QUOTES, 'UTF-8') // e.g., 'audio/mpeg'
+                    ]
+                ];
+
+                if ($radio->rating > 0) {
+                    $jsonLd['aggregateRating'] = [
+                        '@type' => 'AggregateRating',
+                        'ratingValue' => (string)$radio->rating,
+                        'bestRating' => '5',
+                        'worstRating' => '1',
+                        // 'ratingCount' => $radio->ratings()->count() // Si es eficiente y disponible
+                    ];
+                }
+
+                $staticSeoHtml .= "    <script type=\"application/ld+json\">" . json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
+
+                // Log para depuración
+                Log::info('[GenerateStaticStationPages] Contenido de $staticSeoHtml (primeros 200 caracteres): ' . substr($staticSeoHtml, 0, 200));
+                Log::info('[GenerateStaticStationPages] isset($staticSeoHtml) && !empty($staticSeoHtml): ' . (isset($staticSeoHtml) && !empty($staticSeoHtml) ? 'Sí' : 'No'));
+
                 $htmlContent = View::make('detalles', [
                     'radio' => $radio,
                     'related' => $related,
+                    'staticSeoHtml' => $staticSeoHtml // Pasar el HTML de SEO a la vista
                 ])->render();
                 
                 $filePath = $staticPagesPath . '/' . $radio->slug . '.html';
