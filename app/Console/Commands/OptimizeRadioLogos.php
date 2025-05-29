@@ -2,12 +2,15 @@
 
 namespace App\Console\Commands;
 
+use Intervention\Image\ImageManager;
+
 use Illuminate\Console\Command;
 use App\Models\Radio;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Intervention\Image\Encoders\WebpEncoder;
 use Illuminate\Support\Str;
+
 
 
 class OptimizeRadioLogos extends Command
