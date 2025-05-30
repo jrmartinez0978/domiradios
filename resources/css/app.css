@@ -1,7 +1,18 @@
 @tailwind base;
 @tailwind components;
 
-/* Estilos personalizados para Domiradios */
+/*
+@keyframes scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@layer utilities {
+  .animate-scroll {
+    animation: scroll 20s linear infinite;
+  }
+}
+ Estilos personalizados para Domiradios */
 .header-bg {
   background-image: url('/img/header-bg-desktop.png');
 }

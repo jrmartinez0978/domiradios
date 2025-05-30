@@ -257,92 +257,66 @@
                     </div>
                 </div>
 
-                <!-- Reproductor de audio -->
-                <div class="mt-4">
+                <!-- Reproductor flotante siempre visible, solo el player, esquina inferior derecha -->
+                <div class="fixed bottom-0 left-0 right-0 w-full md:bottom-8 md:right-8 md:left-auto md:w-[400px] z-50 bg-white rounded-t-2xl md:rounded-2xl shadow-2xl p-4 flex flex-col items-center gap-3">
                     @if($radio->source_radio === 'RTCStream')
-                    <!-- RTCStream Player (WebRTC) siguiendo el modelo del ejemplo -->
-                    <!-- Player sticky para mobile RTCStream -->
-                    <!-- Mini-player sticky RTCStream para mobile -->
-                    <div class="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 shadow-lg p-2 md:hidden flex flex-col items-center">
-                        <div class="w-full max-w-md flex items-center justify-between">
-                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center mx-1">
-                                <i class="fas fa-play mr-2 text-xl"></i> Escuchar
-                            </button>
-                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-lg flex items-center justify-center mx-1" disabled>
-                                <i class="fas fa-stop mr-2 text-xl"></i> Detener
-                            </button>
-                        </div>
-                        <div id="playerStatus" class="player-status status-info text-xs text-center p-2 mt-1 rounded-lg border border-gray-200 bg-white bg-opacity-80 w-full">Esperando conexión...</div>
-                        <audio id="playerAudio" playsinline webkit-playsinline></audio>
-                    </div>
-                    <!-- Player RTCStream para escritorio -->
-                    <div class="rtc-player relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-xl shadow-md border border-gray-200 md:block hidden" id="rtcPlayer">
-                        <!-- Efectos visuales de fondo -->
-                        <div class="absolute top-0 left-0 w-24 h-24 bg-emerald-500 rounded-full filter blur-3xl opacity-10 -translate-x-1/2 -translate-y-1/2"></div>
-                        <div class="absolute bottom-0 right-0 w-32 h-32 bg-brand-blue rounded-full filter blur-3xl opacity-10 translate-x-1/3 translate-y-1/3"></div>
-
-                        <h3 class="font-semibold text-gray-700 mb-2 flex items-center">
-                            <span class="inline-block w-7 h-7 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 mr-3 flex items-center justify-center shadow-sm">
-                                <i class="fas fa-headphones-alt text-white text-xs"></i>
-                            </span>
-                            <span id="playerSlug" class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">{{ Str::afterLast($radio->link_radio, '/') }}</span>
-                        </h3>
-                        <div class="text-xs mb-4 ml-10 font-bold italic drop-shadow-sm text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-red">
-                            <i class="fas fa-info-circle mr-1"></i> Baja latencia con RTCStream
-                        </div>
-
-                        <div class="flex gap-3 mb-4">
-                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:shadow-lg hover:opacity-95 transform hover:-translate-y-0.5 transition-all duration-300 focus:ring focus:ring-brand-blue/30">
+                        <div id="playerStatus" class="text-xs text-center p-2 rounded-lg border border-gray-200 bg-white bg-opacity-80 mb-2">Esperando conexión...</div>
+                        <audio id="playerAudio" playsinline webkit-playsinline preload="none" class="w-full rounded-lg mb-2" src="{{ $radio->link_radio }}"></audio>
+                        <div class="flex gap-3 w-full">
+                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:shadow-lg hover:opacity-95 transition-all">
                                 <i class="fas fa-play mr-2"></i> Escuchar
                             </button>
-                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-gray-300 hover:shadow-sm transform hover:-translate-y-0.5 transition-all duration-300" disabled>
+                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-gray-300 transition-all" disabled>
                                 <i class="fas fa-stop mr-2"></i> Detener
                             </button>
                         </div>
-
-                        <div id="playerStatus" class="player-status status-info text-sm text-center p-2 rounded-lg border border-gray-200 bg-white bg-opacity-70 backdrop-blur-sm">Esperando conexión...</div>
-
-                        <div class="flex justify-center items-center mt-3">
-                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 border border-gray-200">
-                                <i class="fas fa-clock text-xs text-gray-500 mr-2"></i>
-                                <div id="playerTimer" class="text-xs font-mono text-gray-700">00:00</div>
-                            </div>
-                        </div>
-
-                        <audio id="playerAudio" playsinline webkit-playsinline></audio>
-                    </div>
-
                     @else
-                    <!-- Reproductor Estándar HTML5 -->
-                    @if($radio->link_radio)
-                    <div class="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 shadow-lg p-2 md:hidden flex flex-col items-center">
-                        <audio id="audio-player" src="{{ $radio->link_radio }}"></audio>
-                        <button id="play-btn" class="w-full max-w-md bg-gradient-to-r from-brand-blue to-brand-red text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center hover:opacity-90 focus:ring focus:ring-brand-blue/30 transition-all">
-                            <i class="fas fa-play mr-3 text-xl"></i> Escuchar en Vivo
-                        </button>
-                    </div>
-                    <div class="md:block hidden">
-                        <audio id="audio-player-desktop" src="{{ $radio->link_radio }}"></audio>
-                        <button id="play-btn-desktop" class="w-full bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:opacity-90 transition-all focus:ring focus:ring-brand-blue/30">
-                            <i class="fas fa-play mr-2"></i> Reproducir
-                        </button>
-                    </div>
-                    @endif
+                        <audio id="playerAudio" playsinline webkit-playsinline preload="none" class="w-full rounded-lg mb-2" src="{{ $radio->link_radio }}"></audio>
+                        <div class="flex gap-3 w-full">
+                            <button id="btnPlay" class="flex-1 bg-gradient-to-r from-brand-blue to-brand-red text-white py-3 rounded-lg font-medium flex items-center justify-center hover:shadow-lg hover:opacity-95 transition-all">
+                                <i class="fas fa-play mr-2"></i> Escuchar
+                            </button>
+                            <button id="btnStop" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-gray-300 transition-all" disabled>
+                                <i class="fas fa-stop mr-2"></i> Detener
+                            </button>
+                        </div>
                     @endif
                 </div>
+
+                <!-- Descripción -->
+                @if($radio->description)
+                <div class="mt-6 p-6 border-t border-gray-100 bg-white rounded-xl shadow-md">
+                    <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
+                        <span class="text-brand-blue mr-2"><i class="fas fa-info-circle"></i></span>
+                        Acerca de esta emisora
+                    </h2>
+                    <div class="prose max-w-none text-gray-700">{!! $radio->description !!}</div>
+                </div>
+                @endif
             </div>
         </div>
 
-        <!-- Descripción -->
-        @if($radio->description)
-        <div class="mt-6 p-6 border-t border-gray-100 bg-white rounded-xl shadow-md">
-            <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                <span class="text-brand-blue mr-2"><i class="fas fa-info-circle"></i></span>
-                Acerca de esta emisora
+        <!-- Emisoras relacionadas -->
+        <div class="mt-8">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                <span class="text-brand-blue mr-2"><i class="fas fa-broadcast-tower"></i></span>
+                Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}
             </h2>
-            <div class="prose max-w-none text-gray-700">{!! $radio->description !!}</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                @foreach($related as $related)
+    @if(is_object($related) && isset($related->slug))
+        <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 group">
+            <a href="{{ route('emisoras.show', ['slug' => $related->slug]) }}" class="block">
+                <div class="h-32 flex items-center justify-center mb-3 overflow-hidden bg-gray-50 rounded-lg p-2">
+                    <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="mx-auto max-h-full object-contain group-hover:scale-105 transition-transform duration-300">
+                </div>
+                <h3 class="text-center font-medium text-gray-800 group-hover:text-brand-red transition-colors">{{ $related->name }}</h3>
+            </a>
         </div>
-        @endif
+    @endif
+@endforeach
+            </div>
+        </div>
     </div>
 
     <!-- Emisoras relacionadas -->
@@ -353,15 +327,17 @@
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
             @foreach($related as $related)
-                <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 group">
-                    <a href="{{ route('emisoras.show', ['slug' => $related->slug]) }}" class="block">
-                        <div class="h-32 flex items-center justify-center mb-3 overflow-hidden bg-gray-50 rounded-lg p-2">
-                            <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="mx-auto max-h-full object-contain group-hover:scale-105 transition-transform duration-300">
-                        </div>
-                        <h3 class="text-center font-medium text-gray-800 group-hover:text-brand-red transition-colors">{{ $related->name }}</h3>
-                    </a>
+    @if(is_object($related) && isset($related->slug))
+        <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 group">
+            <a href="{{ route('emisoras.show', ['slug' => $related->slug]) }}" class="block">
+                <div class="h-32 flex items-center justify-center mb-3 overflow-hidden bg-gray-50 rounded-lg p-2">
+                    <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="mx-auto max-h-full object-contain group-hover:scale-105 transition-transform duration-300">
                 </div>
-            @endforeach
+                <h3 class="text-center font-medium text-gray-800 group-hover:text-brand-red transition-colors">{{ $related->name }}</h3>
+            </a>
+        </div>
+    @endif
+@endforeach
         </div>
     </div>
 </div>
@@ -603,93 +579,121 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 </script>
 
-@if($radio->source_radio === 'RTCStream')
-<!-- Script RTCStream Player - Versión optimizada -->
-<script src="https://live.rtcstreaming.com:9000/mediasoup-client.min.js"></script>
-<script src="/js/rtc-player-v2.js"></script>
-
+<!-- Script universal para el popup flotante del reproductor -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  try {
-    // URL directa desde la base de datos
-    const rtcUrl = "{{ $radio->link_radio }}";
+  const openBtn = document.getElementById('openPlayerPopup');
+  const popup = document.getElementById('playerPopup');
+  const closeBtn = document.getElementById('closePlayerPopup');
+  const playBtn = document.getElementById('btnPlay');
+  const stopBtn = document.getElementById('btnStop');
+  const audio = document.getElementById('playerAudio');
+  const statusEl = document.getElementById('playerStatus');
+  const timerEl = document.getElementById('playerTimer');
+  let isPlaying = false;
+  let timerInterval = null;
 
-    // Comprobar si la URL es válida
-    if (!rtcUrl) {
-      console.error('Error: No hay URL de WebSocket configurada');
-      if (document.getElementById('rtcStatus')) {
-        document.getElementById('rtcStatus').textContent = 'Error: URL no configurada';
-        document.getElementById('rtcStatus').className = 'status error';
-      }
-      return;
-    }
-
-    // Extraer slug para la interfaz
-    const slug = rtcUrl.split('/').pop() || '{{ $radio->slug }}';
-
-    // Configurar metatags para dispositivos móviles
-    ['apple-mobile-web-app-capable', 'apple-mobile-web-app-status-bar-style', 'apple-mobile-web-app-title'].forEach((name, i) => {
-      const content = i === 0 ? 'yes' : i === 1 ? 'black-translucent' : '{{ $radio->name }}';
-      if (!document.querySelector(`meta[name="${name}"]`)) {
-        const meta = document.createElement('meta');
-        meta.name = name;
-        meta.content = content;
-        document.head.appendChild(meta);
-      }
-    });
-
-    // Esperar a que los scripts se carguen completamente
-    const checkScriptsLoaded = setInterval(function() {
-      if (window.RTCStreamPlayer && window.mediasoupClient) {
-        clearInterval(checkScriptsLoaded);
-
-        // Inicializar el reproductor
-        window.RTCStreamPlayer.init({
-          wsUrl: rtcUrl,
-          title: "{{ $radio->name }} - En vivo",
-          artist: "{{ $radio->name }}",
-          autoplay: false,
-          artwork: [
-            { src: "{{ url(Storage::url($radio->img)) }}", sizes: '96x96', type: 'image/png' },
-            { src: "{{ url(Storage::url($radio->img)) }}", sizes: '256x256', type: 'image/png' }
-          ]
-        });
-
-        // Actualizar interfaz
-        const slugDisplay = document.getElementById('playerSlug');
-        if (slugDisplay) slugDisplay.textContent = slug;
-      }
-    }, 100);
-
-    // Timeout de seguridad después de 5 segundos
-    setTimeout(function() {
-      if (!window.RTCStreamPlayer || !window.mediasoupClient) {
-        clearInterval(checkScriptsLoaded);
-        console.error('Error: No se pudieron cargar los scripts necesarios después de 5 segundos');
-        if (document.getElementById('rtcStatus')) {
-          document.getElementById('rtcStatus').textContent = 'Error: No se pudieron cargar los scripts';
-          document.getElementById('rtcStatus').className = 'status error';
-        }
-        // Marcar la página como cargada para el navegador (en caso de bloqueos)
-        if (window.stop) window.stop();
-        if (document.readyState !== 'complete') {
-          window.addEventListener('load', function() {}, { once: true });
-        }
-      }
-    }, 5000);
-
-  } catch (error) {
-    console.error('Error al inicializar RTCStreamPlayer:', error);
-    if (document.getElementById('rtcStatus')) {
-      document.getElementById('rtcStatus').textContent = 'Error: ' + error.message;
-      document.getElementById('rtcStatus').className = 'status error';
+  function setStatus(msg, error = false) {
+    if (statusEl) {
+      statusEl.textContent = msg;
+      statusEl.className = 'player-status ' + (error ? 'status-error' : 'status-info');
     }
   }
+  function updateTimer() {
+    if (audio && !audio.paused) {
+      const sec = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+      const min = Math.floor(audio.currentTime / 60).toString().padStart(2, '0');
+      timerEl.textContent = `${min}:${sec}`;
+    }
+  }
+  function startTimer() {
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+  function stopTimer() {
+    clearInterval(timerInterval); timerInterval = null; timerEl.textContent = '00:00';
+  }
+
+  if (openBtn && popup) {
+    openBtn.addEventListener('click', () => { popup.classList.remove('hidden'); });
+  }
+  if (closeBtn && popup) {
+    closeBtn.addEventListener('click', () => {
+      popup.classList.add('hidden');
+      if (audio) { audio.pause(); isPlaying = false; setStatus('Detenido'); stopBtn.disabled = true; playBtn.disabled = false; playBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Escuchar'; stopTimer(); }
+    });
+  }
+  if (playBtn && audio) {
+    playBtn.addEventListener('click', function() {
+      playBtn.disabled = true;
+      playBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Conectando...';
+      setStatus('Conectando...');
+      audio.play();
+    });
+  }
+  if (stopBtn && audio) {
+    stopBtn.addEventListener('click', function() {
+      audio.pause();
+      setStatus('Detenido');
+      stopBtn.disabled = true;
+      playBtn.disabled = false;
+      playBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Escuchar';
+      stopTimer();
+    });
+  }
+  if (audio) {
+    audio.addEventListener('playing', function() {
+      playBtn.disabled = true;
+      playBtn.innerHTML = '<i class="fas fa-pause mr-2"></i> Pausar';
+      stopBtn.disabled = false;
+      setStatus('En vivo');
+      isPlaying = true;
+      startTimer();
+    });
+    audio.addEventListener('pause', function() {
+      setStatus('Detenido');
+      stopBtn.disabled = true;
+      playBtn.disabled = false;
+      playBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Escuchar';
+      isPlaying = false;
+      stopTimer();
+    });
+    audio.addEventListener('error', function() {
+      setStatus('Error de conexión', true);
+      stopBtn.disabled = true;
+      playBtn.disabled = false;
+      playBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Escuchar';
+      isPlaying = false;
+      stopTimer();
+    });
+  }
+  // Si es RTCStream, inicializa el reproductor RTCStream (solo si existe la función y la librería)
+  @if($radio->source_radio === 'RTCStream')
+  try {
+    const rtcUrl = "{{ $radio->link_radio }}";
+    if (!rtcUrl) return;
+    const slug = rtcUrl.split('/').pop() || '{{ $radio->slug }}';
+    if (document.getElementById('playerSlug')) document.getElementById('playerSlug').textContent = slug;
+    window.RTCStreamPlayer && window.mediasoupClient && window.RTCStreamPlayer.init({
+      wsUrl: rtcUrl,
+      title: "{{ $radio->name }} - En vivo",
+      artist: "{{ $radio->name }}",
+      autoplay: false,
+      artwork: [
+        { src: "{{ url(Storage::url($radio->img)) }}", sizes: '96x96', type: 'image/png' },
+        { src: "{{ url(Storage::url($radio->img)) }}", sizes: '256x256', type: 'image/png' }
+      ]
+    });
+  } catch (error) { console.error(error); }
+  @endif
 });
 </script>
+@if($radio->source_radio === 'RTCStream')
+<script src="https://live.rtcstreaming.com:9000/mediasoup-client.min.js"></script>
+<script src="/js/rtc-player-v2.js"></script>
 @endif
 
 
 
 
 @endsection
+

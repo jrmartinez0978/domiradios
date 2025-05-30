@@ -310,6 +310,7 @@
             </div>
         </div>
     </header>
+
     
     {{-- Hero Section con buscador Livewire --}}
     @if(request()->route()->getName() == 'emisoras.index' || !request()->route()->getName())
@@ -325,10 +326,10 @@
                         Domiradios
                     </h1>
                     <p class="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">
-                        Directorio dominicano de emisoras de radio
-                    </p>
-                    
-                    <!-- Se eliminó el buscador del header para mantener solo el buscador Livewire del cuerpo de la página -->
+    Directorio dominicano de emisoras de radio
+</p>
+
+<!-- Se eliminó el buscador del header para mantener solo el buscador Livewire del cuerpo de la página -->
                 </div>
             </div>
         </div>
@@ -353,6 +354,7 @@
         </div>
     @endif
 
+    
     <main class="flex-grow py-8">
         @yield('content')
     </main>
