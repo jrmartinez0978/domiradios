@@ -59,7 +59,8 @@
   const $slugEl  = document.getElementById('playerSlug');
 
   /* STATE ------------------------------------------------------------- */
-  let ws, device, recvTransport, consumer;
+  const TURN = { ip: '40.160.13.94', port: 2031, user: 'rtcuser', pass: 'rtcpass' };
+let ws, device, recvTransport, consumer;
   let producerId = null, producerReady = false;
   let intentionalClose = false, intentionalPause = false;
   let wakeLock = null, audioContext = null, mediaElementSource = null;
@@ -423,7 +424,15 @@
         break;
 
       case 'webRtcTransportCreated':
-        recvTransport = device.createRecvTransport(m.payload);
+        // Integrar TURN server en iceServers
+const iceServers = [
+  {
+    urls: [`turn:${TURN.ip}:${TURN.port}`],
+    username: TURN.user,
+    credential: TURN.pass
+  }
+];
+recvTransport = device.createRecvTransport({ ...m.payload, iceServers });
         recvTransport.on('connect',({dtlsParameters},cb)=>{ send('connectWebRtcTransport',{transportId:recvTransport.id,dtlsParameters}); cb();});
         recvTransport.on('connectionstatechange',s=> {
           console.log('Estado de conexión de transporte:', s);
