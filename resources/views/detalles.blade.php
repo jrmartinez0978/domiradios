@@ -319,27 +319,6 @@
         </div>
     </div>
 
-    <!-- Emisoras relacionadas -->
-    <div class="mt-8">
-        <h2 class="text-xl font-bold mb-4 text-gray-800 flex items-center">
-            <span class="text-brand-blue mr-2"><i class="fas fa-broadcast-tower"></i></span>
-            Otras emisoras de {{ $radio->genres->pluck('name')->implode(', ') }}
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            @foreach($related as $related)
-    @if(is_object($related) && isset($related->slug))
-        <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 group">
-            <a href="{{ route('emisoras.show', ['slug' => $related->slug]) }}" class="block">
-                <div class="h-32 flex items-center justify-center mb-3 overflow-hidden bg-gray-50 rounded-lg p-2">
-                    <img src="{{ Storage::url($related->img) }}" alt="{{ $related->name }}" class="mx-auto max-h-full object-contain group-hover:scale-105 transition-transform duration-300">
-                </div>
-                <h3 class="text-center font-medium text-gray-800 group-hover:text-brand-red transition-colors">{{ $related->name }}</h3>
-            </a>
-        </div>
-    @endif
-@endforeach
-        </div>
-    </div>
 </div>
 
 <script>
