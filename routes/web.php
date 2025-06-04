@@ -6,6 +6,7 @@ use App\Http\Controllers\RadioController;
 use App\Models\Radio;
 use Illuminate\Http\Request;
 use App\Http\Controllers\SitemapController;
+use Illuminate\Support\Facades\Auth;
 
 // Ruta para la página de inicio (todas las emisoras)
 Route::get('/', [RadioController::class, 'index'])->name('emisoras.index');
@@ -29,6 +30,17 @@ Route::get('/privacidad', function() { return view('livewire.privacy-policy'); }
 
 // Ruta para la página de contacto
 Route::get('/contacto', [App\Http\Controllers\ContactoController::class, 'index'])->name('contacto');
+
+// Ruta para dashboard de estadísticas SEO
+Route::get('/admin/seo-stats', function () {
+    return [
+        'total_radios' => Radio::where('isActive', true)->count(),
+        'optimized' => Radio::where('seo_score', '>=', 75)->count(),
+        'needs_optimization' => Radio::needsSeo()->count(),
+        'last_check' => Radio::max('seo_last_checked_at'),
+        'average_score' => Radio::where('isActive', true)->avg('seo_score')
+    ];
+})->middleware('auth');
 Route::post('/contacto', [App\Http\Controllers\ContactoController::class, 'store'])->name('contacto.store');
 
 // Rutas para valoración de emisoras

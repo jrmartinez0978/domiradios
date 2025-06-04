@@ -33,17 +33,18 @@ class Radio extends Model
         'rating',
         'description',
         'address',
+        'meta_title',
+        'meta_description',
+        'og_title',
+        'og_description',
+        'og_image',
+        'h1',
+        'canonical_url',
+        'seo_checksum',
+        'seo_last_checked_at',
+        'seo_score',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        static::saving(function ($radio) {
-            if (empty($radio->slug)) {
-                $radio->slug = Str::slug($radio->name);
-            }
-        });
-    }
 
     /**
      * Get the URL of the optimized logo.
@@ -106,6 +107,11 @@ class Radio extends Model
     {
         return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id');
     }
+
+    public function seoBackups()
+    {
+        return $this->hasMany(\App\Models\RadioSeoBackup::class);
+    }
     
     public function getDescripcionAttribute()
     {
@@ -120,6 +126,53 @@ class Radio extends Model
     public function getDescriptionAttribute($value)
     {
         return $value;
+    }
+    
+    /**
+     * Calcula la puntuación SEO basada en varios factores
+     * 
+     * @return int
+     */
+    public function calculateSeoScore()
+    {
+        $score = 100;
+        
+        // Título
+        $titleLength = strlen($this->meta_title ?? '');
+        if ($titleLength < 45 || $titleLength > 60) $score -= 15;
+        if (!str_contains(strtolower($this->meta_title ?? ''), strtolower($this->name))) $score -= 5;
+        
+        // Descripción
+        $descLength = strlen($this->meta_description ?? '');
+        if ($descLength < 130 || $descLength > 160) $score -= 15;
+        if (!preg_match('/escucha|sintoniza|en vivo/i', $this->meta_description ?? '')) $score -= 5;
+        
+        // H1
+        if (empty($this->h1)) $score -= 10;
+        
+        // Open Graph
+        if (empty($this->og_title)) $score -= 5;
+        if (empty($this->og_description)) $score -= 5;
+        
+        return max(0, $score);
+    }
+    
+    /**
+     * Scope para filtrar emisoras que necesitan optimización SEO
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $threshold
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeNeedsSeo($query, $threshold = 75)
+    {
+        return $query->where('isActive', true)
+                     ->where(function ($q) use ($threshold) {
+                         $q->whereNull('seo_score')
+                           ->orWhere('seo_score', '<', $threshold)
+                           ->orWhereNull('seo_last_checked_at')
+                           ->orWhere('seo_last_checked_at', '<', now()->subDays(30));
+                     });
     }
 }
 
