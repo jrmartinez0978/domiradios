@@ -1,0 +1,121 @@
+# robots.txt Optimizado para SEO 2025
+# Domiradios - Directorio de Radios Dominicanas
+# Última actualización: 2025-10-22
+
+# ========================================
+# CONFIGURACIÓN PARA TODOS LOS ROBOTS
+# ========================================
+User-agent: *
+Allow: /
+
+# Permitir indexación de contenido público
+Allow: /emisoras
+Allow: /emisoras/*
+Allow: /ciudades
+Allow: /ciudades/*
+Allow: /generos
+Allow: /generos/*
+Allow: /blog
+Allow: /blog/*
+
+# Permitir assets para renderizado correcto
+Allow: /css/
+Allow: /js/
+Allow: /storage/radios/
+Allow: /build/
+
+# BLOQUEAR: Áreas administrativas
+Disallow: /admin
+Disallow: /admin/
+Disallow: /filament
+Disallow: /filament/
+
+# BLOQUEAR: Endpoints internos de Livewire
+Disallow: /livewire/
+Disallow: /livewire/message/
+Disallow: /livewire/upload-file/
+
+# BLOQUEAR: Autenticación y formularios
+Disallow: /login
+Disallow: /register
+Disallow: /password
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# BLOQUEAR: APIs internas
+Disallow: /api/
+
+# BLOQUEAR: Parámetros de sesión (NO bloquear UTM - útil para analytics)
+Disallow: /*?session=
+Disallow: /*?token=
+Allow: /*?utm_
+
+# ========================================
+# GOOGLEBOT ESPECÍFICO (SEO 2025)
+# ========================================
+User-agent: Googlebot
+Allow: /
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.webp$
+Allow: /*.svg$
+Allow: /*.gif$
+# NO Crawl-delay para Google (2025)
+
+# ========================================
+# GOOGLEBOT MOBILE
+# ========================================
+User-agent: Googlebot-Mobile
+Allow: /
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.webp$
+
+# ========================================
+# GOOGLEBOT IMAGE (Critical para radios)
+# ========================================
+User-agent: Googlebot-Image
+Allow: /storage/radios/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Disallow: /
+
+# ========================================
+# BINGBOT
+# ========================================
+User-agent: Bingbot
+Allow: /
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.webp$
+
+# ========================================
+# BLOQUEAR: Bots malos y scrapers
+# ========================================
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# ========================================
+# SITEMAPS
+# ========================================
+Sitemap: https://domiradios.com.do/sitemap.xml
+Sitemap: https://domiradios.com.do/sitemap-images.xml
+
+# ========================================
+# HOST (Canonical domain)
+# ========================================
+Host: https://domiradios.com.do
