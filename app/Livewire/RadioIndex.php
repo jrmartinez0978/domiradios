@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Genre;
 use App\Models\Radio;
 use App\Traits\HasSeo;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -69,10 +70,12 @@ class RadioIndex extends Component
 
         $radios = $query->orderByDesc('isFeatured')->paginate(15);
 
-        $genres = Genre::genres()->withCount('radios')
-            ->having('radios_count', '>', 0)
-            ->orderBy('name')
-            ->get();
+        $genres = Cache::remember('genre_filter_list', 3600, function () {
+            return Genre::genres()->withCount('radios')
+                ->having('radios_count', '>', 0)
+                ->orderBy('name')
+                ->get();
+        });
 
         return view('livewire.radio-index', [
             'featured' => $featured,

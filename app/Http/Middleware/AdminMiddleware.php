@@ -20,7 +20,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if ($request->user()->user_status != 1) {
+        if ($request->user()->user_status !== 1) {
             abort(403, 'Unauthorized. Admin access required.');
         }
 

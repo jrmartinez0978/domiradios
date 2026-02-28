@@ -266,11 +266,13 @@ class RadioController extends Controller
     // Método para mostrar todas las ciudades (géneros)
     public function indexCiudades()
     {
-        // Obtener solo ciudades con conteo de emisoras
-        $genres = Genre::cities()->withCount('radios')
-            ->having('radios_count', '>', 0)
-            ->orderBy('radios_count', 'desc')
-            ->get();
+        // Obtener solo ciudades con conteo de emisoras (cache 1 hora)
+        $genres = Cache::remember('cities_with_radio_count', 3600, function () {
+            return Genre::cities()->withCount('radios')
+                ->having('radios_count', '>', 0)
+                ->orderBy('radios_count', 'desc')
+                ->get();
+        });
 
         // Generar la URL canónica
         $canonical_url = route('ciudades.index');

@@ -5,10 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\BlogPost;
 use App\Traits\HasSeo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BlogController extends Controller
 {
     use HasSeo;
+
+    private function getCategories()
+    {
+        return Cache::remember('blog_categories', 3600, function () {
+            return BlogPost::published()
+                ->whereNotNull('category')
+                ->select('category')
+                ->distinct()
+                ->pluck('category');
+        });
+    }
 
     /**
      * Mostrar el índice del blog con todos los posts publicados
@@ -33,11 +45,7 @@ class BlogController extends Controller
             ->limit(3)
             ->get();
 
-        $categories = BlogPost::published()
-            ->whereNotNull('category')
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        $categories = $this->getCategories();
 
         return view('blog.index', compact('posts', 'featuredPosts', 'categories'));
     }
@@ -89,11 +97,7 @@ class BlogController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(12);
 
-        $categories = BlogPost::published()
-            ->whereNotNull('category')
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        $categories = $this->getCategories();
 
         return view('blog.category', compact('posts', 'category', 'categories'));
     }
@@ -115,11 +119,7 @@ class BlogController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(12);
 
-        $categories = BlogPost::published()
-            ->whereNotNull('category')
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        $categories = $this->getCategories();
 
         return view('blog.tag', compact('posts', 'tag', 'categories'));
     }
@@ -152,11 +152,7 @@ class BlogController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(12);
 
-        $categories = BlogPost::published()
-            ->whereNotNull('category')
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        $categories = $this->getCategories();
 
         return view('blog.search', compact('posts', 'query', 'categories'));
     }

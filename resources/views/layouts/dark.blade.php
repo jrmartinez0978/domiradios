@@ -80,6 +80,9 @@
     {{-- SEO Meta --}}
     <meta name="keywords" content="@yield('meta_keywords', 'radio dominicana, emisoras dominicanas, radio online, streaming radio, radio en vivo, música dominicana, radio RD')" />
     @yield('head_additional')
+    @hasSection('canonical')
+        <link rel="canonical" href="@yield('canonical')">
+    @endif
     <meta name="author" content="Domiradios">
     <meta name="robots" content="index, follow">
 

@@ -62,7 +62,7 @@ class ThemeController extends Controller
      */
     public function show(Theme $theme)
     {
-        return view('admin.themes.show', compact('theme'));
+        return redirect()->route('admin.themes.edit', $theme);
     }
 
     /**

@@ -59,9 +59,7 @@ class BlogPostController extends Controller
      */
     public function show(BlogPost $blogPost)
     {
-        $blogPost->load('user');
-
-        return view('admin.blog-posts.show', compact('blogPost'));
+        return redirect()->route('admin.blog-posts.edit', $blogPost);
     }
 
     /**

@@ -120,9 +120,19 @@ class Radio extends Model
         });
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('isActive', true);
+    }
+
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id');
+    }
+
+    public function visitas()
+    {
+        return $this->hasMany(Visita::class);
     }
 
     public function musicGenres()

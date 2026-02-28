@@ -11,7 +11,7 @@ class UpdateBlogPostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->user_status === 1;
     }
 
     /**
@@ -31,7 +31,7 @@ class UpdateBlogPostRequest extends FormRequest
             'tags.*' => 'string|max:100',
             'status' => 'required|in:draft,published,scheduled',
             'published_at' => 'nullable|date',
-            'featured_image' => 'nullable|image|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
             'featured_image_alt' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:300',
             'meta_title' => 'nullable|string|max:255',

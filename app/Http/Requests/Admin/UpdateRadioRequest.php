@@ -11,7 +11,7 @@ class UpdateRadioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->user_status === 1;
     }
 
     /**
@@ -29,7 +29,7 @@ class UpdateRadioRequest extends FormRequest
             'source_radio' => 'required|in:HTML5,RTCStream',
             'type_radio' => 'nullable|string|max:100',
             'tags' => 'nullable|string',
-            'img' => 'nullable|image|max:2048',
+            'img' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
             'isActive' => 'boolean',
             'isFeatured' => 'boolean',
             'rating' => 'nullable|numeric|min:0|max:5',

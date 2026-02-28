@@ -68,9 +68,7 @@ class GenreController extends Controller
      */
     public function show(Genre $genre)
     {
-        $genre->load('radios');
-
-        return view('admin.genres.show', compact('genre'));
+        return redirect()->route('admin.genres.edit', $genre);
     }
 
     /**
