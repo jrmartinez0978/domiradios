@@ -7,6 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Google Analytics --}}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M35PSXL3E0"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-M35PSXL3E0');</script>
+
+    {{-- Google AdSense --}}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9858891498081498" crossorigin="anonymous"></script>
+
     {{-- Preconnect CRÍTICO para Performance - debe estar lo más arriba posible --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

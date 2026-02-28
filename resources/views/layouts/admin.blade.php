@@ -7,6 +7,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
 
+    {{-- Google Analytics --}}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M35PSXL3E0"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-M35PSXL3E0');</script>
+
     <title>@yield('title', 'Admin Panel') - Domiradios</title>
 
     {{-- Fonts & Icons --}}

@@ -38,13 +38,13 @@ class SecurityHeaders
         // Configurado para permitir recursos actuales del sitio
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://domiradios.com.do https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://*.livewire.com https://live.rtcstreaming.com:*",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://domiradios.com.do https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://*.livewire.com https://live.rtcstreaming.com:* https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://adservice.google.com https://tpc.googlesyndication.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
             "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
             "img-src 'self' data: https: blob:",
-            "connect-src 'self' https://domiradios.com.do wss://live.rtcstreaming.com:* https://live.rtcstreaming.com:*",
+            "connect-src 'self' https://domiradios.com.do wss://live.rtcstreaming.com:* https://live.rtcstreaming.com:* https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://pagead2.googlesyndication.com",
             "media-src 'self' https: http: blob: wss://live.rtcstreaming.com:*",
-            "frame-src 'self'",
+            "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",
