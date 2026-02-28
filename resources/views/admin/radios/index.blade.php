@@ -34,7 +34,7 @@
     </div>
 
     {{-- Bulk Actions --}}
-    <form method="POST" action="{{ route('admin.radios.bulk') }}" id="bulkForm" class="mb-4">
+    <form method="POST" action="{{ route('admin.radios.bulk-action') }}" id="bulkForm" class="mb-4">
         @csrf
         <div class="flex items-center gap-3">
             <select name="action" class="glass-input !py-2 text-sm w-44">
@@ -55,7 +55,7 @@
         @forelse($radios as $radio)
             <tr class="hover:bg-glass-white-10 transition-colors">
                 <td class="px-4 py-3">
-                    <input type="checkbox" name="selected[]" value="{{ $radio->id }}" class="row-checkbox w-4 h-4 rounded bg-dark-600 border-dark-500 text-accent-red focus:ring-accent-red/50 focus:ring-offset-0">
+                    <input type="checkbox" name="ids[]" value="{{ $radio->id }}" class="row-checkbox w-4 h-4 rounded bg-dark-600 border-dark-500 text-accent-red focus:ring-accent-red/50 focus:ring-offset-0">
                 </td>
                 <td class="px-4 py-3">
                     <img src="{{ $radio->optimized_logo_url }}" alt="{{ $radio->name }}" class="w-10 h-10 rounded-lg object-cover border border-glass-border">

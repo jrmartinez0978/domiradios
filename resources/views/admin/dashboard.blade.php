@@ -40,7 +40,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {{-- Radios por Ciudad --}}
         <div class="glass-card p-6">
-            <h3 class="text-lg font-semibold text-gray-100 mb-4">Radios por Ciudad</h3>
+            <h3 class="text-lg font-semibold text-gray-100 mb-4">Radios por Género</h3>
             <div class="relative" style="height: 300px;">
                 <canvas id="chartByCity"></canvas>
             </div>
