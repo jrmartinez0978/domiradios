@@ -1,7 +1,7 @@
 @props(['radio', 'loop' => null])
 
 @php
-    $isRTC = $radio->source_radio === 'RTCStream';
+    $isRTC = $radio->source_radio === 'JRMStream';
     $isShoutcast = $radio->source_radio === 'Shoutcast';
     $playData = [
         'id' => $radio->id,
@@ -26,7 +26,7 @@
 <article
     x-data
     class="group relative rounded-xl bg-white border border-primary/40 shadow-[0_0_12px_rgba(0,80,70,0.25)] hover:shadow-[0_0_25px_rgba(0,80,70,0.45)] hover:border-primary/70 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-    itemscope itemtype="http://schema.org/RadioStation"
+    itemscope itemtype="https://schema.org/RadioStation"
 >
     {{-- Schema.org --}}
     <span itemprop="address" itemscope itemtype="https://schema.org/PostalAddress" hidden>
@@ -126,7 +126,7 @@
         <div class="flex items-center justify-between mb-1.5">
             <span class="text-xs font-bold text-primary" itemprop="frequency">{{ $radio->bitrate }}</span>
             <span class="text-[9px] font-semibold uppercase tracking-wider {{ $isRTC ? 'text-accent' : ($isShoutcast ? 'text-blue-500' : 'text-gray-400') }}">
-                @if($isRTC) RTCStream @elseif($isShoutcast) Shoutcast @else Online @endif
+                @if($isRTC) JRMStream @elseif($isShoutcast) Shoutcast @else Online @endif
             </span>
         </div>
         @endif
@@ -156,7 +156,7 @@
         </div>
     </a>
 
-    <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="sr-only">
+    <span itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating" class="sr-only">
         <meta itemprop="ratingValue" content="{{ $radio->rating }}">
         <meta itemprop="bestRating" content="5">
         <meta itemprop="worstRating" content="1">

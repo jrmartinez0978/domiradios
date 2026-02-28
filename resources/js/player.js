@@ -1,6 +1,6 @@
 /**
  * Domiradios - Global Radio Player (Alpine.js Store)
- * Unifica HTML5 Audio + RTCStream en un player global persistente.
+ * Unifica HTML5 Audio + JRMStream en un player global persistente.
  */
 document.addEventListener('alpine:init', () => {
     Alpine.store('player', {
@@ -56,7 +56,7 @@ document.addEventListener('alpine:init', () => {
             this.radioFrequency = data.frequency || '';
             this.currentTrack = '';
             this.listeners = 0;
-            this.isRTC = data.sourceRadio === 'RTCStream';
+            this.isRTC = data.sourceRadio === 'JRMStream';
             this._registeredPlay = false;
             this.state = 'connecting';
 
@@ -114,7 +114,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         /**
-         * RTCStream playback
+         * JRMStream playback
          */
         async _playRTC(data) {
             // Create AudioContext during user gesture
@@ -172,7 +172,7 @@ document.addEventListener('alpine:init', () => {
 
                 player.connect();
             } catch (e) {
-                console.error('RTCStream error:', e);
+                console.error('JRMStream error:', e);
                 this.state = 'offline';
                 this._rtcPlayer = null;
             }

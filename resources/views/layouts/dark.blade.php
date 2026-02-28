@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#005046">
 
     {{-- Preconnect para Performance --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,6 +39,12 @@
         "name": "Domiradios",
         "url": "https://domiradios.com.do",
         "logo": "https://domiradios.com.do/img/domiradios-logo-og.jpg",
+        "description": "Directorio de emisoras de radio dominicanas en vivo. Escucha gratis las mejores radios de República Dominicana.",
+        "areaServed": {
+          "@@type": "Country",
+          "name": "República Dominicana"
+        },
+        "knowsLanguage": "es",
         "sameAs": [
           "https://www.facebook.com/domiradios",
           "https://twitter.com/domiradios"
@@ -63,7 +70,7 @@
         "inLanguage": "es",
         "potentialAction": {
           "@@type": "SearchAction",
-          "target": "https://domiradios.com.do/buscar?q={search_term_string}",
+          "target": "https://domiradios.com.do/?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       }
@@ -75,7 +82,7 @@
     {{-- Language alternates --}}
     <link rel="alternate" hreflang="es-do" href="{{ url()->current() }}">
     <link rel="alternate" hreflang="es" href="{{ url()->current() }}">
-    <link rel="alternate" hreflang="x-default" href="{{ url('/') }}">
+    <link rel="alternate" hreflang="x-default" href="{{ url()->current() }}">
 
     {{-- SEO Meta --}}
     <meta name="keywords" content="@yield('meta_keywords', 'radio dominicana, emisoras dominicanas, radio online, streaming radio, radio en vivo, música dominicana, radio RD')" />
@@ -84,7 +91,7 @@
         <link rel="canonical" href="@yield('canonical')">
     @endif
     <meta name="author" content="Domiradios">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="@yield('robots', 'index, follow')">
 
     @stack('scripts')
 
@@ -126,9 +133,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="flex items-center justify-between h-16">
                 {{-- Logo (left) --}}
-                <a href="{{ url('/') }}" wire:navigate class="flex items-center gap-2 flex-shrink-0">
-                    <div class="text-2xl font-extrabold text-primary tracking-tight">
-                        <span>DOMI</span><span class="border-b-2 border-primary">RADIOS</span>
+                <a href="{{ url('/') }}" wire:navigate class="flex items-center gap-2.5 flex-shrink-0 group">
+                    <img src="/img/domiradios-logo.jpg" alt="Domiradios - Radios Dominicanas en Vivo" class="w-10 h-10 rounded-xl shadow-sm group-hover:shadow-md transition-shadow" width="40" height="40">
+                    <div class="text-2xl font-extrabold tracking-tight leading-none">
+                        <span class="text-[#003A70]">DOMI</span><span class="text-[#E84C2B]">RADIOS</span>
                     </div>
                 </a>
 
@@ -282,7 +290,7 @@
         <div class="bg-primary">
             <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/80">
                 <span>&copy; {{ date('Y') }} Domiradios. Todos los derechos reservados.</span>
-                <a href="https://rtcstreaming.com" target="_blank" rel="nofollow noopener noreferrer" class="text-white/60 hover:text-white transition-colors">Directorio de RTCStream</a>
+                <a href="https://rtcstreaming.com" target="_blank" rel="nofollow noopener noreferrer" class="text-white/60 hover:text-white transition-colors">Directorio de JRMStream</a>
             </div>
         </div>
     </footer>

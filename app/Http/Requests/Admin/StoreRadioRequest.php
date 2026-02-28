@@ -24,7 +24,7 @@ class StoreRadioRequest extends FormRequest
             'slug' => 'nullable|string|max:255|unique:radios,slug',
             'bitrate' => 'nullable|string|max:50',
             'link_radio' => 'required|url',
-            'source_radio' => 'required|in:HTML5,RTCStream',
+            'source_radio' => 'required|in:HTML5,JRMStream,Shoutcast,Icecast,SonicPanel,AzuraCast,Other,user_submitted',
             'type_radio' => 'nullable|string|max:100',
             'tags' => 'nullable|string',
             'img' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',

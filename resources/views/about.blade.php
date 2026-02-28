@@ -46,7 +46,7 @@
             </div>
             <div class="bg-surface-100 rounded-xl p-5 border border-surface-300">
                 <h3 class="font-bold text-gray-800 mb-2"><i class="fas fa-play-circle text-primary mr-2"></i>Streaming en Vivo</h3>
-                <p class="text-gray-600 text-sm">Tecnología de streaming avanzada incluyendo HTML5 Audio y RTCStream para la mejor calidad y menor latencia.</p>
+                <p class="text-gray-600 text-sm">Tecnología de streaming avanzada incluyendo HTML5 Audio y JRMStream para la mejor calidad y menor latencia.</p>
             </div>
             <div class="bg-surface-100 rounded-xl p-5 border border-surface-300">
                 <h3 class="font-bold text-gray-800 mb-2"><i class="fas fa-mobile-alt text-primary mr-2"></i>Multiplataforma</h3>

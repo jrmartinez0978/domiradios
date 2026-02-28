@@ -28,6 +28,12 @@
         "mainEntityOfPage": {
             "@@type": "WebPage",
             "@@id": "{{ route('blog.show', $post->slug) }}"
+        },
+        "wordCount": {{ str_word_count(strip_tags($post->content)) }},
+        "articleSection": "{{ $post->category ?? 'General' }}",
+        "speakable": {
+            "@@type": "SpeakableSpecification",
+            "cssSelector": ["h1", ".blog-excerpt"]
         }
         @if($post->tags)
         ,"keywords": "{{ is_array($post->tags) ? implode(', ', $post->tags) : $post->tags }}"
@@ -37,19 +43,17 @@
 
     <article class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         {{-- Breadcrumb --}}
-        <nav class="mb-6 text-sm">
-            <ol class="flex items-center space-x-2 text-gray-500">
-                <li><a href="/" class="hover:text-primary">Inicio</a></li>
-                <li>/</li>
-                <li><a href="{{ route('blog.index') }}" class="hover:text-primary">Blog</a></li>
-                @if($post->category)
-                    <li>/</li>
-                    <li><a href="{{ route('blog.category', $post->category) }}" class="hover:text-primary">{{ $post->category }}</a></li>
-                @endif
-                <li>/</li>
-                <li class="text-gray-800 font-semibold">{{ Str::limit($post->title, 50) }}</li>
-            </ol>
-        </nav>
+        @php
+        $breadcrumbItems = [
+            ['name' => 'Inicio', 'url' => url('/')],
+            ['name' => 'Blog', 'url' => route('blog.index')],
+        ];
+        if ($post->category) {
+            $breadcrumbItems[] = ['name' => $post->category, 'url' => route('blog.category', $post->category)];
+        }
+        $breadcrumbItems[] = ['name' => Str::limit($post->title, 50)];
+        @endphp
+        <x-breadcrumbs :items="$breadcrumbItems" />
 
         {{-- Categoría y Fecha --}}
         <div class="flex items-center justify-between mb-4">
@@ -113,7 +117,7 @@
 
         {{-- Extracto --}}
         @if($post->excerpt)
-            <div class="text-xl text-gray-600 font-medium mb-8 p-6 bg-surface-100 rounded-xl border-l-4 border-primary">
+            <div class="text-xl text-gray-600 font-medium mb-8 p-6 bg-surface-100 rounded-xl border-l-4 border-primary blog-excerpt">
                 {{ $post->excerpt }}
             </div>
         @endif

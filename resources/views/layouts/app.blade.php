@@ -349,7 +349,7 @@
             </div>
         </div>
         <div class="text-center py-4 bg-brand-red text-sm">
-            <a href="https://rtcstreaming.com" target="_blank" rel="nofollow noopener noreferrer" class="text-white hover:underline">Directorio de RTCStream</a> | {{ date('Y') }} Domiradios
+            <a href="https://rtcstreaming.com" target="_blank" rel="nofollow noopener noreferrer" class="text-white hover:underline">Directorio de JRMStream</a> | {{ date('Y') }} Domiradios
         </div>
     </footer>
 

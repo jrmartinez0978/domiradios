@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <x-admin.form-select name="source_radio" label="Fuente" :options="['HTML5' => 'HTML5', 'RTCStream' => 'RTCStream']" required />
+                        <x-admin.form-select name="source_radio" label="Fuente" :options="['Shoutcast' => 'Shoutcast', 'Icecast' => 'Icecast', 'SonicPanel' => 'SonicPanel', 'JRMStream' => 'JRMStream', 'AzuraCast' => 'AzuraCast', 'HTML5' => 'HTML5', 'Other' => 'Other']" required />
                         <x-admin.form-select name="type_radio" label="Tipo Audio" :options="['audio/mpeg' => 'audio/mpeg', 'audio/aac' => 'audio/aac', 'audio/ogg' => 'audio/ogg']" required />
                     </div>
 

@@ -28,7 +28,7 @@ class RadioController extends Controller
 
     private const SOURCE_AZURACAST = 'AzuraCast';
 
-    private const SOURCE_RTCSTREAM = 'RTCStream';
+    private const SOURCE_JRMSTREAM = 'JRMStream';
 
     // Método para mostrar la vista de favoritos
     public function favoritos()
@@ -165,37 +165,8 @@ class RadioController extends Controller
         // Canonical URL
         SEOMeta::setCanonical($canonical_url);
 
-        // JSON-LD Structured Data (Schema.org RadioStation)
-        JsonLd::setType('RadioStation');
-        JsonLd::setTitle($radio->name);
-        JsonLd::setDescription($metaDescription);
-        JsonLd::setUrl($canonical_url);
-        JsonLd::addImage($radioImage);
-        JsonLd::addValue('broadcastFrequency', $radio->bitrate);
-        if ($radio->address) {
-            JsonLd::addValue('address', [
-                '@type' => 'PostalAddress',
-                'addressLocality' => $radio->address,
-                'addressCountry' => 'DO',
-            ]);
-        }
-        if ($radio->genres->isNotEmpty()) {
-            JsonLd::addValue('genre', $radio->genres->pluck('name')->toArray());
-        }
-        JsonLd::addValue('contentLocation', [
-            '@type' => 'Place',
-            'name' => $radio->address ?? 'República Dominicana',
-        ]);
-
-        // Añadir valoración si existe
-        if ($radio->rating) {
-            JsonLd::addValue('aggregateRating', [
-                '@type' => 'AggregateRating',
-                'ratingValue' => $radio->rating,
-                'bestRating' => 5,
-                'worstRating' => 1,
-            ]);
-        }
+        // JSON-LD is generated in the Blade template (detalles.blade.php) via inline schema
+        // to avoid duplication with the SEOTools JsonLd facade
 
         return view('detalles', compact('radio', 'related'));
     }
@@ -609,8 +580,8 @@ class RadioController extends Controller
                     }
                     break;
 
-                case self::SOURCE_RTCSTREAM:
-                    // RTCStream usa WebRTC/Opus, no tiene endpoint HTTP de stats
+                case self::SOURCE_JRMSTREAM:
+                    // JRMStream usa WebRTC/Opus, no tiene endpoint HTTP de stats
                     $currentTrack = $radio->name.' - En vivo';
                     $listeners = $this->getFictitiousListeners($id);
                     break;

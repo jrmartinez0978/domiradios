@@ -1,17 +1,18 @@
 @extends('layouts.dark')
 
+@section('robots', 'noindex, follow')
+
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {{-- Breadcrumb --}}
-        <nav class="mb-6 text-sm">
-            <ol class="flex items-center space-x-2 text-dark-400">
-                <li><a href="/" class="hover:text-accent-red">Inicio</a></li>
-                <li>/</li>
-                <li><a href="{{ route('blog.index') }}" class="hover:text-accent-red">Blog</a></li>
-                <li>/</li>
-                <li class="text-gray-100 font-semibold">Buscar</li>
-            </ol>
-        </nav>
+        @php
+        $breadcrumbItems = [
+            ['name' => 'Inicio', 'url' => url('/')],
+            ['name' => 'Blog', 'url' => route('blog.index')],
+            ['name' => 'Buscar']
+        ];
+        @endphp
+        <x-breadcrumbs :items="$breadcrumbItems" />
 
         {{-- Header con búsqueda --}}
         <div class="mb-12">

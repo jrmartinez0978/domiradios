@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Traits\HasSeo;
+use Artesaos\SEOTools\Facades\SEOMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -140,6 +141,8 @@ class BlogController extends Controller
             "Resultados de búsqueda para '{$query}' en el blog.",
             asset('img/domiradios-logo-og.jpg')
         );
+
+        SEOMeta::setRobots('noindex, follow');
 
         $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $query);
         $posts = BlogPost::published()

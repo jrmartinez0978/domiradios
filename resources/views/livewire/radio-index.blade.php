@@ -12,7 +12,7 @@
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             @foreach($featured as $radio)
-                @if($radio->source_radio === 'RTCStream')
+                @if($radio->source_radio === 'JRMStream')
                     <div class="col-span-2">
                         <x-radio-card :radio="$radio" :loop="$loop" />
                     </div>
@@ -24,7 +24,7 @@
     </div>
     @endif
 
-    {{-- All Radios Section (hybrid: RTCStream span 2, rest span 1) --}}
+    {{-- All Radios Section (hybrid: JRMStream span 2, rest span 1) --}}
     @if($radios->count())
     <div class="mt-12">
         <div class="flex items-center justify-between mb-6">
@@ -49,7 +49,7 @@
 
         <div id="radio-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             @foreach($radios as $radio)
-                @if($radio->source_radio === 'RTCStream')
+                @if($radio->source_radio === 'JRMStream')
                     <div class="col-span-2">
                         <x-radio-card :radio="$radio" :loop="$loop" />
                     </div>

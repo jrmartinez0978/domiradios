@@ -15,7 +15,7 @@ return [
             'description'  => 'Escucha las mejores emisoras de radio de República Dominicana en vivo. Directorio actualizado de radios dominicanas online.',
             'separator'    => ' | ',
             'keywords'     => ['radio', 'emisoras', 'dominicanas', 'online', 'en vivo', 'República Dominicana', 'Domiradios', 'streaming', 'música'],
-            'canonical'    => false, // Deshabilitar la generación automática de canónica por defecto
+            'canonical'    => 'current',
             'robots'       => 'index, follow',
         ],
         /*
@@ -39,10 +39,10 @@ return [
         'defaults' => [
             'title'       => 'Domiradios',
             'description' => 'Escucha las mejores emisoras de radio de República Dominicana en vivo. Directorio actualizado de radios dominicanas online.',
-            'url'         => false, // Deshabilitar la generación automática de og:url por defecto
+            'url'         => 'current',
             'type'        => 'website',
             'site_name'   => 'Domiradios',
-            'images'      => ['/img/domiradios-logo-og.jpg'],
+            'images'      => [env('APP_URL', 'https://domiradios.com.do') . '/img/domiradios-logo-og.jpg'],
         ],
     ],
     'twitter' => [
@@ -52,7 +52,7 @@ return [
         'defaults' => [
             'card'        => 'summary_large_image',
             'site'        => '@Domiradios',
-            'images'      => ['/img/domiradios-logo-og.jpg'],
+            'images'      => [env('APP_URL', 'https://domiradios.com.do') . '/img/domiradios-logo-og.jpg'],
         ],
     ],
     'json-ld' => [
@@ -64,7 +64,7 @@ return [
             'description' => 'Escucha las mejores emisoras de radio de República Dominicana en vivo. Directorio actualizado de radios dominicanas online.',
             'url'         => 'current',
             'type'        => 'WebPage',
-            'images'      => ['/img/domiradios-logo-og.jpg'],
+            'images'      => [env('APP_URL', 'https://domiradios.com.do') . '/img/domiradios-logo-og.jpg'],
         ],
     ],
 ];

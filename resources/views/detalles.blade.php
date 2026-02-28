@@ -18,10 +18,10 @@
 <meta property="og:description" content="Escucha {{ $radio->name }} en vivo. Emisora {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}.">
 <meta property="og:image" content="{{ $radio->optimized_logo_url }}">
 <meta property="og:url" content="{{ url()->current() }}">
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
-<meta property="twitter:description" content="Escucha {{ $radio->name }} en vivo. Emisora {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}.">
-<meta property="twitter:image" content="{{ $radio->optimized_logo_url }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $radio->name }} - Escucha en vivo {{ $radio->bitrate }}">
+<meta name="twitter:description" content="Escucha {{ $radio->name }} en vivo. Emisora {{ $radio->bitrate }} - {{ Str::of($radio->tags)->explode(',')->first() }}.">
+<meta name="twitter:image" content="{{ $radio->optimized_logo_url }}">
 
 @php
     $schemaData = [
@@ -34,6 +34,8 @@
         'description' => "Escucha {$radio->name} en vivo. Emisora de radio {$radio->bitrate} - " . Str::of($radio->tags)->explode(',')->first() . ".",
         'genre' => $radio->tags,
         'frequency' => $radio->bitrate,
+        'areaServed' => ['@type' => 'Country', 'name' => 'República Dominicana'],
+        'broadcastTimezone' => 'America/Santo_Domingo',
     ];
     if (!empty($radio->address)) {
         $schemaData['address'] = ['@type' => 'PostalAddress', 'streetAddress' => $radio->address, 'addressCountry' => 'República Dominicana'];
@@ -59,10 +61,10 @@
 
 @section('content')
 @php
-    $isRTC = $radio->source_radio === 'RTCStream';
+    $isRTC = $radio->source_radio === 'JRMStream';
     $isShoutcast = $radio->source_radio === 'Shoutcast';
     $sourceColor = $isRTC ? 'accent' : ($isShoutcast ? 'blue-500' : 'primary');
-    $sourceLabel = $isRTC ? 'RTCStream' : ($isShoutcast ? 'Shoutcast' : 'Online');
+    $sourceLabel = $isRTC ? 'JRMStream' : ($isShoutcast ? 'Shoutcast' : 'Online');
     $genreNames = $radio->genres->where('type', 'genre')->pluck('name')->implode(', ');
     $cityName = $radio->genres->where('type', 'city')->first()?->name;
     $location = $radio->address ?: ($cityName ?: 'República Dominicana');
@@ -105,7 +107,7 @@
             <div class="relative flex flex-col md:flex-row items-center gap-6">
                 {{-- Logo --}}
                 <div class="w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-white/20 flex-shrink-0">
-                    <img src="{{ $radio->optimized_logo_url }}" alt="{{ $radio->name }}" class="w-full h-full object-cover" width="300" height="300" fetchpriority="high">
+                    <img src="{{ $radio->optimized_logo_url }}" alt="Logo de {{ $radio->name }} - Emisora {{ $radio->bitrate }} en {{ $cityName ?: 'República Dominicana' }}" class="w-full h-full object-cover" width="300" height="300" fetchpriority="high">
                 </div>
 
                 {{-- Info --}}
@@ -117,7 +119,7 @@
                         </span>
                         @endif
                         <span class="inline-flex items-center gap-1 px-2.5 py-1 {{ $isRTC ? 'bg-accent' : ($isShoutcast ? 'bg-blue-500' : 'bg-white/20') }} text-white text-xs font-bold rounded-full">
-                            @if($isRTC) <i class="fas fa-bolt text-[10px]"></i> RTCStream HD
+                            @if($isRTC) <i class="fas fa-bolt text-[10px]"></i> JRMStream HD
                             @elseif($isShoutcast) <i class="fas fa-broadcast-tower text-[10px]"></i> Shoutcast
                             @else <i class="fas fa-globe text-[10px]"></i> Online
                             @endif

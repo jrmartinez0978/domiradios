@@ -2,6 +2,14 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        @php
+        $breadcrumbs = [
+            ['name' => 'Inicio', 'url' => url('/')],
+            ['name' => 'Blog']
+        ];
+        @endphp
+        <x-breadcrumbs :items="$breadcrumbs" />
+
         {{-- Header del Blog --}}
         <div class="mb-12">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">

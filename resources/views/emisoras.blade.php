@@ -8,6 +8,8 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-primary mt-6 mb-2">Emisoras de Radio Dominicanas en Vivo</h1>
+
         {{-- Search Card (floating, like habidominicana) --}}
         <div class="mt-2 relative z-10">
             <livewire:radio-index />
