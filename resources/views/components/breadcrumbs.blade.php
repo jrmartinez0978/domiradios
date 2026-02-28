@@ -5,7 +5,7 @@
 
 @if (!empty($items))
 <nav aria-label="breadcrumb" class="mb-6 text-sm">
-    <ol class="flex items-center space-x-1 text-gray-600 rtl:space-x-reverse" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <ol class="flex items-center space-x-1 text-dark-400 rtl:space-x-reverse" itemscope itemtype="https://schema.org/BreadcrumbList">
         @foreach ($items as $index => $item)
             <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
                 <div class="flex items-center">
@@ -16,13 +16,13 @@
                     @endif
                     @if (!$loop->last && isset($item['url']))
                         <a href="{{ $item['url'] }}"
-                           class="hover:text-brand-blue hover:underline transition-colors"
+                           class="hover:text-accent-red hover:underline transition-colors"
                            itemprop="item">
                             <span itemprop="name">{{ $item['name'] }}</span>
                         </a>
                         <meta itemprop="position" content="{{ $index + 1 }}">
                     @else
-                        <span class="text-gray-900 font-semibold" itemprop="name">{{ $item['name'] }}</span>
+                        <span class="text-gray-200 font-semibold" itemprop="name">{{ $item['name'] }}</span>
                         <meta itemprop="position" content="{{ $index + 1 }}">
                         <link itemprop="item" href="{{ url()->current() }}">
                     @endif

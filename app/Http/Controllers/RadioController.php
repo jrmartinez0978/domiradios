@@ -2,29 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Carbon;
-use App\Models\Radio;
-use App\Models\Genre;
 use App\Models\BlogPost;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http; // Importación necesaria
-use Illuminate\Support\Facades\Log;  // Importación necesaria para Log
+use App\Models\Genre;
+use App\Models\Radio;
 use App\Models\Visita;
-use App\Traits\HasSeo; // Importar el trait
-use Artesaos\SEOTools\Facades\JsonLd; // Para structured data
-use Artesaos\SEOTools\Facades\SEOMeta; // Para canonical URLs
-
+use App\Traits\HasSeo;
+use Artesaos\SEOTools\Facades\JsonLd; // Importación necesaria
+use Artesaos\SEOTools\Facades\SEOMeta;  // Importación necesaria para Log
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache; // Importar el trait
+use Illuminate\Support\Facades\Http; // Para structured data
+use Illuminate\Support\Facades\Log; // Para canonical URLs
 
 class RadioController extends Controller
 {
     use HasSeo; // Usar el trait
+
     private const DEFAULT_TRACK_INFO = 'Sin información';
+
     private const SOURCE_SONICPANEL = 'SonicPanel';
+
     private const SOURCE_SHOUTCAST = 'Shoutcast';
+
     private const SOURCE_ICECAST = 'Icecast';
+
     private const SOURCE_AZURACAST = 'AzuraCast';
-	private const SOURCE_RTCSTREAM    = 'RTCStream';
+
+    private const SOURCE_RTCSTREAM = 'RTCStream';
 
     // Método para mostrar la vista de favoritos
     public function favoritos()
@@ -34,6 +38,7 @@ class RadioController extends Controller
             'Accede y gestiona tu lista de emisoras de radio dominicanas favoritas.',
             asset('img/domiradios-logo-og.jpg')
         );
+
         return view('favoritos');
     }
 
@@ -57,18 +62,19 @@ class RadioController extends Controller
             // Considera redirigir a la página principal o a una página de "no resultados" más específica.
             // return redirect()->route('emisoras.index'); // Opcional
         } else {
-             $this->setSeoData(
+            $this->setSeoData(
                 "Resultados para: \"{$query}\"",
                 "Emisoras de radio dominicanas encontradas para tu búsqueda: \"{$query}\". Escucha en vivo.",
                 asset('img/domiradios-logo-og.jpg')
             );
         }
 
-        $radios = Radio::where('isActive', true)
-            ->where(function($q) use ($query) {
-                $q->where('name', 'like', "%$query%")
-                  ->orWhere('bitrate', 'like', "%$query%") // Considera si buscar por bitrate es útil para el usuario
-                  ->orWhere('tags', 'like', "%$query%");
+        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $query);
+        $radios = Radio::with('genres')->where('isActive', true)
+            ->where(function ($q) use ($escaped) {
+                $q->where('name', 'like', "%$escaped%")
+                    ->orWhere('bitrate', 'like', "%$escaped%")
+                    ->orWhere('tags', 'like', "%$escaped%");
             })
             ->get();
 
@@ -103,9 +109,9 @@ class RadioController extends Controller
         $related = Radio::whereHas('genres', function ($query) use ($radio) {
             $query->whereIn('genres.id', $radio->genres->pluck('id'));
         })
-        ->where('id', '!=', $radio->id)
-        ->limit(4)
-        ->get();
+            ->where('id', '!=', $radio->id)
+            ->limit(4)
+            ->get();
 
         // Generar la URL canónica
         $canonical_url = route('emisoras.show', ['slug' => $radio->slug]);
@@ -118,7 +124,7 @@ class RadioController extends Controller
         }
 
         // Imagen de la emisora (usar asset completo para OpenGraph)
-        $radioImage = $radio->img ? asset('storage/' . $radio->img) : asset('img/domiradios-logo-og.jpg');
+        $radioImage = $radio->img ? asset('storage/'.$radio->img) : asset('img/domiradios-logo-og.jpg');
 
         // Keywords: combinar tags + género + ciudad
         $keywords = [];
@@ -137,7 +143,7 @@ class RadioController extends Controller
 
         // SEO 2025 Optimizado: Meta tags, OpenGraph, Twitter Cards
         $this->setSeoData(
-            $radio->name . ' - Escucha en vivo ' . $radio->bitrate . ' | Domiradios',
+            $radio->name.' - Escucha en vivo '.$radio->bitrate.' | Domiradios',
             $metaDescription,
             $radioImage,
             $keywords,
@@ -158,7 +164,7 @@ class RadioController extends Controller
             JsonLd::addValue('address', [
                 '@type' => 'PostalAddress',
                 'addressLocality' => $radio->address,
-                'addressCountry' => 'DO'
+                'addressCountry' => 'DO',
             ]);
         }
         if ($radio->genres->isNotEmpty()) {
@@ -166,7 +172,7 @@ class RadioController extends Controller
         }
         JsonLd::addValue('contentLocation', [
             '@type' => 'Place',
-            'name' => $radio->address ?? 'República Dominicana'
+            'name' => $radio->address ?? 'República Dominicana',
         ]);
 
         // Añadir valoración si existe
@@ -175,13 +181,12 @@ class RadioController extends Controller
                 '@type' => 'AggregateRating',
                 'ratingValue' => $radio->rating,
                 'bestRating' => 5,
-                'worstRating' => 1
+                'worstRating' => 1,
             ]);
         }
 
         return view('detalles', compact('radio', 'related'));
     }
-
 
     // Método para mostrar las emisoras por ciudad (géneros)
     public function emisorasPorCiudad($slug)
@@ -190,7 +195,7 @@ class RadioController extends Controller
         $genre = Genre::where('slug', $slug)->firstOrFail();
 
         // Obtener las emisoras activas relacionadas a esa ciudad
-        $radios = Radio::where('isActive', true)
+        $radios = Radio::with('genres')->where('isActive', true)
             ->whereHas('genres', function ($query) use ($genre) {
                 $query->where('genres.id', $genre->id);
             })->get();
@@ -200,17 +205,17 @@ class RadioController extends Controller
 
         // Keywords dinámicas para la ciudad
         $keywords = [
-            'emisoras ' . $genre->name,
-            'radios ' . $genre->name,
-            'radio online ' . $genre->name,
-            $genre->name . ' República Dominicana',
-            'escuchar radio ' . $genre->name
+            'emisoras '.$genre->name,
+            'radios '.$genre->name,
+            'radio online '.$genre->name,
+            $genre->name.' República Dominicana',
+            'escuchar radio '.$genre->name,
         ];
 
-        $description = 'Encuentra y escucha las mejores emisoras de radio en ' . $genre->name . ', República Dominicana. Directorio actualizado con ' . $radios->count() . ' emisoras en vivo.';
+        $description = 'Encuentra y escucha las mejores emisoras de radio en '.$genre->name.', República Dominicana. Directorio actualizado con '.$radios->count().' emisoras en vivo.';
 
         $this->setSeoData(
-            'Emisoras de Radio en ' . $genre->name . ' | Domiradios',
+            'Emisoras de Radio en '.$genre->name.' | Domiradios',
             $description,
             asset('img/domiradios-logo-og.jpg'),
             $keywords,
@@ -222,14 +227,14 @@ class RadioController extends Controller
 
         // JSON-LD Structured Data (Schema.org CollectionPage)
         JsonLd::setType('CollectionPage');
-        JsonLd::setTitle('Emisoras de Radio en ' . $genre->name);
+        JsonLd::setTitle('Emisoras de Radio en '.$genre->name);
         JsonLd::setDescription($description);
         JsonLd::setUrl($canonical_url);
         JsonLd::addImage(asset('img/domiradios-logo-og.jpg'));
         JsonLd::addValue('mainEntity', [
             '@type' => 'ItemList',
             'numberOfItems' => $radios->count(),
-            'itemListElement' => $radios->take(10)->map(function($radio, $index) {
+            'itemListElement' => $radios->take(10)->map(function ($radio, $index) {
                 return [
                     '@type' => 'ListItem',
                     'position' => $index + 1,
@@ -237,10 +242,10 @@ class RadioController extends Controller
                         '@type' => 'RadioStation',
                         'name' => $radio->name,
                         'url' => route('emisoras.show', $radio->slug),
-                        'broadcastFrequency' => $radio->bitrate
-                    ]
+                        'broadcastFrequency' => $radio->bitrate,
+                    ],
                 ];
-            })->values()->toArray()
+            })->values()->toArray(),
         ]);
 
         return view('emisoras_por_ciudad', compact('radios', 'genre'));
@@ -263,12 +268,12 @@ class RadioController extends Controller
             'radios dominicanas por ciudad',
             'emisoras República Dominicana',
             'radio online ciudades',
-            'directorio radios dominicanas'
+            'directorio radios dominicanas',
         ];
 
         // Añadir primeras 10 ciudades a keywords
         foreach ($genres->take(10) as $genre) {
-            $keywords[] = 'radios ' . $genre->name;
+            $keywords[] = 'radios '.$genre->name;
         }
 
         $description = 'Emisoras de República Dominicana organizadas por ciudad. Explora radios de Santo Domingo, Santiago, Azua y más. Escucha gratis en vivo.';
@@ -293,17 +298,17 @@ class RadioController extends Controller
         JsonLd::addValue('mainEntity', [
             '@type' => 'ItemList',
             'numberOfItems' => $genres->count(),
-            'itemListElement' => $genres->take(20)->map(function($genre, $index) {
+            'itemListElement' => $genres->take(20)->map(function ($genre, $index) {
                 return [
                     '@type' => 'ListItem',
                     'position' => $index + 1,
                     'item' => [
                         '@type' => 'City',
                         'name' => $genre->name,
-                        'url' => route('ciudades.show', $genre->slug)
-                    ]
+                        'url' => route('ciudades.show', $genre->slug),
+                    ],
                 ];
-            })->values()->toArray()
+            })->values()->toArray(),
         ]);
 
         return view('ciudades', compact('genres'));
@@ -312,7 +317,7 @@ class RadioController extends Controller
     // Método para mostrar todas las emisoras
     public function index()
     {
-        $emisoras = Radio::where('isActive', true)
+        $emisoras = Radio::with('genres')->where('isActive', true)
             ->orderBy('isFeatured', 'desc')
             ->orderBy('name')
             ->get(); // Emisoras activas, destacadas primero
@@ -327,8 +332,7 @@ class RadioController extends Controller
         $canonical_url = route('emisoras.index');
 
         // Keywords dinámicas basadas en las ciudades y géneros más populares
-        $topGenres = $emisoras->load('genres')
-            ->pluck('genres')
+        $topGenres = $emisoras->pluck('genres')
             ->flatten()
             ->pluck('name')
             ->unique()
@@ -341,10 +345,10 @@ class RadioController extends Controller
             'radio online dominicana',
             'escuchar radio dominicana gratis',
             'radio en vivo RD',
-            'estaciones de radio dominicanas'
+            'estaciones de radio dominicanas',
         ], $topGenres);
 
-        $description = 'Directorio completo de emisoras de radio de República Dominicana. Escucha en vivo música, noticias y deportes de ' . $emisoras->count() . ' radios dominicanas gratis. ¡Sintoniza ahora!';
+        $description = 'Directorio completo de emisoras de radio de República Dominicana. Escucha en vivo música, noticias y deportes de '.$emisoras->count().' radios dominicanas gratis. ¡Sintoniza ahora!';
 
         $this->setSeoData(
             'Emisoras de Radio Dominicanas Online en Vivo | Domiradios',
@@ -369,9 +373,9 @@ class RadioController extends Controller
             '@type' => 'SearchAction',
             'target' => [
                 '@type' => 'EntryPoint',
-                'urlTemplate' => route('buscar') . '?q={search_term_string}'
+                'urlTemplate' => route('buscar').'?q={search_term_string}',
             ],
-            'query-input' => 'required name=search_term_string'
+            'query-input' => 'required name=search_term_string',
         ]);
 
         // Lista de emisoras destacadas
@@ -381,7 +385,7 @@ class RadioController extends Controller
                 '@type' => 'ItemList',
                 'name' => 'Emisoras Destacadas',
                 'numberOfItems' => $featuredRadios->count(),
-                'itemListElement' => $featuredRadios->values()->map(function($radio, $index) {
+                'itemListElement' => $featuredRadios->values()->map(function ($radio, $index) {
                     return [
                         '@type' => 'ListItem',
                         'position' => $index + 1,
@@ -390,262 +394,264 @@ class RadioController extends Controller
                             'name' => $radio->name,
                             'url' => route('emisoras.show', $radio->slug),
                             'broadcastFrequency' => $radio->bitrate,
-                            'image' => $radio->img ? asset('storage/' . $radio->img) : null
-                        ]
+                            'image' => $radio->img ? asset('storage/'.$radio->img) : null,
+                        ],
                     ];
-                })->toArray()
+                })->toArray(),
             ]);
         }
 
         return view('emisoras', compact('emisoras', 'latestBlogPosts'));
     }
-// Método para obtener la canción actual y oyentes
-public function getCurrentTrack($id)
-{
-    $radio = Radio::findOrFail($id);
 
-    $linkRadio = $radio->link_radio; // Enlace completo incluyendo puerto y mount point
+    // Método para obtener la canción actual y oyentes
+    public function getCurrentTrack($id)
+    {
+        $radio = Radio::findOrFail($id);
 
-    Log::debug('Processing radio ID ' . $id . ' source_radio ' . $radio->source_radio);
+        $linkRadio = $radio->link_radio; // Enlace completo incluyendo puerto y mount point
 
-    try {
-        // Parsear el link_radio para extraer componentes
-        $parsedUrl = parse_url($linkRadio);
-        $scheme = $parsedUrl['scheme'] ?? 'http'; // Default to http
-        $host = $parsedUrl['host'] ?? null;
-        $portFromUrl = $parsedUrl['port'] ?? null; // Port explicitly in link_radio
-        $path = $parsedUrl['path'] ?? '';
+        Log::debug('Processing radio ID '.$id.' source_radio '.$radio->source_radio);
 
-        if (!$host) {
-            Log::error("Could not parse host from link_radio '{$linkRadio}' for radio ID {$id}.");
-            throw new \Exception("Invalid link_radio: host missing.");
-        }
+        try {
+            // Parsear el link_radio para extraer componentes
+            $parsedUrl = parse_url($linkRadio);
+            $scheme = $parsedUrl['scheme'] ?? 'http'; // Default to http
+            $host = $parsedUrl['host'] ?? null;
+            $portFromUrl = $parsedUrl['port'] ?? null; // Port explicitly in link_radio
+            $path = $parsedUrl['path'] ?? '';
 
-        // Construir la URL base del servidor de streaming (scheme://host:port)
-        $serverBaseUrl = $scheme . '://' . $host;
-        if ($portFromUrl) {
-            $serverBaseUrl .= ':' . $portFromUrl;
-        }
+            if (! $host) {
+                Log::error("Could not parse host from link_radio '{$linkRadio}' for radio ID {$id}.");
+                throw new \Exception('Invalid link_radio: host missing.');
+            }
 
-        Log::debug("Radio ID {$id}: baseUrl='{$serverBaseUrl}' path='{$path}'");
+            // Construir la URL base del servidor de streaming (scheme://host:port)
+            $serverBaseUrl = $scheme.'://'.$host;
+            if ($portFromUrl) {
+                $serverBaseUrl .= ':'.$portFromUrl;
+            }
 
-        $currentTrack = self::DEFAULT_TRACK_INFO;
-        $listeners = $this->getFictitiousListeners($id);
-        $infoUrl = '';
+            Log::debug("Radio ID {$id}: baseUrl='{$serverBaseUrl}' path='{$path}'");
 
-        switch ($radio->source_radio) {
-            case self::SOURCE_SONICPANEL:
-                $sonicPort = $portFromUrl;
-                if (!$sonicPort) {
-                    if (preg_match('/\/(\d+)(?:\/|$)/', $path, $matches)) {
-                        $sonicPort = $matches[1];
-                    } else {
-                        Log::warning("Radio ID {$id}: SonicPanel port could not be determined, using fallback.");
-                        $currentTrack = $radio->name . ' - En vivo';
-                        break;
-                    }
-                }
-                $infoUrl = $scheme . '://' . $host . '/cp/get_info.php?p=' . $sonicPort;
+            $currentTrack = self::DEFAULT_TRACK_INFO;
+            $listeners = $this->getFictitiousListeners($id);
+            $infoUrl = '';
 
-                try {
-                    $response = Http::timeout(5)->get($infoUrl);
-                    if ($response->successful()) {
-                        $json = json_decode($response->body(), true);
-                        if ($json !== null) {
-                            $currentTrack = $json['title'] ?? self::DEFAULT_TRACK_INFO;
-                            $listeners = $json['listeners'] ?? $this->getFictitiousListeners($id);
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    Log::warning("Radio ID {$id}: SonicPanel stats unavailable: " . $e->getMessage());
-                }
-                break;
-
-            case self::SOURCE_SHOUTCAST:
-                // Shoutcast stats: /stats?sid=1 (v2 XML) o /7.html (v1 HTML)
-                $infoUrl = $serverBaseUrl . '/stats?sid=1';
-
-                try {
-                    $response = Http::timeout(5)->get($infoUrl);
-                    if ($response->failed()) {
-                        // Intentar parsear HTML de Shoutcast v1
-                        if (strpos($response->body(), '<HTML>') !== false) {
-                            if (preg_match('/Current Song: <\/font><\/td><td class=default><b>(.*?)<\/b><\/td>/i', $response->body(), $songMatches)) {
-                                $currentTrack = trim($songMatches[1]);
-                            }
-                            if (preg_match('/Current Listeners: <\/font><\/td><td class=default><b>(\d+)<\/b><\/td>/i', $response->body(), $listenerMatches)) {
-                                $listeners = (int)trim($listenerMatches[1]);
-                            }
+            switch ($radio->source_radio) {
+                case self::SOURCE_SONICPANEL:
+                    $sonicPort = $portFromUrl;
+                    if (! $sonicPort) {
+                        if (preg_match('/\/(\d+)(?:\/|$)/', $path, $matches)) {
+                            $sonicPort = $matches[1];
+                        } else {
+                            Log::warning("Radio ID {$id}: SonicPanel port could not be determined, using fallback.");
+                            $currentTrack = $radio->name.' - En vivo';
                             break;
                         }
-                        // Stats no disponibles (proxy, CDN, etc) - fallback silencioso
-                        break;
                     }
-                    $data = $response->body();
-                    libxml_use_internal_errors(true);
-                    $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
-                    if ($xml === false) {
-                        libxml_clear_errors();
-                        // Intentar parsear como HTML v1
-                        if (preg_match('/Current Song: <\/font><\/td><td class=default><b>(.*?)<\/b><\/td>/i', $data, $songMatches)) {
-                            $currentTrack = trim($songMatches[1]);
-                        }
-                        if (preg_match('/Current Listeners: <\/font><\/td><td class=default><b>(\d+)<\/b><\/td>/i', $data, $listenerMatches)) {
-                            $listeners = (int)trim($listenerMatches[1]);
-                        }
-                    } else {
-                        $currentTrack = isset($xml->SONGTITLE) ? (string) $xml->SONGTITLE : self::DEFAULT_TRACK_INFO;
-                        $listeners = isset($xml->CURRENTLISTENERS) ? (int) $xml->CURRENTLISTENERS : $this->getFictitiousListeners($id);
-                    }
-                } catch (\Throwable $e) {
-                    Log::warning("Radio ID {$id}: Shoutcast stats unavailable: " . $e->getMessage());
-                }
-                break;
+                    $infoUrl = $scheme.'://'.$host.'/cp/get_info.php?p='.$sonicPort;
 
-            case self::SOURCE_ICECAST:
-                // Icecast stats: /status-json.xsl (JSON) con fallback a .xspf (XML)
-                $infoUrl = $serverBaseUrl . '/status-json.xsl';
-
-                try {
-                    $response = Http::timeout(5)->get($infoUrl);
-                    if ($response->successful()) {
-                        $json = json_decode($response->body(), true);
-                        if ($json !== null && isset($json['icestats'])) {
-                            $icestats = $json['icestats'];
-                            $source = null;
-                            if (isset($icestats['source']) && is_array($icestats['source'])) {
-                                if (array_is_list($icestats['source'])) {
-                                    // Múltiples sources - buscar la que coincida con el path
-                                    if (!empty($path) && $path !== '/') {
-                                        foreach ($icestats['source'] as $src) {
-                                            if (isset($src['listenurl']) && strpos($src['listenurl'], $path) !== false) {
-                                                $source = $src;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (!$source && !empty($icestats['source'])) {
-                                        $source = $icestats['source'][0];
-                                    }
-                                } else {
-                                    $source = $icestats['source'];
-                                }
+                    try {
+                        $response = Http::timeout(5)->get($infoUrl);
+                        if ($response->successful()) {
+                            $json = json_decode($response->body(), true);
+                            if ($json !== null) {
+                                $currentTrack = $json['title'] ?? self::DEFAULT_TRACK_INFO;
+                                $listeners = $json['listeners'] ?? $this->getFictitiousListeners($id);
                             }
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning("Radio ID {$id}: SonicPanel stats unavailable: ".$e->getMessage());
+                    }
+                    break;
 
-                            if ($source) {
-                                $currentTrack = $source['title'] ?? $source['song'] ?? self::DEFAULT_TRACK_INFO;
-                                $listeners = $source['listeners'] ?? $this->getFictitiousListeners($id);
+                case self::SOURCE_SHOUTCAST:
+                    // Shoutcast stats: /stats?sid=1 (v2 XML) o /7.html (v1 HTML)
+                    $infoUrl = $serverBaseUrl.'/stats?sid=1';
+
+                    try {
+                        $response = Http::timeout(5)->get($infoUrl);
+                        if ($response->failed()) {
+                            // Intentar parsear HTML de Shoutcast v1
+                            if (strpos($response->body(), '<HTML>') !== false) {
+                                if (preg_match('/Current Song: <\/font><\/td><td class=default><b>(.*?)<\/b><\/td>/i', $response->body(), $songMatches)) {
+                                    $currentTrack = trim($songMatches[1]);
+                                }
+                                if (preg_match('/Current Listeners: <\/font><\/td><td class=default><b>(\d+)<\/b><\/td>/i', $response->body(), $listenerMatches)) {
+                                    $listeners = (int) trim($listenerMatches[1]);
+                                }
                                 break;
                             }
+                            // Stats no disponibles (proxy, CDN, etc) - fallback silencioso
+                            break;
                         }
-                    }
-
-                    // Fallback XSPF
-                    $xspfUrl = $linkRadio . '.xspf';
-                    $xspfResponse = Http::timeout(5)->get($xspfUrl);
-                    if ($xspfResponse->successful()) {
+                        $data = $response->body();
                         libxml_use_internal_errors(true);
-                        $xml = simplexml_load_string($xspfResponse->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
-                        if ($xml !== false) {
-                            $namespaces = $xml->getNamespaces(true);
-                            $xml->registerXPathNamespace('x', $namespaces[''] ?? 'http://xspf.org/ns/0/');
-                            $titleNode = $xml->xpath('//x:trackList/x:track/x:title');
-                            $currentTrack = isset($titleNode[0]) ? (string) $titleNode[0] : self::DEFAULT_TRACK_INFO;
-                            $annotationNode = $xml->xpath('//x:trackList/x:track/x:annotation');
-                            if (isset($annotationNode[0])) {
-                                if (preg_match('/Current Listeners:\s*(\d+)/i', (string) $annotationNode[0], $listenerMatches)) {
-                                    $listeners = (int) $listenerMatches[1];
+                        $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+                        if ($xml === false) {
+                            libxml_clear_errors();
+                            // Intentar parsear como HTML v1
+                            if (preg_match('/Current Song: <\/font><\/td><td class=default><b>(.*?)<\/b><\/td>/i', $data, $songMatches)) {
+                                $currentTrack = trim($songMatches[1]);
+                            }
+                            if (preg_match('/Current Listeners: <\/font><\/td><td class=default><b>(\d+)<\/b><\/td>/i', $data, $listenerMatches)) {
+                                $listeners = (int) trim($listenerMatches[1]);
+                            }
+                        } else {
+                            $currentTrack = isset($xml->SONGTITLE) ? (string) $xml->SONGTITLE : self::DEFAULT_TRACK_INFO;
+                            $listeners = isset($xml->CURRENTLISTENERS) ? (int) $xml->CURRENTLISTENERS : $this->getFictitiousListeners($id);
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning("Radio ID {$id}: Shoutcast stats unavailable: ".$e->getMessage());
+                    }
+                    break;
+
+                case self::SOURCE_ICECAST:
+                    // Icecast stats: /status-json.xsl (JSON) con fallback a .xspf (XML)
+                    $infoUrl = $serverBaseUrl.'/status-json.xsl';
+
+                    try {
+                        $response = Http::timeout(5)->get($infoUrl);
+                        if ($response->successful()) {
+                            $json = json_decode($response->body(), true);
+                            if ($json !== null && isset($json['icestats'])) {
+                                $icestats = $json['icestats'];
+                                $source = null;
+                                if (isset($icestats['source']) && is_array($icestats['source'])) {
+                                    if (array_is_list($icestats['source'])) {
+                                        // Múltiples sources - buscar la que coincida con el path
+                                        if (! empty($path) && $path !== '/') {
+                                            foreach ($icestats['source'] as $src) {
+                                                if (isset($src['listenurl']) && strpos($src['listenurl'], $path) !== false) {
+                                                    $source = $src;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (! $source && ! empty($icestats['source'])) {
+                                            $source = $icestats['source'][0];
+                                        }
+                                    } else {
+                                        $source = $icestats['source'];
+                                    }
+                                }
+
+                                if ($source) {
+                                    $currentTrack = $source['title'] ?? $source['song'] ?? self::DEFAULT_TRACK_INFO;
+                                    $listeners = $source['listeners'] ?? $this->getFictitiousListeners($id);
+                                    break;
                                 }
                             }
                         }
-                        libxml_clear_errors();
-                    }
-                } catch (\Throwable $e) {
-                    Log::warning("Radio ID {$id}: Icecast stats unavailable: " . $e->getMessage());
-                }
-                break;
 
-            case self::SOURCE_AZURACAST:
-                // AzuraCast API: /api/nowplaying o /api/nowplaying/station_id
-                $infoUrl = $serverBaseUrl . '/api/nowplaying';
-
-                try {
-                    $response = Http::timeout(5)->get($infoUrl);
-                    if ($response->failed()) {
-                        // Intentar con station_id del path (/radio/ID/stream)
-                        if (preg_match('/\/radio\/([^\/]+)\//', $path, $pathMatches)) {
-                            $specificInfoUrl = $serverBaseUrl . '/api/nowplaying/' . $pathMatches[1];
-                            $response = Http::timeout(5)->get($specificInfoUrl);
+                        // Fallback XSPF
+                        $xspfUrl = $linkRadio.'.xspf';
+                        $xspfResponse = Http::timeout(5)->get($xspfUrl);
+                        if ($xspfResponse->successful()) {
+                            libxml_use_internal_errors(true);
+                            $xml = simplexml_load_string($xspfResponse->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
+                            if ($xml !== false) {
+                                $namespaces = $xml->getNamespaces(true);
+                                $xml->registerXPathNamespace('x', $namespaces[''] ?? 'http://xspf.org/ns/0/');
+                                $titleNode = $xml->xpath('//x:trackList/x:track/x:title');
+                                $currentTrack = isset($titleNode[0]) ? (string) $titleNode[0] : self::DEFAULT_TRACK_INFO;
+                                $annotationNode = $xml->xpath('//x:trackList/x:track/x:annotation');
+                                if (isset($annotationNode[0])) {
+                                    if (preg_match('/Current Listeners:\s*(\d+)/i', (string) $annotationNode[0], $listenerMatches)) {
+                                        $listeners = (int) $listenerMatches[1];
+                                    }
+                                }
+                            }
+                            libxml_clear_errors();
                         }
+                    } catch (\Throwable $e) {
+                        Log::warning("Radio ID {$id}: Icecast stats unavailable: ".$e->getMessage());
                     }
-                    if ($response->successful()) {
-                        $json = json_decode($response->body(), true);
-                        if ($json !== null) {
-                            $currentTrack = $json['now_playing']['song']['title'] ?? $json['now_playing']['song']['text'] ?? self::DEFAULT_TRACK_INFO;
-                            $listeners = $json['listeners']['current'] ?? $json['listeners']['total'] ?? $this->getFictitiousListeners($id);
+                    break;
+
+                case self::SOURCE_AZURACAST:
+                    // AzuraCast API: /api/nowplaying o /api/nowplaying/station_id
+                    $infoUrl = $serverBaseUrl.'/api/nowplaying';
+
+                    try {
+                        $response = Http::timeout(5)->get($infoUrl);
+                        if ($response->failed()) {
+                            // Intentar con station_id del path (/radio/ID/stream)
+                            if (preg_match('/\/radio\/([^\/]+)\//', $path, $pathMatches)) {
+                                $specificInfoUrl = $serverBaseUrl.'/api/nowplaying/'.$pathMatches[1];
+                                $response = Http::timeout(5)->get($specificInfoUrl);
+                            }
                         }
+                        if ($response->successful()) {
+                            $json = json_decode($response->body(), true);
+                            if ($json !== null) {
+                                $currentTrack = $json['now_playing']['song']['title'] ?? $json['now_playing']['song']['text'] ?? self::DEFAULT_TRACK_INFO;
+                                $listeners = $json['listeners']['current'] ?? $json['listeners']['total'] ?? $this->getFictitiousListeners($id);
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning("Radio ID {$id}: AzuraCast stats unavailable: ".$e->getMessage());
                     }
-                } catch (\Throwable $e) {
-                    Log::warning("Radio ID {$id}: AzuraCast stats unavailable: " . $e->getMessage());
-                }
-                break;
+                    break;
 
-            case self::SOURCE_RTCSTREAM:
-                // RTCStream usa WebRTC/Opus, no tiene endpoint HTTP de stats
-                $currentTrack = $radio->name . ' - En vivo';
-                $listeners = $this->getFictitiousListeners($id);
-                break;
+                case self::SOURCE_RTCSTREAM:
+                    // RTCStream usa WebRTC/Opus, no tiene endpoint HTTP de stats
+                    $currentTrack = $radio->name.' - En vivo';
+                    $listeners = $this->getFictitiousListeners($id);
+                    break;
 
-            case 'Other':
-            case 'user_submitted':
-                // Fuentes sin endpoint de stats conocido - fallback genérico
-                $currentTrack = $radio->name . ' - En vivo';
-                $listeners = $this->getFictitiousListeners($id);
-                break;
+                case 'Other':
+                case 'user_submitted':
+                    // Fuentes sin endpoint de stats conocido - fallback genérico
+                    $currentTrack = $radio->name.' - En vivo';
+                    $listeners = $this->getFictitiousListeners($id);
+                    break;
 
-            default:
-                Log::warning("Radio ID {$id}: Tipo de fuente no reconocido: " . $radio->source_radio);
-                $currentTrack = $radio->name . ' - En vivo';
-                $listeners = $this->getFictitiousListeners($id);
-                break;
+                default:
+                    Log::warning("Radio ID {$id}: Tipo de fuente no reconocido: ".$radio->source_radio);
+                    $currentTrack = $radio->name.' - En vivo';
+                    $listeners = $this->getFictitiousListeners($id);
+                    break;
+            }
+
+            return response()->json([
+                'current_track' => $currentTrack,
+                'listeners' => $listeners,
+            ]);
+
+        } catch (\Throwable $e) { // Catch Throwable for broader error catching including Http client errors
+            Log::error("Radio ID {$id}: Exception in getCurrentTrack: ".$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
+
+            // Fallback to default information on any exception
+            return response()->json([
+                'current_track' => self::DEFAULT_TRACK_INFO,
+                'listeners' => $this->getFictitiousListeners($id),
+            ]);
         }
-
-        return response()->json([
-            'current_track' => $currentTrack,
-            'listeners' => $listeners,
-        ]);
-
-    } catch (\Throwable $e) { // Catch Throwable for broader error catching including Http client errors
-        Log::error("Radio ID {$id}: Exception in getCurrentTrack: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
-        // Fallback to default information on any exception
-        return response()->json([
-            'current_track' => self::DEFAULT_TRACK_INFO,
-            'listeners' => $this->getFictitiousListeners($id),
-        ]);
     }
-}
 
-// Método para generar un número de oyentes ficticio y realista
-private function getFictitiousListeners($radioId)
-{
-    // Utilizar caché para mantener el conteo entre solicitudes
-    $cacheKey = 'listeners_' . $radioId;
-    $listeners = Cache::get($cacheKey, rand(1, 100));
+    // Método para generar un número de oyentes ficticio y realista
+    private function getFictitiousListeners($radioId)
+    {
+        // Utilizar caché para mantener el conteo entre solicitudes
+        $cacheKey = 'listeners_'.$radioId;
+        $listeners = Cache::get($cacheKey, rand(1, 100));
 
-    // Cambiar el número de oyentes de forma aleatoria entre -3 y +2
-    $change = rand(-3, 2);
-    $listeners += $change;
+        // Cambiar el número de oyentes de forma aleatoria entre -3 y +2
+        $change = rand(-3, 2);
+        $listeners += $change;
 
-    // Asegurarse de que el número de oyentes esté entre 1 y 100
-    $listeners = max(1, min($listeners, 100));
+        // Asegurarse de que el número de oyentes esté entre 1 y 100
+        $listeners = max(1, min($listeners, 100));
 
-    // Guardar el nuevo valor en caché por un tiempo definido (ejemplo: 1 minuto)
-    Cache::put($cacheKey, $listeners, now()->addMinutes(1));
+        // Guardar el nuevo valor en caché por un tiempo definido (ejemplo: 1 minuto)
+        Cache::put($cacheKey, $listeners, now()->addMinutes(1));
 
-    return $listeners;
-}
+        return $listeners;
+    }
 
-public function registerPlay(Request $request)
+    public function registerPlay(Request $request)
     {
         $validated = $request->validate([
             'radio_id' => 'required|integer|exists:radios,id',
@@ -656,7 +662,4 @@ public function registerPlay(Request $request)
 
         return response()->json(['message' => 'Visita registrada']);
     }
-
 }
-
-

@@ -1,13 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.dark')
 
 @section('title', 'Términos y Condiciones - Domiradios')
 @section('meta_description', 'Términos y condiciones de uso de Domiradios. Información sobre los derechos y obligaciones al utilizar nuestro servicio.')
 
 @section('content')
-<div class="container max-w-7xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-xl shadow-md p-6 md:p-8 border border-gray-100">
-        <h1 class="text-3xl font-bold mb-3 text-gray-800 flex items-center">
-            <span class="text-brand-blue mr-3"><i class="fas fa-gavel"></i></span>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div class="glass-card p-6 md:p-8 prose prose-invert max-w-none prose-headings:text-gray-100 prose-p:text-dark-300 prose-li:text-dark-300 prose-strong:text-gray-200">
+        <h1 class="text-3xl font-bold mb-3 text-gray-100 flex items-center not-prose">
+            <span class="text-accent-red mr-3"><i class="fas fa-gavel"></i></span>
             Términos y Condiciones
         </h1>
 

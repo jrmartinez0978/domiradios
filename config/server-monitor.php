@@ -54,7 +54,7 @@ return [
 
         // Separate the email by , to add many recipients
         'mail' => [
-            'to' => 'your@email.com',
+            'to' => env('SERVER_MONITOR_EMAIL', 'info@domiradios.com.do'),
         ],
 
         'slack' => [

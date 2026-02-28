@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use App\Traits\HasSeo;
+use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
@@ -60,7 +59,7 @@ class BlogController extends Controller
         $this->setSeoData(
             $post->meta_title ?? $post->title,
             $post->meta_description ?? $post->excerpt ?? substr(strip_tags($post->content), 0, 160),
-            $post->featured_image ? asset('storage/' . $post->featured_image) : asset('img/domiradios-logo-og.jpg'),
+            $post->featured_image ? asset('storage/'.$post->featured_image) : asset('img/domiradios-logo-og.jpg'),
             ['keywords' => $post->meta_keywords]
         );
 
@@ -142,11 +141,12 @@ class BlogController extends Controller
             asset('img/domiradios-logo-og.jpg')
         );
 
+        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $query);
         $posts = BlogPost::published()
-            ->where(function($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                  ->orWhere('excerpt', 'like', "%{$query}%")
-                  ->orWhere('content', 'like', "%{$query}%");
+            ->where(function ($q) use ($escaped) {
+                $q->where('title', 'like', "%{$escaped}%")
+                    ->orWhere('excerpt', 'like', "%{$escaped}%")
+                    ->orWhere('content', 'like', "%{$escaped}%");
             })
             ->with('user')
             ->orderBy('published_at', 'desc')

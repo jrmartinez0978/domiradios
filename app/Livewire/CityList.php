@@ -2,22 +2,22 @@
 
 namespace App\Livewire;
 
+use Illuminate\Support\Collection;
+use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Support\Collection; // Usaremos Collection para facilitar el filtrado
 
 class CityList extends Component
 {
-    public Collection $allGenres; // Colección de todos los géneros/ciudades
-    public string $searchTerm = '';
+    public Collection $allGenres;
 
-    // Escuchador para el evento que vendrá del buscador
-    protected $listeners = ['searchTermUpdated' => 'updateSearchTerm'];
+    public string $searchTerm = '';
 
     public function mount(Collection $genres)
     {
         $this->allGenres = $genres;
     }
 
+    #[On('searchTermUpdated')]
     public function updateSearchTerm($term)
     {
         $this->searchTerm = $term;
@@ -27,7 +27,7 @@ class CityList extends Component
     {
         $filteredGenres = $this->allGenres;
 
-        if (!empty($this->searchTerm)) {
+        if (! empty($this->searchTerm)) {
             $filteredGenres = $this->allGenres->filter(function ($genre) {
                 // Filtrar por nombre del género/ciudad
                 return stripos($genre->name, $this->searchTerm) !== false;
@@ -35,7 +35,7 @@ class CityList extends Component
         }
 
         return view('livewire.city-list', [
-            'genres' => $filteredGenres
+            'genres' => $filteredGenres,
         ]);
     }
 }

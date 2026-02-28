@@ -1,18 +1,109 @@
 @tailwind base;
 @tailwind components;
 
-/*
-@keyframes scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+/* ========================================
+   DOMIRADIOS - Dark Theme + Glassmorphism
+   ======================================== */
 
-@layer utilities {
-  .animate-scroll {
-    animation: scroll 20s linear infinite;
+@layer base {
+  body {
+    @apply bg-dark-950 text-gray-100 antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dark-500 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dark-400;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-accent-red/30 text-white;
+  }
+
+  /* Focus rings */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-accent-red/50 ring-offset-2 ring-offset-dark-900;
   }
 }
- Estilos personalizados para Domiradios */
+
+@layer components {
+  /* Glass Card */
+  .glass-card {
+    @apply bg-glass-white backdrop-blur-xl border border-glass-border rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+  .glass-card-hover:hover {
+    @apply bg-glass-white-10 border-glass-border-light shadow-lg shadow-black/20;
+    transform: translateY(-2px);
+  }
+
+  /* Glow effects */
+  .glow-red {
+    box-shadow: 0 0 15px rgba(226, 28, 37, 0.3), 0 0 45px rgba(226, 28, 37, 0.1);
+  }
+
+  .glow-red-intense {
+    box-shadow: 0 0 20px rgba(226, 28, 37, 0.5), 0 0 60px rgba(226, 28, 37, 0.2);
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-red to-red-400;
+  }
+
+  .text-gradient-blue {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400;
+  }
+
+  /* Glass input */
+  .glass-input {
+    @apply bg-glass-white-10 backdrop-blur-lg border border-glass-border rounded-xl px-4 py-3
+           text-gray-100 placeholder-dark-400 transition-all duration-200;
+  }
+  .glass-input:focus {
+    @apply border-accent-red/50 bg-glass-white-20 ring-1 ring-accent-red/30;
+  }
+
+  /* Glass button */
+  .btn-primary {
+    @apply bg-gradient-to-r from-accent-red to-red-600 text-white font-semibold px-6 py-3
+           rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-accent-red/25
+           active:scale-95;
+  }
+
+  .btn-glass {
+    @apply bg-glass-white-10 backdrop-blur-lg border border-glass-border text-gray-200
+           px-4 py-2 rounded-xl transition-all duration-200;
+  }
+  .btn-glass:hover {
+    @apply bg-glass-white-20 border-glass-border-light text-white;
+  }
+
+  /* Badge */
+  .badge-featured {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold
+           bg-accent-red/20 text-red-300 border border-accent-red/30;
+  }
+
+  /* Equalizer animation bars */
+  .equalizer-bar {
+    @apply w-[3px] bg-accent-red rounded-full;
+  }
+}
+
+/* Legacy support */
 .header-bg {
   background-image: url('/img/header-bg-desktop.png');
 }

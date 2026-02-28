@@ -9,6 +9,6 @@ class TermsAndConditions extends Component
     public function render()
     {
         return view('livewire.terms-and-conditions')
-        ->layout('layouts.app');
+            ->layout('layouts.app');
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.dark')
 
 @section('title', 'Política de Privacidad - Domiradios')
 @section('meta_description', 'Política de privacidad de Domiradios. Información sobre cómo protegemos tus datos personales.')

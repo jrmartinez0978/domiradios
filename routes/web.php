@@ -8,6 +8,12 @@ use App\Http\Controllers\Api\MobileApiController;
 use App\Models\Radio;
 use Illuminate\Http\Request;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Auth\LoginController;
+
+// Autenticación admin
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Ruta para la página de inicio (todas las emisoras)
 Route::get('/', [RadioController::class, 'index'])->name('emisoras.index');
@@ -35,9 +41,10 @@ Route::get('/blog/categoria/{category}', [BlogController::class, 'category'])->n
 Route::get('/blog/tag/{tag}', [BlogController::class, 'tag'])->name('blog.tag');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
-// Rutas para las páginas legales
+// Rutas para las páginas legales e informativas
 Route::get('/terminos', function() { return view('livewire.terms-and-conditions'); })->name('terminos');
 Route::get('/privacidad', function() { return view('livewire.privacy-policy'); })->name('privacidad');
+Route::get('/sobre-nosotros', function() { return view('about'); })->name('about');
 
 // Ruta para la página de contacto
 Route::get('/contacto', [App\Http\Controllers\ContactoController::class, 'index'])->name('contacto');

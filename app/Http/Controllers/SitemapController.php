@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Radio;
-use App\Models\Genre;
 use App\Models\BlogPost;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
+use App\Models\Genre;
+use App\Models\Radio;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 
 /**
  * Sitemap Controller - SEO 2025 Optimizado
@@ -54,7 +54,7 @@ class SitemapController extends Controller
             ->setPriority(0.8));
 
         // Añadir cada emisora activa al sitemap
-        $radios = Radio::where('isActive', true)->get(); // Filtrar por activas
+        $radios = Radio::without('genres')->where('isActive', true)->get(); // Filtrar por activas
         foreach ($radios as $radio) {
             $sitemap->add(Url::create(route('emisoras.show', ['slug' => $radio->slug]))
                 ->setLastModificationDate($radio->updated_at ?? Carbon::now())
@@ -142,43 +142,43 @@ class SitemapController extends Controller
      */
     private function generateImageSitemap()
     {
-        $radios = Radio::where('isActive', true)->get();
+        $radios = Radio::without('genres')->where('isActive', true)->get();
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . PHP_EOL;
-        $xml .= '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . PHP_EOL;
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL;
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'.PHP_EOL;
+        $xml .= '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'.PHP_EOL;
 
         // Homepage con imágenes de todas las emisoras
-        $xml .= '  <url>' . PHP_EOL;
-        $xml .= '    <loc>' . route('emisoras.index') . '</loc>' . PHP_EOL;
-        $xml .= '    <lastmod>' . Carbon::now()->toAtomString() . '</lastmod>' . PHP_EOL;
+        $xml .= '  <url>'.PHP_EOL;
+        $xml .= '    <loc>'.route('emisoras.index').'</loc>'.PHP_EOL;
+        $xml .= '    <lastmod>'.Carbon::now()->toAtomString().'</lastmod>'.PHP_EOL;
 
         foreach ($radios as $radio) {
-            $imageUrl = url('storage/radios/' . basename($radio->img));
-            $xml .= '    <image:image>' . PHP_EOL;
-            $xml .= '      <image:loc>' . htmlspecialchars($imageUrl) . '</image:loc>' . PHP_EOL;
-            $xml .= '      <image:title>' . htmlspecialchars($radio->name . ' - Logo Oficial') . '</image:title>' . PHP_EOL;
-            $xml .= '      <image:caption>' . htmlspecialchars('Logo de ' . $radio->name . ' ' . $radio->bitrate . ' - Radio ' . ($radio->tags ? explode(',', $radio->tags)[0] : 'Online') . ' en vivo desde República Dominicana') . '</image:caption>' . PHP_EOL;
-            $xml .= '      <image:geo_location>República Dominicana</image:geo_location>' . PHP_EOL;
-            $xml .= '    </image:image>' . PHP_EOL;
+            $imageUrl = url('storage/radios/'.basename($radio->img));
+            $xml .= '    <image:image>'.PHP_EOL;
+            $xml .= '      <image:loc>'.htmlspecialchars($imageUrl).'</image:loc>'.PHP_EOL;
+            $xml .= '      <image:title>'.htmlspecialchars($radio->name.' - Logo Oficial').'</image:title>'.PHP_EOL;
+            $xml .= '      <image:caption>'.htmlspecialchars('Logo de '.$radio->name.' '.$radio->bitrate.' - Radio '.($radio->tags ? explode(',', $radio->tags)[0] : 'Online').' en vivo desde República Dominicana').'</image:caption>'.PHP_EOL;
+            $xml .= '      <image:geo_location>República Dominicana</image:geo_location>'.PHP_EOL;
+            $xml .= '    </image:image>'.PHP_EOL;
         }
 
-        $xml .= '  </url>' . PHP_EOL;
+        $xml .= '  </url>'.PHP_EOL;
 
         // Cada página de emisora con su imagen
         foreach ($radios as $radio) {
-            $imageUrl = url('storage/radios/' . basename($radio->img));
+            $imageUrl = url('storage/radios/'.basename($radio->img));
 
-            $xml .= '  <url>' . PHP_EOL;
-            $xml .= '    <loc>' . route('emisoras.show', ['slug' => $radio->slug]) . '</loc>' . PHP_EOL;
-            $xml .= '    <lastmod>' . ($radio->updated_at ?? Carbon::now())->toAtomString() . '</lastmod>' . PHP_EOL;
-            $xml .= '    <image:image>' . PHP_EOL;
-            $xml .= '      <image:loc>' . htmlspecialchars($imageUrl) . '</image:loc>' . PHP_EOL;
-            $xml .= '      <image:title>' . htmlspecialchars($radio->name . ' ' . $radio->bitrate . ' - Escuchar en Vivo') . '</image:title>' . PHP_EOL;
-            $xml .= '      <image:caption>' . htmlspecialchars('Escucha ' . $radio->name . ' en vivo online gratis. Emisora de radio ' . ($radio->tags ? explode(',', $radio->tags)[0] : 'dominicana') . ' transmitiendo 24/7 desde República Dominicana.') . '</image:caption>' . PHP_EOL;
-            $xml .= '      <image:geo_location>República Dominicana</image:geo_location>' . PHP_EOL;
-            $xml .= '    </image:image>' . PHP_EOL;
-            $xml .= '  </url>' . PHP_EOL;
+            $xml .= '  <url>'.PHP_EOL;
+            $xml .= '    <loc>'.route('emisoras.show', ['slug' => $radio->slug]).'</loc>'.PHP_EOL;
+            $xml .= '    <lastmod>'.($radio->updated_at ?? Carbon::now())->toAtomString().'</lastmod>'.PHP_EOL;
+            $xml .= '    <image:image>'.PHP_EOL;
+            $xml .= '      <image:loc>'.htmlspecialchars($imageUrl).'</image:loc>'.PHP_EOL;
+            $xml .= '      <image:title>'.htmlspecialchars($radio->name.' '.$radio->bitrate.' - Escuchar en Vivo').'</image:title>'.PHP_EOL;
+            $xml .= '      <image:caption>'.htmlspecialchars('Escucha '.$radio->name.' en vivo online gratis. Emisora de radio '.($radio->tags ? explode(',', $radio->tags)[0] : 'dominicana').' transmitiendo 24/7 desde República Dominicana.').'</image:caption>'.PHP_EOL;
+            $xml .= '      <image:geo_location>República Dominicana</image:geo_location>'.PHP_EOL;
+            $xml .= '    </image:image>'.PHP_EOL;
+            $xml .= '  </url>'.PHP_EOL;
         }
 
         $xml .= '</urlset>';
@@ -197,7 +197,7 @@ class SitemapController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'All sitemap caches cleared. Next request will regenerate them.'
+            'message' => 'All sitemap caches cleared. Next request will regenerate them.',
         ]);
     }
 }

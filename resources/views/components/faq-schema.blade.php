@@ -3,8 +3,8 @@
 
   Uso:
   <x-faq-schema :faqs="[
-      ['question' => '¿Cómo escuchar esta radio?', 'answer' => 'Haz clic en el botón...'],
-      ['question' => '¿Es gratis?', 'answer' => 'Sí, completamente gratis...']
+      ['question' => 'ï¿½Cï¿½mo escuchar esta radio?', 'answer' => 'Haz clic en el botï¿½n...'],
+      ['question' => 'ï¿½Es gratis?', 'answer' => 'Sï¿½, completamente gratis...']
   ]" />
 
   Beneficios:
@@ -18,28 +18,19 @@
 
 @if(count($faqs) > 0)
 {{-- FAQ Visual --}}
-<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-        <svg class="w-6 h-6 mr-2 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        Preguntas Frecuentes
-    </h2>
-
-    <div class="space-y-4" itemscope itemtype="https://schema.org/FAQPage">
-        @foreach($faqs as $index => $faq)
-        <div class="border-b border-gray-200 pb-4 last:border-0" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2" itemprop="name">
-                {{ $faq['question'] }}
-            </h3>
-            <div class="text-gray-700 leading-relaxed" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                <div itemprop="text">
-                    {!! nl2br(e($faq['answer'])) !!}
-                </div>
+<div class="space-y-4" itemscope itemtype="https://schema.org/FAQPage">
+    @foreach($faqs as $index => $faq)
+    <div class="border-b border-glass-border pb-4 last:border-0" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 class="text-base font-semibold text-gray-200 mb-2" itemprop="name">
+            {{ $faq['question'] }}
+        </h3>
+        <div class="text-dark-300 text-sm leading-relaxed" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <div itemprop="text">
+                {!! nl2br(e($faq['answer'])) !!}
             </div>
         </div>
-        @endforeach
     </div>
+    @endforeach
 </div>
 
 {{-- FAQ Schema JSON-LD --}}

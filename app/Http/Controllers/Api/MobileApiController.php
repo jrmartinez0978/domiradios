@@ -14,11 +14,11 @@ class MobileApiController extends Controller
     {
         $method = strtolower(trim($request->input('method', '')));
 
-        if (!in_array($method, $this->allowedMethods)) {
+        if (! in_array($method, $this->allowedMethods)) {
             return response()->json(['status' => 403, 'msg' => 'Method not allowed'], 200);
         }
 
-        if (!$this->checkApiKey($request)) {
+        if (! $this->checkApiKey($request)) {
             return response()->json(['status' => 404, 'msg' => 'Invalid api key'], 200);
         }
 
@@ -34,10 +34,12 @@ class MobileApiController extends Controller
     private function checkApiKey(Request $request): bool
     {
         $apiKey = $request->input('api_key');
-        if (!$apiKey) {
+        $configKey = config('mobile.api_key');
+        if (! $apiKey || ! $configKey) {
             return false;
         }
-        return hash_equals(config('mobile.api_key'), $apiKey);
+
+        return hash_equals($configKey, $apiKey);
     }
 
     private function success(array $datas): \Illuminate\Http\JsonResponse
@@ -108,9 +110,10 @@ class MobileApiController extends Controller
         $q = $request->input('q', '');
         if ($q !== '') {
             $q = urldecode($q);
-            $query->where(function ($sub) use ($q) {
-                $sub->where('r.name', 'LIKE', "%{$q}%")
-                    ->orWhere('r.tags', 'LIKE', "%{$q}%");
+            $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $q);
+            $query->where(function ($sub) use ($escaped) {
+                $sub->where('r.name', 'LIKE', "%{$escaped}%")
+                    ->orWhere('r.tags', 'LIKE', "%{$escaped}%");
             });
         }
 
@@ -159,7 +162,11 @@ class MobileApiController extends Controller
 
     private function getRemoteConfigs(): \Illuminate\Http\JsonResponse
     {
-        $configs = DB::table('configs')->get()->toArray();
+        $configs = DB::table('configs')
+            ->select('id', 'name', 'value')
+            ->get()
+            ->toArray();
+
         return $this->success($configs);
     }
 }

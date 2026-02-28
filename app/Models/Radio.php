@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
-use Intervention\Image\ImageManager;           // Intervention Image v3 ImageManager
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;           // Intervention Image v3 ImageManager
 use Intervention\Image\Drivers\Gd\Driver;      // Intervention Image v3 GD Driver
 use Intervention\Image\Encoders\WebpEncoder;   // Intervention Image v3 WebpEncoder
-use Illuminate\Support\Str;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Intervention\Image\ImageManager;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Radio extends Model
 {
@@ -20,7 +20,8 @@ class Radio extends Model
     /**
      * Eager load relationships by default
      */
-    protected $with = ['genres'];
+    // Eager loading movido a queries específicos donde se necesita
+    // protected $with = ['genres'];
 
     protected $fillable = [
         'name',
@@ -60,8 +61,6 @@ class Radio extends Model
 
     /**
      * Get the URL of the optimized logo.
-     *
-     * @return string
      */
     public function getOptimizedLogoUrlAttribute(): string
     {
@@ -71,33 +70,33 @@ class Radio extends Model
 
         $originalPath = $this->img; // e.g., 'radios_logos/imagen.jpg'
 
-        if (!Storage::disk('public')->exists($originalPath)) {
-            logger()->warning('Original image not found for radio ' . $this->id . ': ' . $originalPath);
+        if (! Storage::disk('public')->exists($originalPath)) {
+            logger()->warning('Original image not found for radio '.$this->id.': '.$originalPath);
+
             return asset('images/default-radio-logo.png');
         }
 
         $fileLastModifiedTime = Storage::disk('public')->lastModified($originalPath);
-        $cacheKey = 'optimized_logo_url_' . md5($originalPath) . '_' . $fileLastModifiedTime;
+        $cacheKey = 'optimized_logo_url_'.md5($originalPath).'_'.$fileLastModifiedTime;
         $cacheDuration = now()->addHours(24);
 
         return Cache::remember($cacheKey, $cacheDuration, function () use ($originalPath) {
             try {
-                $imageName = pathinfo($originalPath, PATHINFO_FILENAME) . '.webp';
+                $imageName = pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
                 $optimizedDirPath = 'radios/optimized'; // Directorio para imágenes optimizadas
-                $optimizedFullPath = $optimizedDirPath . '/' . $imageName;
+                $optimizedFullPath = $optimizedDirPath.'/'.$imageName;
 
                 // Crear directorio si no existe y si la imagen optimizada no existe ya o es más antigua
-                if (!Storage::disk('public')->exists($optimizedFullPath) || 
-                    Storage::disk('public')->lastModified($originalPath) > Storage::disk('public')->lastModified($optimizedFullPath)) 
-                {
-                    if (!Storage::disk('public')->exists($optimizedDirPath)) {
+                if (! Storage::disk('public')->exists($optimizedFullPath) ||
+                    Storage::disk('public')->lastModified($originalPath) > Storage::disk('public')->lastModified($optimizedFullPath)) {
+                    if (! Storage::disk('public')->exists($optimizedDirPath)) {
                         Storage::disk('public')->makeDirectory($optimizedDirPath);
                     }
 
                     $imageContent = Storage::disk('public')->get($originalPath);
 
                     // Procesar con Intervention Image v3
-                    $manager = new ImageManager(new Driver());
+                    $manager = new ImageManager(new Driver);
                     $img = $manager->read($imageContent);
                     $img->scale(width: 300, height: 300);
 
@@ -107,7 +106,8 @@ class Radio extends Model
 
                 return Storage::url($optimizedFullPath);
             } catch (\Exception $e) {
-                logger()->error('Error optimizing image for radio ' . $this->id . ' (' . $originalPath . '): ' . $e->getMessage());
+                logger()->error('Error optimizing image for radio '.$this->id.' ('.$originalPath.'): '.$e->getMessage());
+
                 return asset('images/default-radio-logo.png');
             }
         });
@@ -118,29 +118,7 @@ class Radio extends Model
         return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id');
     }
 
-    public function user()
-    {
-        // Relación temporal - las radios no tienen user_id actualmente
-        return $this->belongsTo(\App\Models\User::class)->withDefault([
-            'name' => 'Sistema',
-            'email' => 'sistema@domiradios.com.do'
-        ]);
-    }
-    
-    public function getDescripcionAttribute()
-    {
-        return $this->attributes['description'] ?? null;
-    }
-    
-    public function setDescripcionAttribute($value)
-    {
-        $this->attributes['description'] = $value;
-    }
-
-    public function getDescriptionAttribute($value)
-    {
-        return $value;
-    }
+    // Nota: No existe columna user_id en radios, relación removida por integridad
 
     /**
      * Activity Log configuration
@@ -151,7 +129,6 @@ class Radio extends Model
             ->logOnly(['name', 'slug', 'isActive', 'isFeatured', 'rating', 'link_radio', 'source_radio', 'type_radio'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Radio {$eventName}");
+            ->setDescriptionForEvent(fn (string $eventName) => "Radio {$eventName}");
     }
 }
-

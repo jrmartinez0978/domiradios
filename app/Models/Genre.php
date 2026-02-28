@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class Genre extends Model
 {
     use HasFactory;
@@ -19,7 +18,6 @@ class Genre extends Model
     ];
 
     public function radios()
-
     {
         return $this->belongsToMany(Radio::class, 'radios_cat', 'genre_id', 'radio_id');
     }
@@ -33,12 +31,9 @@ class Genre extends Model
     {
         parent::boot();
         static::saving(function ($genre) {
-            // Genera automáticamente el slug a partir del nombre si no se ha definido
             if (empty($genre->slug)) {
                 $genre->slug = Str::slug($genre->name);
             }
         });
     }
-
-
 }

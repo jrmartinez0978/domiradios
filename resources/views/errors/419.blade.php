@@ -1,5 +1,6 @@
-@extends('errors::minimal')
+@extends('errors::layout')
 
-@section('title', __('Page Expired'))
+@section('title', 'Página expirada')
 @section('code', '419')
-@section('message', __('Page Expired'))
+@section('message', 'Página expirada')
+@section('detail', 'Tu sesión ha expirado. Recarga la página e intenta de nuevo.')

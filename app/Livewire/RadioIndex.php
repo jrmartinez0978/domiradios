@@ -2,15 +2,15 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\Radio;
-use App\Traits\HasSeo; // Importar el trait
+use App\Traits\HasSeo;
+use Livewire\Component;
+use Livewire\WithPagination; // Importar el trait
 
 class RadioIndex extends Component
 {
-    use WithPagination;
-    use HasSeo; // Usar el trait
+    use HasSeo;
+    use WithPagination; // Usar el trait
 
     public $search = '';  // Variable para la búsqueda
 
@@ -35,17 +35,15 @@ class RadioIndex extends Component
     public function render()
     {
         // Filtrar emisoras activas por nombre utilizando LIKE y paginar
-        $radios = Radio::where('isActive', true)
-            ->where('name', 'like', '%' . $this->search . '%')
-            ->paginate(15); // Ajusta el número de elementos por página según tus necesidades
+        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $this->search);
+        $radios = Radio::with('genres')
+            ->where('isActive', true)
+            ->where('name', 'like', '%'.$escaped.'%')
+            ->orderByDesc('isFeatured')
+            ->paginate(15);
 
         return view('livewire.radio-index', [
             'radios' => $radios,
         ]);
     }
 }
-
-
-
-
-

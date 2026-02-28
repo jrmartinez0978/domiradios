@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Filament\Panel;
 use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\FilamentUser;
 
-
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable
 {
     use Notifiable;
 
@@ -50,11 +47,6 @@ class User extends Authenticatable implements FilamentUser
      * @var string
      */
     protected $primaryKey = 'user_id';
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->user_status === 1 || $this->user_status === '1';
-    }
 
     /**
      * Relación con posts del blog

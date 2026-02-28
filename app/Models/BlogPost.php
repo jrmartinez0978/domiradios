@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\WebpEncoder;
+use Intervention\Image\ImageManager;
 
 class BlogPost extends Model
 {
@@ -45,13 +46,6 @@ class BlogPost extends Model
         'reading_time' => 'integer',
     ];
 
-    protected $dates = [
-        'published_at',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-
     protected static function boot()
     {
         parent::boot();
@@ -63,7 +57,7 @@ class BlogPost extends Model
             }
 
             // Calcular tiempo de lectura automáticamente
-            if (!empty($post->content) && empty($post->reading_time)) {
+            if (! empty($post->content) && empty($post->reading_time)) {
                 $post->reading_time = static::calculateReadingTime($post->content);
             }
 
@@ -73,7 +67,7 @@ class BlogPost extends Model
             }
 
             // Generar excerpt automáticamente si está vacío
-            if (empty($post->excerpt) && !empty($post->content)) {
+            if (empty($post->excerpt) && ! empty($post->content)) {
                 $post->excerpt = Str::limit(strip_tags($post->content), 160);
             }
         });
@@ -87,6 +81,7 @@ class BlogPost extends Model
     {
         $wordCount = str_word_count(strip_tags($content));
         $minutes = ceil($wordCount / 200);
+
         return max(1, $minutes); // Mínimo 1 minuto
     }
 
@@ -104,7 +99,7 @@ class BlogPost extends Model
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
-                     ->where('published_at', '<=', now());
+            ->where('published_at', '<=', now());
     }
 
     /**
@@ -142,32 +137,30 @@ class BlogPost extends Model
 
         $originalPath = $this->featured_image;
 
-        if (!Storage::disk('public')->exists($originalPath)) {
-            logger()->warning('Featured image not found for blog post ' . $this->id . ': ' . $originalPath);
+        if (! Storage::disk('public')->exists($originalPath)) {
+            logger()->warning('Featured image not found for blog post '.$this->id.': '.$originalPath);
+
             return asset('images/default-blog-post.jpg');
         }
 
         try {
-            $imageName = pathinfo($originalPath, PATHINFO_FILENAME) . '.webp';
+            $imageName = pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
             $optimizedDirPath = 'blog/optimized';
-            $optimizedFullPath = $optimizedDirPath . '/' . $imageName;
+            $optimizedFullPath = $optimizedDirPath.'/'.$imageName;
 
             // Crear imagen optimizada si no existe
-            if (!Storage::disk('public')->exists($optimizedFullPath) ||
-                Storage::disk('public')->lastModified($originalPath) > Storage::disk('public')->lastModified($optimizedFullPath))
-            {
-                if (!Storage::disk('public')->exists($optimizedDirPath)) {
+            if (! Storage::disk('public')->exists($optimizedFullPath) ||
+                Storage::disk('public')->lastModified($originalPath) > Storage::disk('public')->lastModified($optimizedFullPath)) {
+                if (! Storage::disk('public')->exists($optimizedDirPath)) {
                     Storage::disk('public')->makeDirectory($optimizedDirPath);
                 }
 
                 $imageContent = Storage::disk('public')->get($originalPath);
 
                 // Procesar con Intervention Image v3
-                $img = Image::read($imageContent);
-                $img->resize(1200, 630, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
+                $manager = new ImageManager(new Driver);
+                $img = $manager->read($imageContent);
+                $img->scale(width: 1200);
 
                 $encodedImage = $img->encode(new WebpEncoder(quality: 85));
                 Storage::disk('public')->put($optimizedFullPath, (string) $encodedImage);
@@ -175,7 +168,8 @@ class BlogPost extends Model
 
             return Storage::url($optimizedFullPath);
         } catch (\Exception $e) {
-            logger()->error('Error optimizing featured image for blog post ' . $this->id . ' (' . $originalPath . '): ' . $e->getMessage());
+            logger()->error('Error optimizing featured image for blog post '.$this->id.' ('.$originalPath.'): '.$e->getMessage());
+
             return asset('images/default-blog-post.jpg');
         }
     }
@@ -185,7 +179,7 @@ class BlogPost extends Model
      */
     public function getCanonicalUrlAttribute($value): string
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             return $value;
         }
 
@@ -215,7 +209,7 @@ class BlogPost extends Model
      */
     public function getFormattedPublishedDateAttribute(): string
     {
-        if (!$this->published_at) {
+        if (! $this->published_at) {
             return 'No publicado';
         }
 
@@ -228,22 +222,24 @@ class BlogPost extends Model
     public function getRelatedPosts(int $limit = 3)
     {
         $query = static::published()
-                       ->where('id', '!=', $this->id);
+            ->where('id', '!=', $this->id);
 
-        // Priorizar posts con tags similares
-        if (!empty($this->tags) && is_array($this->tags)) {
-            foreach ($this->tags as $tag) {
-                $query->orWhereJsonContains('tags', $tag);
+        $query->where(function ($q) {
+            // Priorizar posts con tags similares
+            if (! empty($this->tags) && is_array($this->tags)) {
+                foreach ($this->tags as $tag) {
+                    $q->orWhereJsonContains('tags', $tag);
+                }
             }
-        }
 
-        // Si no hay suficientes, agregar posts de la misma categoría
-        if (!empty($this->category)) {
-            $query->orWhere('category', $this->category);
-        }
+            // Si no hay suficientes, agregar posts de la misma categoría
+            if (! empty($this->category)) {
+                $q->orWhere('category', $this->category);
+            }
+        });
 
         return $query->orderBy('published_at', 'desc')
-                     ->limit($limit)
-                     ->get();
+            ->limit($limit)
+            ->get();
     }
 }
