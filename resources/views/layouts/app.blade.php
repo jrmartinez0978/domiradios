@@ -34,8 +34,8 @@
     <script type="application/ld+json">
     [
       {
-        "@context": "https://schema.org",
-        "@type": "Organization",
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
         "name": "Domiradios",
         "url": "https://domiradios.com.do",
         "logo": "https://domiradios.com.do/img/domiradios-logo-og.jpg",
@@ -44,18 +44,18 @@
           "https://twitter.com/domiradios"
         ],
         "address": {
-          "@type": "PostalAddress",
+          "@@type": "PostalAddress",
           "addressLocality": "Santo Domingo",
           "addressCountry": "República Dominicana"
         }
       },
       {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
         "url": "https://domiradios.com.do",
         "name": "Domiradios",
         "potentialAction": {
-          "@type": "SearchAction",
+          "@@type": "SearchAction",
           "target": "https://domiradios.com.do/buscar?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }

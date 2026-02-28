@@ -35,12 +35,12 @@
 {{-- BreadcrumbList Schema JSON-LD --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
   "itemListElement": [
     @foreach ($items as $index => $item)
     {
-      "@type": "ListItem",
+      "@@type": "ListItem",
       "position": {{ $index + 1 }},
       "name": "{{ $item['name'] }}",
       "item": "{{ $item['url'] ?? url()->current() }}"

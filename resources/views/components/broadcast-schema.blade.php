@@ -15,9 +15,9 @@
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "BroadcastService",
-  "@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}#broadcastservice",
+  "@@context": "https://schema.org",
+  "@@type": "BroadcastService",
+  "@@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}#broadcastservice",
   "name": "{{ $radio->name }}",
   "alternateName": "{{ $radio->name }} Radio",
   "description": "{{ $radio->description ?? 'Escucha ' . $radio->name . ' en vivo online. Emisora de radio de República Dominicana transmitiendo ' . ($radio->tags ? str_replace(',', ', ', $radio->tags) : 'música y entretenimiento') . ' las 24 horas.' }}",
@@ -40,23 +40,23 @@
   ],
   "broadcastFrequency": "{{ $radio->bitrate }}",
   "broadcastAffiliateOf": {
-    "@type": "Organization",
+    "@@type": "Organization",
     "name": "Domiradios",
     "url": "https://domiradios.com.do"
   },
   "broadcaster": {
-    "@type": "Organization",
+    "@@type": "Organization",
     "name": "{{ $radio->name }}",
     @if($radio->address)
     "address": {
-      "@type": "PostalAddress",
+      "@@type": "PostalAddress",
       "addressLocality": "{{ $radio->address }}",
       "addressCountry": "DO",
       "addressRegion": "República Dominicana"
     },
     @endif
     "contactPoint": {
-      "@type": "ContactPoint",
+      "@@type": "ContactPoint",
       "contactType": "customer service",
       "url": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}"
     }
@@ -68,7 +68,7 @@
   "dateModified": "{{ $radio->updated_at ? $radio->updated_at->toIso8601String() : now()->toIso8601String() }}",
   @if($radio->rating)
   "aggregateRating": {
-    "@type": "AggregateRating",
+    "@@type": "AggregateRating",
     "ratingValue": {{ number_format($radio->rating, 1, '.', '') }},
     "bestRating": 5,
     "worstRating": 1,
@@ -76,9 +76,9 @@
   },
   @endif
   "potentialAction": {
-    "@type": "ListenAction",
+    "@@type": "ListenAction",
     "target": {
-      "@type": "EntryPoint",
+      "@@type": "EntryPoint",
       "urlTemplate": "{{ $radio->link_radio }}",
       "actionPlatform": [
         "http://schema.org/DesktopWebPlatform",
@@ -88,14 +88,14 @@
       ]
     },
     "expectsAcceptanceOf": {
-      "@type": "Offer",
+      "@@type": "Offer",
       "price": "0",
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock"
     }
   },
   "areaServed": {
-    "@type": "Country",
+    "@@type": "Country",
     "name": "República Dominicana",
     "identifier": "DO"
   }

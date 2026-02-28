@@ -3,9 +3,9 @@
 {{-- LocalBusiness Schema - SEO 2025 Local Business Optimization --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": ["LocalBusiness", "RadioStation"],
-    "@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}#localbusiness",
+    "@@context": "https://schema.org",
+    "@@type": ["LocalBusiness", "RadioStation"],
+    "@@id": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}#localbusiness",
     "name": "{{ $radio->name }}",
     "alternateName": "{{ $radio->name }} {{ $radio->bitrate }}",
     "description": "{{ Str::limit(strip_tags($radio->description ?? 'Escucha ' . $radio->name . ' en vivo. Emisora de radio dominicana transmitiendo 24/7 con la mejor programación.'), 250) }}",
@@ -15,18 +15,18 @@
 
     {{-- Dirección (República Dominicana) --}}
     "address": {
-        "@type": "PostalAddress",
+        "@@type": "PostalAddress",
         "addressLocality": "{{ $radio->genres->pluck('name')->implode(', ') ?: 'Santo Domingo' }}",
         "addressRegion": "Distrito Nacional",
         "addressCountry": {
-            "@type": "Country",
+            "@@type": "Country",
             "name": "República Dominicana"
         }
     },
 
     {{-- Coordenadas geográficas (Centro de República Dominicana) --}}
     "geo": {
-        "@type": "GeoCoordinates",
+        "@@type": "GeoCoordinates",
         "latitude": "18.7357",
         "longitude": "-70.1627"
     },
@@ -62,7 +62,7 @@
     {{-- Horarios de operación (24/7 para radio online) --}}
     "openingHoursSpecification": [
         {
-            "@type": "OpeningHoursSpecification",
+            "@@type": "OpeningHoursSpecification",
             "dayOfWeek": [
                 "Monday",
                 "Tuesday",
@@ -83,7 +83,7 @@
     {{-- Calificación agregada (si existe) --}}
     @if($radio->ratings_count > 0)
     "aggregateRating": {
-        "@type": "AggregateRating",
+        "@@type": "AggregateRating",
         "ratingValue": {{ round($radio->ratings_avg_stars ?? 0, 1) }},
         "ratingCount": {{ $radio->ratings_count }},
         "bestRating": 5,
@@ -99,7 +99,7 @@
 
     {{-- Área de servicio --}}
     "areaServed": {
-        "@type": "Country",
+        "@@type": "Country",
         "name": "República Dominicana"
     },
 
@@ -109,9 +109,9 @@
     {{-- Servicios ofrecidos --}}
     "makesOffer": [
         {
-            "@type": "Offer",
+            "@@type": "Offer",
             "itemOffered": {
-                "@type": "Service",
+                "@@type": "Service",
                 "name": "Transmisión de radio en vivo online gratis",
                 "description": "Escucha {{ $radio->name }} en vivo desde cualquier dispositivo sin registro ni descargas"
             },
@@ -122,13 +122,13 @@
 
     {{-- Características adicionales --}}
     "hasOfferCatalog": {
-        "@type": "OfferCatalog",
+        "@@type": "OfferCatalog",
         "name": "Programación de {{ $radio->name }}",
         "itemListElement": [
             {
-                "@type": "Offer",
+                "@@type": "Offer",
                 "itemOffered": {
-                    "@type": "BroadcastService",
+                    "@@type": "BroadcastService",
                     "name": "Transmisión en vivo 24/7",
                     "broadcastDisplayName": "{{ $radio->name }} en vivo"
                 }
@@ -138,9 +138,9 @@
 
     {{-- Potencial acción: Escuchar --}}
     "potentialAction": {
-        "@type": "ListenAction",
+        "@@type": "ListenAction",
         "target": {
-            "@type": "EntryPoint",
+            "@@type": "EntryPoint",
             "urlTemplate": "{{ route('emisoras.show', ['slug' => $radio->slug]) }}",
             "actionPlatform": [
                 "http://schema.org/DesktopWebPlatform",
@@ -150,7 +150,7 @@
             ]
         },
         "expectsAcceptanceOf": {
-            "@type": "Offer",
+            "@@type": "Offer",
             "price": "0",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock"

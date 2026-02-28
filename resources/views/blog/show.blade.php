@@ -6,28 +6,28 @@
     {{-- Schema.org Structured Data para el artículo --}}
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
+        "@@context": "https://schema.org",
+        "@@type": "BlogPosting",
         "headline": "{{ $post->title }}",
         "image": "{{ $post->featured_image ? asset('storage/' . $post->featured_image) : asset('img/domiradios-logo-og.jpg') }}",
         "datePublished": "{{ $post->published_at->toIso8601String() }}",
         "dateModified": "{{ $post->updated_at->toIso8601String() }}",
         "author": {
-            "@type": "Person",
+            "@@type": "Person",
             "name": "{{ $post->user->name }}"
         },
         "publisher": {
-            "@type": "Organization",
+            "@@type": "Organization",
             "name": "Domiradios",
             "logo": {
-                "@type": "ImageObject",
+                "@@type": "ImageObject",
                 "url": "{{ asset('img/domiradios-logo-og.jpg') }}"
             }
         },
         "description": "{{ $post->excerpt ?? substr(strip_tags($post->content), 0, 160) }}",
         "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "{{ route('blog.show', $post->slug) }}"
+            "@@type": "WebPage",
+            "@@id": "{{ route('blog.show', $post->slug) }}"
         }
         @if($post->tags)
         ,"keywords": "{{ is_array($post->tags) ? implode(', ', $post->tags) : $post->tags }}"
