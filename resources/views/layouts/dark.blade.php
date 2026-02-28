@@ -116,7 +116,7 @@
     @livewireStyles
     <link rel="stylesheet" href="/css/rtc-player.css?v={{ time() }}">
 </head>
-<body class="min-h-screen flex flex-col font-sans bg-white text-gray-800">
+<body x-data class="min-h-screen flex flex-col font-sans bg-white text-gray-800">
     {{-- Top Info Bar (like habidominicana) --}}
     <div class="top-bar hidden sm:block bg-primary text-white text-sm py-2">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-6">
