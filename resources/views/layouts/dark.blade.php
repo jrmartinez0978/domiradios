@@ -239,13 +239,13 @@
     </div>
 
     {{-- Main Content --}}
-    <main class="flex-grow pb-24">
+    <main class="flex-grow" :class="$store.player.isActive ? 'pb-24' : ''">
         @yield('hero')
         @yield('content')
     </main>
 
     {{-- Footer (mint/sage like habidominicana) --}}
-    <footer class="bg-footer pb-20">
+    <footer class="bg-footer" :class="$store.player.isActive ? 'pb-20' : ''">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
                 {{-- Brand --}}
