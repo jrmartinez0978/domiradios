@@ -19,8 +19,14 @@ class DashboardController extends Controller
         $totalBlogPosts = BlogPost::count();
         $totalUsers = User::count();
 
-        // Radios agrupadas por género (top 10)
-        $radiosByCity = Genre::withCount('radios')
+        // Ciudades
+        $radiosByCity = Genre::cities()->withCount('radios')
+            ->orderByDesc('radios_count')
+            ->get()
+            ->map(fn ($g) => ['label' => $g->name, 'value' => $g->radios_count]);
+
+        // Radios por género musical
+        $radiosByGenre = Genre::genres()->withCount('radios')
             ->orderByDesc('radios_count')
             ->limit(10)
             ->get()
@@ -37,7 +43,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'totalRadios', 'activeRadios', 'totalBlogPosts', 'totalUsers',
-            'radiosByCity', 'playsByDay'
+            'radiosByCity', 'radiosByGenre', 'playsByDay'
         ));
     }
 }

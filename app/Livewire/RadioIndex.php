@@ -2,48 +2,82 @@
 
 namespace App\Livewire;
 
+use App\Models\Genre;
 use App\Models\Radio;
 use App\Traits\HasSeo;
+use Livewire\Attributes\Url;
 use Livewire\Component;
-use Livewire\WithPagination; // Importar el trait
+use Livewire\WithPagination;
 
 class RadioIndex extends Component
 {
     use HasSeo;
-    use WithPagination; // Usar el trait
+    use WithPagination;
 
-    public $search = '';  // Variable para la búsqueda
+    #[Url(as: 'q')]
+    public $search = '';
 
-    protected $paginationTheme = 'tailwind'; // Configuración para Tailwind CSS
+    #[Url]
+    public $genre = '';
+
+    protected $paginationTheme = 'tailwind';
 
     public function mount()
     {
-        // Establecer los datos SEO para esta página
         $this->setSeoData(
-            'Emisoras Dominicanas Online', // Título de la página
-            'Escucha las mejores emisoras de radio de República Dominicana en vivo. Directorio actualizado de radios dominicanas online.', // Descripción
-            asset('img/domiradios-logo-og.jpg') // Imagen OG optimizada para redes sociales (1200x630px)
+            'Emisoras Dominicanas Online',
+            'Escucha las mejores emisoras de radio de República Dominicana en vivo. Directorio actualizado de radios dominicanas online.',
+            asset('img/domiradios-logo-og.jpg')
         );
     }
 
-    // Reseteamos la página cuando cambia el término de búsqueda
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingGenre()
     {
         $this->resetPage();
     }
 
     public function render()
     {
-        // Filtrar emisoras activas por nombre utilizando LIKE y paginar
         $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $this->search);
-        $radios = Radio::with('genres')
-            ->where('isActive', true)
-            ->where('name', 'like', '%'.$escaped.'%')
-            ->orderByDesc('isFeatured')
-            ->paginate(15);
+
+        // Featured radios (only when no search/filter active)
+        $featured = collect();
+        if (empty($this->search) && empty($this->genre)) {
+            $featured = Radio::with('genres')
+                ->where('isActive', true)
+                ->where('isFeatured', true)
+                ->limit(6)
+                ->get();
+        }
+
+        // All radios query
+        $query = Radio::with('genres')
+            ->where('isActive', true);
+
+        if (!empty($this->search)) {
+            $query->where('name', 'like', '%' . $escaped . '%');
+        }
+
+        if (!empty($this->genre)) {
+            $query->whereHas('genres', fn ($q) => $q->where('genres.id', $this->genre));
+        }
+
+        $radios = $query->orderByDesc('isFeatured')->paginate(15);
+
+        $genres = Genre::genres()->withCount('radios')
+            ->having('radios_count', '>', 0)
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.radio-index', [
+            'featured' => $featured,
             'radios' => $radios,
+            'genres' => $genres,
         ]);
     }
 }

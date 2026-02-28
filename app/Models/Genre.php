@@ -13,9 +13,20 @@ class Genre extends Model
     protected $fillable = [
         'name',
         'slug',
+        'type',
         'img',
         'isActive',
     ];
+
+    public function scopeGenres($query)
+    {
+        return $query->where('type', 'genre');
+    }
+
+    public function scopeCities($query)
+    {
+        return $query->where('type', 'city');
+    }
 
     public function radios()
     {

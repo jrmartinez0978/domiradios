@@ -49,6 +49,13 @@ class Radio extends Model
         'last_stream_failure',
     ];
 
+    protected $casts = [
+        'is_stream_active' => 'boolean',
+        'isFeatured' => 'boolean',
+        'isActive' => 'boolean',
+        'last_stream_check' => 'datetime',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -116,6 +123,23 @@ class Radio extends Model
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id');
+    }
+
+    public function musicGenres()
+    {
+        return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id')
+            ->where('type', 'genre');
+    }
+
+    public function cityGenres()
+    {
+        return $this->belongsToMany(Genre::class, 'radios_cat', 'radio_id', 'genre_id')
+            ->where('type', 'city');
+    }
+
+    public function getCityAttribute()
+    {
+        return $this->cityGenres->first()?->name;
     }
 
     // Nota: No existe columna user_id en radios, relación removida por integridad

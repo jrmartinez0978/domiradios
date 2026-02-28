@@ -12,11 +12,20 @@ class GenreController extends Controller
     /**
      * Display a listing of genres.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $genres = Genre::orderBy('name')->paginate(20);
+        $type = $request->input('type', 'genre');
+        $query = Genre::query();
 
-        return view('admin.genres.index', compact('genres'));
+        if ($type === 'city') {
+            $query->cities();
+        } else {
+            $query->genres();
+        }
+
+        $genres = $query->withCount('radios')->orderBy('name')->paginate(20)->withQueryString();
+
+        return view('admin.genres.index', compact('genres', 'type'));
     }
 
     /**
@@ -35,6 +44,7 @@ class GenreController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:genres,slug',
+            'type' => 'required|in:genre,city',
             'img' => 'nullable|image|max:2048',
             'isActive' => 'boolean',
         ]);
@@ -49,8 +59,8 @@ class GenreController extends Controller
 
         Genre::create($data);
 
-        return redirect()->route('admin.genres.index')
-            ->with('success', 'Genre created successfully.');
+        return redirect()->route('admin.genres.index', ['type' => $data['type']])
+            ->with('success', ($data['type'] === 'city' ? 'Ciudad' : 'Género') . ' creado exitosamente.');
     }
 
     /**
@@ -79,6 +89,7 @@ class GenreController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:genres,slug,'.$genre->id,
+            'type' => 'required|in:genre,city',
             'img' => 'nullable|image|max:2048',
             'isActive' => 'boolean',
         ]);
@@ -93,8 +104,8 @@ class GenreController extends Controller
 
         $genre->update($data);
 
-        return redirect()->route('admin.genres.index')
-            ->with('success', 'Genre updated successfully.');
+        return redirect()->route('admin.genres.index', ['type' => $data['type']])
+            ->with('success', ($data['type'] === 'city' ? 'Ciudad' : 'Género') . ' actualizado exitosamente.');
     }
 
     /**

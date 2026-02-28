@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRadioRequest;
 use App\Http\Requests\Admin\UpdateRadioRequest;
+use App\Models\Genre;
 use App\Models\Radio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -34,7 +35,8 @@ class RadioController extends Controller
 
         // Filter by featured
         if ($request->has('featured') && $request->input('featured') !== '') {
-            $query->where('isFeatured', (bool) $request->input('featured'));
+            $isFeatured = $request->input('featured') === 'yes';
+            $query->where('isFeatured', $isFeatured);
         }
 
         $radios = $query->orderBy('name')->paginate(20)->withQueryString();
@@ -47,7 +49,10 @@ class RadioController extends Controller
      */
     public function create()
     {
-        return view('admin.radios.create');
+        $genres = Genre::genres()->orderBy('name')->get();
+        $cities = Genre::cities()->orderBy('name')->get();
+
+        return view('admin.radios.create', compact('genres', 'cities'));
     }
 
     /**
@@ -67,7 +72,13 @@ class RadioController extends Controller
             $data['img'] = $request->file('img')->store('radios_logos', 'public');
         }
 
-        Radio::create($data);
+        $radio = Radio::create($data);
+
+        // Sync géneros musicales y ciudad
+        $genreIds = $request->input('genres', []);
+        $cityId = $request->input('city_id');
+        $syncIds = array_filter(array_merge($genreIds, $cityId ? [$cityId] : []));
+        $radio->genres()->sync($syncIds);
 
         return redirect()->route('admin.radios.index')
             ->with('success', 'Radio created successfully.');
@@ -88,7 +99,11 @@ class RadioController extends Controller
      */
     public function edit(Radio $radio)
     {
-        return view('admin.radios.edit', compact('radio'));
+        $radio->load('genres');
+        $genres = Genre::genres()->orderBy('name')->get();
+        $cities = Genre::cities()->orderBy('name')->get();
+
+        return view('admin.radios.edit', compact('radio', 'genres', 'cities'));
     }
 
     /**
@@ -109,6 +124,12 @@ class RadioController extends Controller
         }
 
         $radio->update($data);
+
+        // Sync géneros musicales y ciudad
+        $genreIds = $request->input('genres', []);
+        $cityId = $request->input('city_id');
+        $syncIds = array_filter(array_merge($genreIds, $cityId ? [$cityId] : []));
+        $radio->genres()->sync($syncIds);
 
         return redirect()->route('admin.radios.index')
             ->with('success', 'Radio updated successfully.');

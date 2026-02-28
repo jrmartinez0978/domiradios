@@ -105,13 +105,25 @@ class RadioController extends Controller
             ->where('isActive', true)
             ->firstOrFail();
 
-        // Obtener emisoras relacionadas basadas en los mismos géneros
-        $related = Radio::whereHas('genres', function ($query) use ($radio) {
-            $query->whereIn('genres.id', $radio->genres->pluck('id'));
-        })
-            ->where('id', '!=', $radio->id)
-            ->limit(4)
-            ->get();
+        // Obtener emisoras relacionadas: primero por géneros musicales, luego por ciudad
+        $musicGenreIds = $radio->musicGenres->pluck('id');
+        if ($musicGenreIds->isNotEmpty()) {
+            $related = Radio::whereHas('genres', function ($query) use ($musicGenreIds) {
+                $query->whereIn('genres.id', $musicGenreIds);
+            })
+                ->where('id', '!=', $radio->id)
+                ->where('isActive', true)
+                ->limit(4)
+                ->get();
+        } else {
+            $related = Radio::whereHas('genres', function ($query) use ($radio) {
+                $query->whereIn('genres.id', $radio->genres->pluck('id'));
+            })
+                ->where('id', '!=', $radio->id)
+                ->where('isActive', true)
+                ->limit(4)
+                ->get();
+        }
 
         // Generar la URL canónica
         $canonical_url = route('emisoras.show', ['slug' => $radio->slug]);
@@ -254,8 +266,8 @@ class RadioController extends Controller
     // Método para mostrar todas las ciudades (géneros)
     public function indexCiudades()
     {
-        // Obtener todos los géneros (ciudades) con conteo de emisoras
-        $genres = Genre::withCount('radios')
+        // Obtener solo ciudades con conteo de emisoras
+        $genres = Genre::cities()->withCount('radios')
             ->having('radios_count', '>', 0)
             ->orderBy('radios_count', 'desc')
             ->get();
@@ -392,7 +404,7 @@ class RadioController extends Controller
                         'item' => [
                             '@type' => 'RadioStation',
                             'name' => $radio->name,
-                            'url' => route('emisoras.show', $radio->slug),
+                            'url' => route('emisoras.show', ['slug' => $radio->slug]),
                             'broadcastFrequency' => $radio->bitrate,
                             'image' => $radio->img ? asset('storage/'.$radio->img) : null,
                         ],
