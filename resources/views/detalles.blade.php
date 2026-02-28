@@ -329,17 +329,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 @foreach($related as $relatedRadio)
                 @if(is_object($relatedRadio) && isset($relatedRadio->slug))
-                <a href="{{ route('emisoras.show', ['slug' => $relatedRadio->slug]) }}" wire:navigate class="group block bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-                    <div class="aspect-square overflow-hidden">
-                        <img src="{{ Storage::url($relatedRadio->img) }}" alt="{{ $relatedRadio->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" width="150" height="150">
-                    </div>
-                    <div class="p-3">
-                        <h3 class="font-semibold text-gray-700 group-hover:text-primary transition-colors text-sm truncate">{{ $relatedRadio->name }}</h3>
-                        @if($relatedRadio->bitrate)
-                        <p class="text-xs text-gray-400 mt-0.5">{{ $relatedRadio->bitrate }}</p>
-                        @endif
-                    </div>
-                </a>
+                    <x-radio-card :radio="$relatedRadio" :loop="$loop" />
                 @endif
                 @endforeach
             </div>

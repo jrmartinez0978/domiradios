@@ -162,10 +162,20 @@ class MobileApiController extends Controller
 
     private function getRemoteConfigs(): \Illuminate\Http\JsonResponse
     {
-        $configs = DB::table('configs')
-            ->select('id', 'name', 'value')
-            ->get()
-            ->toArray();
+        $row = DB::table('configs')->first();
+
+        if (! $row) {
+            return $this->success([]);
+        }
+
+        $configs = [];
+        $id = 1;
+        foreach ((array) $row as $key => $value) {
+            if ($key === 'id') {
+                continue;
+            }
+            $configs[] = (object) ['id' => $id++, 'name' => $key, 'value' => $value];
+        }
 
         return $this->success($configs);
     }

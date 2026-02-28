@@ -108,20 +108,20 @@ class RadioController extends Controller
         // Obtener emisoras relacionadas: primero por géneros musicales, luego por ciudad
         $musicGenreIds = $radio->musicGenres->pluck('id');
         if ($musicGenreIds->isNotEmpty()) {
-            $related = Radio::whereHas('genres', function ($query) use ($musicGenreIds) {
+            $related = Radio::with('genres')->whereHas('genres', function ($query) use ($musicGenreIds) {
                 $query->whereIn('genres.id', $musicGenreIds);
             })
                 ->where('id', '!=', $radio->id)
                 ->where('isActive', true)
-                ->limit(4)
+                ->limit(5)
                 ->get();
         } else {
-            $related = Radio::whereHas('genres', function ($query) use ($radio) {
+            $related = Radio::with('genres')->whereHas('genres', function ($query) use ($radio) {
                 $query->whereIn('genres.id', $radio->genres->pluck('id'));
             })
                 ->where('id', '!=', $radio->id)
                 ->where('isActive', true)
-                ->limit(4)
+                ->limit(5)
                 ->get();
         }
 

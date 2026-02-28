@@ -204,7 +204,7 @@
              x-bind:style="open ? '' : 'display:none'"
              class="fixed inset-0 z-[60]"
              @click.self="open = false">
-            <div class="absolute inset-0" style="background:#000;opacity:0.92"></div>
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
             <div class="relative flex items-start justify-center pt-20 px-4 h-full" @click.self="open = false">
                 <div class="w-full max-w-2xl">
                     <form @submit.prevent="if(query.trim()) { open = false; Livewire.navigate('/?q=' + encodeURIComponent(query.trim())); }"
