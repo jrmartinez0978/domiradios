@@ -5,9 +5,9 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-    <div class="glass-card p-6 md:p-8 prose prose-invert max-w-none prose-headings:text-gray-100 prose-p:text-dark-300 prose-li:text-dark-300 prose-strong:text-gray-200">
-        <h1 class="text-3xl font-bold mb-3 text-gray-100 flex items-center not-prose">
-            <span class="text-accent-red mr-3"><i class="fas fa-gavel"></i></span>
+    <div class="card p-6 md:p-8 prose max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-gray-800">
+        <h1 class="text-3xl font-bold mb-3 text-gray-800 flex items-center not-prose">
+            <span class="text-primary mr-3"><i class="fas fa-gavel"></i></span>
             Términos y Condiciones
         </h1>
 
@@ -55,19 +55,19 @@
 
     <h2 class="text-2xl font-semibold mt-8 mb-4">Your Content</h2>
     <p class="mb-4">
-        In these Website Standard Terms and Conditions, “Your Content” shall mean any audio, video, text, images, or
+        In these Website Standard Terms and Conditions, "Your Content" shall mean any audio, video, text, images, or
         other material you choose to display on this Website. By displaying Your Content, you grant
         <strong>Domiradios</strong> a non-exclusive, worldwide, irrevocable, sublicensable license to use, reproduce,
         adapt, publish, translate, and distribute it in any and all media.
     </p>
     <p class="mb-4">
-        Your Content must be your own and must not be invading any third-party’s rights. <strong>Domiradios</strong>
+        Your Content must be your own and must not be invading any third-party's rights. <strong>Domiradios</strong>
         reserves the right to remove any of Your Content from this Website at any time without notice.
     </p>
 
     <h2 class="text-2xl font-semibold mt-8 mb-4">No Warranties</h2>
     <p class="mb-4">
-        This Website is provided “as is,” with all faults, and <strong>Domiradios</strong> express no representations or
+        This Website is provided "as is," with all faults, and <strong>Domiradios</strong> express no representations or
         warranties, of any kind related to this Website or the materials contained on this Website. Also, nothing
         contained on this Website shall be interpreted as advising you.
     </p>
@@ -113,4 +113,3 @@
         of this Website, and supersede all prior agreements and understandings.
     </p>
 </div>
-

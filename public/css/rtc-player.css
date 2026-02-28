@@ -271,7 +271,4 @@
     margin-right: 0.5rem;
 }
 
-/* Clase de utilidad para ocultar elementos */
-.hidden {
-    display: none !important;
-}
+/* .hidden utility removed - conflicts with Tailwind's responsive hidden/flex classes */

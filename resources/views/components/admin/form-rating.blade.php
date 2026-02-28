@@ -2,7 +2,7 @@
 
 <div x-data="{ rating: {{ old($name, $value) }} }">
     @if($label)
-        <label class="block text-sm font-medium text-dark-300 mb-1.5">{{ $label }}</label>
+        <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ $label }}</label>
     @endif
     <input type="hidden" name="{{ $name }}" :value="rating">
     <div class="flex items-center gap-1">
@@ -10,15 +10,15 @@
             <button
                 type="button"
                 @click="rating = {{ $i }}"
-                :class="rating >= {{ $i }} ? 'text-accent-amber' : 'text-dark-500'"
-                class="text-xl transition-colors hover:text-accent-amber focus:outline-none"
+                :class="rating >= {{ $i }} ? 'text-amber-500' : 'text-gray-300'"
+                class="text-xl transition-colors hover:text-amber-500 focus:outline-none"
             >
                 <i class="fas fa-star"></i>
             </button>
         @endfor
-        <span class="ml-2 text-sm text-dark-400" x-text="rating + '/{{ $max }}'"></span>
+        <span class="ml-2 text-sm text-gray-500" x-text="rating + '/{{ $max }}'"></span>
     </div>
     @error($name)
-        <p class="mt-1 text-xs text-accent-red">{{ $message }}</p>
+        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
     @enderror
 </div>

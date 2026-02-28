@@ -8,8 +8,8 @@
             <i class="fas fa-arrow-left"></i>
         </a>
         <div>
-            <h2 class="text-2xl font-bold text-gray-100">Editar Tema</h2>
-            <p class="text-dark-300 text-sm mt-1">{{ $theme->name }}</p>
+            <h2 class="text-2xl font-bold text-gray-800">Editar Tema</h2>
+            <p class="text-gray-500 text-sm mt-1">{{ $theme->name }}</p>
         </div>
     </div>
 @endsection
@@ -20,8 +20,8 @@
             @csrf
             @method('PUT')
 
-            <div class="glass-card p-6 space-y-5">
-                <h3 class="text-lg font-semibold text-gray-100 border-b border-glass-border pb-3">Informacion del Tema</h3>
+            <div class="bg-white rounded-2xl border border-surface-300 shadow-sm p-6 space-y-5">
+                <h3 class="text-lg font-semibold text-gray-800 border-b border-surface-300 pb-3">Informacion del Tema</h3>
 
                 <x-admin.form-input name="name" label="Nombre" required :value="$theme->name" />
                 <x-admin.form-toggle name="is_active" label="Activo" :checked="$theme->is_active ?? $theme->isActive ?? false" />

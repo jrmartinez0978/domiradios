@@ -91,44 +91,74 @@
     {{-- Critical inline styles for above-the-fold --}}
     <style>
         [x-cloak] { display: none !important; }
-        body { background-color: #0a0a0f; color: #e5e7eb; }
-        nav { background: rgba(22,24,34,0.8); backdrop-filter: blur(24px); }
+        body { background-color: #ffffff; color: #1f2937; }
+        .top-bar-inline { background-color: #005046; color: #fff; }
+        nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #e5e7eb; }
     </style>
 
     @livewireStyles
-    <link rel="stylesheet" href="/css/rtc-player.css">
+    <link rel="stylesheet" href="/css/rtc-player.css?v={{ time() }}">
 </head>
-<body class="min-h-screen flex flex-col font-sans">
-    {{-- Navigation --}}
-    <nav x-data="{ mobileOpen: false }" class="fixed top-0 inset-x-0 z-50 bg-dark-800/80 backdrop-blur-xl border-b border-glass-border">
+<body class="min-h-screen flex flex-col font-sans bg-white text-gray-800">
+    {{-- Top Info Bar (like habidominicana) --}}
+    <div class="top-bar hidden sm:block bg-primary text-white text-sm py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-6">
+            <span class="flex items-center gap-1.5">
+                <i class="fas fa-broadcast-tower text-xs"></i>
+                {{ \App\Models\Radio::where('isActive', true)->count() }}+ emisoras en vivo
+            </span>
+            <span class="hidden md:flex items-center gap-1.5">
+                <i class="fas fa-envelope text-xs"></i>
+                info@domiradios.com.do
+            </span>
+            <span class="hidden md:flex items-center gap-1.5">
+                <i class="fas fa-map-marker-alt text-xs"></i>
+                República Dominicana
+            </span>
+        </div>
+    </div>
+
+    {{-- Navigation (habidominicana format: logo left, links center, actions right) --}}
+    <nav x-data="{ mobileOpen: false }" class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-surface-300 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="flex items-center justify-between h-16">
-                {{-- Logo --}}
-                <a href="{{ url('/') }}" class="flex items-center gap-2">
-                    <div class="text-2xl font-extrabold text-gradient">Domiradios</div>
+                {{-- Logo (left) --}}
+                <a href="{{ url('/') }}" wire:navigate class="flex items-center gap-2 flex-shrink-0">
+                    <div class="text-2xl font-extrabold text-primary tracking-tight">
+                        <span>DOMI</span><span class="border-b-2 border-primary">RADIOS</span>
+                    </div>
                 </a>
 
-                {{-- Desktop Nav --}}
-                <div class="hidden md:flex items-center gap-1">
-                    <a href="{{ url('/') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-glass-white-10 transition-all duration-200">
-                        <i class="fas fa-radio mr-1.5"></i>Emisoras
+                {{-- Center Nav Links (like habidominicana) --}}
+                <div class="hidden lg:flex items-center gap-1">
+                    <a href="{{ url('/') }}" wire:navigate class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors">Emisoras</a>
+                    <a href="{{ route('ciudades.index') }}" wire:navigate class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors">Ciudades</a>
+                    <a href="{{ route('blog.index') }}" wire:navigate class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors">Blog</a>
+                    <a href="{{ route('about') }}" wire:navigate class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors">Sobre Nosotros</a>
+                    <a href="{{ route('contacto') }}" wire:navigate class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors">Contacto</a>
+                </div>
+
+                {{-- Right Actions (like habidominicana: heart, contact btn) --}}
+                <div class="hidden lg:flex items-center gap-3">
+                    <a href="{{ route('favoritos') }}" wire:navigate class="w-10 h-10 rounded-full border border-surface-300 flex items-center justify-center text-gray-500 hover:text-primary hover:border-primary/30 transition-all" title="Favoritos">
+                        <i class="fas fa-heart text-sm"></i>
                     </a>
-                    <a href="{{ route('ciudades.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-glass-white-10 transition-all duration-200">
-                        <i class="fas fa-map-marker-alt mr-1.5"></i>Ciudades
-                    </a>
-                    <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-glass-white-10 transition-all duration-200">
-                        <i class="fas fa-newspaper mr-1.5"></i>Blog
-                    </a>
-                    <a href="{{ route('favoritos') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-glass-white-10 transition-all duration-200">
-                        <i class="fas fa-heart mr-1.5"></i>Favoritos
-                    </a>
-                    <a href="{{ route('contacto') }}" class="ml-2 btn-primary text-sm !px-4 !py-2">
-                        <i class="fas fa-broadcast-tower mr-1.5"></i>Envía tu emisora
+                    <button @click="$dispatch('toggle-search')" class="w-10 h-10 rounded-full border border-surface-300 flex items-center justify-center text-gray-500 hover:text-primary hover:border-primary/30 transition-all" title="Buscar emisora">
+                        <i class="fas fa-search text-sm"></i>
+                    </button>
+                    <a href="{{ route('contacto') }}" wire:navigate class="inline-flex items-center gap-2 bg-primary text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-primary-600 transition-all">
+                        <i class="fas fa-broadcast-tower text-xs"></i>
+                        Envía tu emisora
                     </a>
                 </div>
 
-                {{-- Mobile hamburger --}}
-                <button @click="mobileOpen = !mobileOpen" class="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-glass-white-10 transition-colors">
+                {{-- Mobile search + hamburger --}}
+                <div class="flex items-center gap-1 lg:hidden">
+                    <button @click="$dispatch('toggle-search')" class="p-2 rounded-lg text-gray-500 hover:text-primary hover:bg-primary-50 transition-colors" title="Buscar">
+                        <i class="fas fa-search w-6 h-6 flex items-center justify-center"></i>
+                    </button>
+                </div>
+                <button @click="mobileOpen = !mobileOpen" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-primary hover:bg-primary-50 transition-colors">
                     <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
@@ -147,46 +177,68 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-2"
-             class="md:hidden bg-dark-800/95 backdrop-blur-xl border-b border-glass-border">
+             class="lg:hidden bg-white border-b border-surface-300">
             <div class="px-4 py-3 space-y-1">
-                <a href="{{ url('/') }}" class="block px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-glass-white-10 transition-colors">
-                    <i class="fas fa-radio mr-2 w-5 text-center"></i>Emisoras
+                <a href="{{ url('/') }}" wire:navigate class="block px-3 py-2.5 rounded-lg text-gray-700 hover:text-primary hover:bg-primary-50 transition-colors font-medium">Emisoras</a>
+                <a href="{{ route('ciudades.index') }}" wire:navigate class="block px-3 py-2.5 rounded-lg text-gray-700 hover:text-primary hover:bg-primary-50 transition-colors font-medium">Ciudades</a>
+                <a href="{{ route('blog.index') }}" wire:navigate class="block px-3 py-2.5 rounded-lg text-gray-700 hover:text-primary hover:bg-primary-50 transition-colors font-medium">Blog</a>
+                <a href="{{ route('about') }}" wire:navigate class="block px-3 py-2.5 rounded-lg text-gray-700 hover:text-primary hover:bg-primary-50 transition-colors font-medium">Sobre Nosotros</a>
+                <a href="{{ route('favoritos') }}" wire:navigate class="block px-3 py-2.5 rounded-lg text-gray-700 hover:text-primary hover:bg-primary-50 transition-colors font-medium">
+                    <i class="fas fa-heart mr-2 w-5 text-center text-sm"></i>Favoritos
                 </a>
-                <a href="{{ route('ciudades.index') }}" class="block px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-glass-white-10 transition-colors">
-                    <i class="fas fa-map-marker-alt mr-2 w-5 text-center"></i>Ciudades
-                </a>
-                <a href="{{ route('blog.index') }}" class="block px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-glass-white-10 transition-colors">
-                    <i class="fas fa-newspaper mr-2 w-5 text-center"></i>Blog
-                </a>
-                <a href="{{ route('favoritos') }}" class="block px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-glass-white-10 transition-colors">
-                    <i class="fas fa-heart mr-2 w-5 text-center"></i>Favoritos
-                </a>
-                <a href="{{ route('contacto') }}" class="block px-3 py-2.5 rounded-lg text-white bg-gradient-to-r from-accent-red to-red-600 text-center mt-2">
+                <a href="{{ route('contacto') }}" wire:navigate class="block px-3 py-2.5 rounded-lg text-white bg-primary text-center mt-2 font-medium">
                     <i class="fas fa-broadcast-tower mr-2"></i>Envía tu emisora
                 </a>
             </div>
         </div>
     </nav>
 
+    {{-- Search Overlay --}}
+    <div x-data="{ open: false, query: '' }"
+         @toggle-search.window="open = !open; if(open) setTimeout(() => document.getElementById('search-input')?.focus(), 150)"
+         @keydown.escape.window="open = false">
+        <div x-show="open"
+             x-bind:style="open ? '' : 'display:none'"
+             class="fixed inset-0 z-[60]"
+             @click.self="open = false">
+            <div class="absolute inset-0" style="background:#000;opacity:0.92"></div>
+            <div class="relative flex items-start justify-center pt-20 px-4 h-full" @click.self="open = false">
+                <div class="w-full max-w-2xl">
+                    <form @submit.prevent="if(query.trim()) { open = false; Livewire.navigate('/?q=' + encodeURIComponent(query.trim())); }"
+                          class="bg-white rounded-2xl shadow-2xl p-2 flex items-center gap-2">
+                        <i class="fas fa-search text-gray-400 ml-4"></i>
+                        <input id="search-input" x-model="query" type="text"
+                               class="flex-1 py-3 px-2 text-lg text-gray-800 placeholder-gray-400 bg-transparent border-none outline-none focus:ring-0"
+                               placeholder="Buscar emisora...">
+                        <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-600 transition-colors">
+                            Buscar
+                        </button>
+                    </form>
+                    <p class="text-center text-white/60 text-sm mt-3">Presiona ESC para cerrar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Main Content --}}
-    <main class="flex-grow pt-16 pb-24">
+    <main class="flex-grow pb-24">
         @yield('hero')
         @yield('content')
     </main>
 
-    {{-- Footer --}}
-    <footer class="bg-dark-900 border-t border-glass-border pb-20">
+    {{-- Footer (mint/sage like habidominicana) --}}
+    <footer class="bg-footer pb-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
                 {{-- Brand --}}
                 <div class="md:col-span-1">
-                    <div class="text-2xl font-extrabold text-gradient mb-3">Domiradios</div>
-                    <p class="text-dark-400 text-sm leading-relaxed">El directorio más completo de emisoras de radio dominicanas. Escucha en vivo las mejores estaciones de República Dominicana.</p>
+                    <div class="text-2xl font-extrabold text-primary mb-3">Domiradios</div>
+                    <p class="text-primary-700 text-sm leading-relaxed">El directorio más completo de emisoras de radio dominicanas. Escucha en vivo las mejores estaciones de República Dominicana.</p>
                     <div class="flex gap-3 mt-4">
-                        <a href="https://www.facebook.com/domiradios" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-glass-white-10 flex items-center justify-center text-dark-400 hover:text-white hover:bg-glass-white-20 transition-all">
+                        <a href="https://www.facebook.com/domiradios" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:text-white hover:bg-primary transition-all">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="https://twitter.com/domiradios" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-glass-white-10 flex items-center justify-center text-dark-400 hover:text-white hover:bg-glass-white-20 transition-all">
+                        <a href="https://twitter.com/domiradios" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:text-white hover:bg-primary transition-all">
                             <i class="fab fa-twitter"></i>
                         </a>
                     </div>
@@ -194,50 +246,52 @@
 
                 {{-- Navigation --}}
                 <div>
-                    <h4 class="font-semibold text-gray-200 mb-4 text-sm uppercase tracking-wider">Navegación</h4>
+                    <h4 class="font-semibold text-primary mb-4 text-sm uppercase tracking-wider">Navegación</h4>
                     <ul class="space-y-2">
-                        <li><a href="{{ url('/') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Inicio</a></li>
-                        <li><a href="{{ route('ciudades.index') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Por Ciudad</a></li>
-                        <li><a href="{{ route('blog.index') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Blog</a></li>
-                        <li><a href="{{ route('favoritos') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Mis Favoritos</a></li>
+                        <li><a href="{{ url('/') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Inicio</a></li>
+                        <li><a href="{{ route('ciudades.index') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Por Ciudad</a></li>
+                        <li><a href="{{ route('blog.index') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Blog</a></li>
+                        <li><a href="{{ route('favoritos') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Mis Favoritos</a></li>
                     </ul>
                 </div>
 
                 {{-- Legal --}}
                 <div>
-                    <h4 class="font-semibold text-gray-200 mb-4 text-sm uppercase tracking-wider">Legal</h4>
+                    <h4 class="font-semibold text-primary mb-4 text-sm uppercase tracking-wider">Legal</h4>
                     <ul class="space-y-2">
-                        <li><a href="{{ route('terminos') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Términos y Condiciones</a></li>
-                        <li><a href="{{ route('privacidad') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Política de Privacidad</a></li>
-                        <li><a href="{{ route('about') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Sobre Nosotros</a></li>
-                        <li><a href="{{ route('contacto') }}" class="text-dark-400 hover:text-accent-red text-sm transition-colors">Contacto</a></li>
+                        <li><a href="{{ route('terminos') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Términos y Condiciones</a></li>
+                        <li><a href="{{ route('privacidad') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Política de Privacidad</a></li>
+                        <li><a href="{{ route('about') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Sobre Nosotros</a></li>
+                        <li><a href="{{ route('contacto') }}" wire:navigate class="text-primary-700 hover:text-primary text-sm transition-colors">Contacto</a></li>
                     </ul>
                 </div>
 
                 {{-- Contact info --}}
                 <div>
-                    <h4 class="font-semibold text-gray-200 mb-4 text-sm uppercase tracking-wider">Contacto</h4>
-                    <ul class="space-y-2 text-sm text-dark-400">
-                        <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-accent-red"></i> Santo Domingo, RD</li>
-                        <li class="flex items-center gap-2"><i class="fas fa-envelope text-accent-red"></i> info@domiradios.com.do</li>
+                    <h4 class="font-semibold text-primary mb-4 text-sm uppercase tracking-wider">Contacto</h4>
+                    <ul class="space-y-2 text-sm text-primary-700">
+                        <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-primary"></i> Santo Domingo, RD</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-envelope text-primary"></i> info@domiradios.com.do</li>
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="border-t border-glass-border">
-            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-dark-500">
+        <div class="bg-primary">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/80">
                 <span>&copy; {{ date('Y') }} Domiradios. Todos los derechos reservados.</span>
-                <a href="https://rtcstreaming.com" target="_blank" rel="nofollow noopener noreferrer" class="text-dark-500 hover:text-accent-red transition-colors">Directorio de RTCStream</a>
+                <a href="https://rtcstreaming.com" target="_blank" rel="nofollow noopener noreferrer" class="text-white/60 hover:text-white transition-colors">Directorio de RTCStream</a>
             </div>
         </div>
     </footer>
 
-    {{-- Player Bar Global --}}
-    <x-player-bar />
+    {{-- Player Bar Global (persisted across SPA navigations) --}}
+    @persist('player-bar')
+        <x-player-bar />
+    @endpersist
 
     {{-- Rating System Script --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('livewire:navigated', function() {
             const ratingElements = document.querySelectorAll('.user-rating');
             ratingElements.forEach(function(ratingElement) {
                 const radioId = ratingElement.getAttribute('data-radio-id');
@@ -255,11 +309,11 @@
                 });
             });
             function highlightStars(stars, rating) {
-                stars.forEach((s, i) => { s.classList.toggle('text-yellow-400', i < rating); s.classList.toggle('text-dark-500', i >= rating); });
+                stars.forEach((s, i) => { s.classList.toggle('text-yellow-400', i < rating); s.classList.toggle('text-gray-300', i >= rating); });
             }
             function resetStars(stars, el) {
                 const cur = parseFloat(el.dataset.currentRating);
-                stars.forEach((s, i) => { s.classList.toggle('text-yellow-400', i < cur); s.classList.toggle('text-dark-500', i >= cur); });
+                stars.forEach((s, i) => { s.classList.toggle('text-yellow-400', i < cur); s.classList.toggle('text-gray-300', i >= cur); });
             }
             function submitRating(radioId, rating, stars, el) {
                 const ctrl = new AbortController();
@@ -273,7 +327,7 @@
             }
             function showNotification(msg, type) {
                 const n = document.createElement('div');
-                n.className = `fixed bottom-28 right-4 z-[60] px-4 py-3 rounded-xl text-sm font-medium text-white ${type === 'success' ? 'bg-emerald-500/90' : 'bg-red-500/90'} backdrop-blur-sm shadow-lg`;
+                n.className = `fixed bottom-28 right-4 z-[60] px-4 py-3 rounded-xl text-sm font-medium text-white ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} shadow-lg`;
                 n.textContent = msg;
                 document.body.appendChild(n);
                 setTimeout(() => n.remove(), 3000);

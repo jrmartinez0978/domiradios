@@ -4,8 +4,8 @@
 
 @section('page-header')
     <div>
-        <h2 class="text-2xl font-bold text-gray-100">Settings</h2>
-        <p class="text-dark-300 text-sm mt-1">Configuracion general del sistema</p>
+        <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
+        <p class="text-gray-500 text-sm mt-1">Configuracion general del sistema</p>
     </div>
 @endsection
 
@@ -15,8 +15,8 @@
             @csrf
             @method('PUT')
 
-            <div class="glass-card p-6 space-y-5">
-                <h3 class="text-lg font-semibold text-gray-100 border-b border-glass-border pb-3">Configuracion</h3>
+            <div class="bg-white rounded-2xl border border-surface-300 shadow-sm p-6 space-y-5">
+                <h3 class="text-lg font-semibold text-gray-800 border-b border-surface-300 pb-3">Configuracion</h3>
 
                 @php
                     $fields = $setting->toArray();

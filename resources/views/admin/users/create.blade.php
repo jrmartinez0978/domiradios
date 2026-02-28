@@ -8,8 +8,8 @@
             <i class="fas fa-arrow-left"></i>
         </a>
         <div>
-            <h2 class="text-2xl font-bold text-gray-100">Nuevo Usuario</h2>
-            <p class="text-dark-300 text-sm mt-1">Crear un nuevo usuario del sistema</p>
+            <h2 class="text-2xl font-bold text-gray-800">Nuevo Usuario</h2>
+            <p class="text-gray-500 text-sm mt-1">Crear un nuevo usuario del sistema</p>
         </div>
     </div>
 @endsection
@@ -19,8 +19,8 @@
         <form method="POST" action="{{ route('admin.users.store') }}">
             @csrf
 
-            <div class="glass-card p-6 space-y-5">
-                <h3 class="text-lg font-semibold text-gray-100 border-b border-glass-border pb-3">Informacion del Usuario</h3>
+            <div class="bg-white rounded-2xl border border-surface-300 shadow-sm p-6 space-y-5">
+                <h3 class="text-lg font-semibold text-gray-800 border-b border-surface-300 pb-3">Informacion del Usuario</h3>
 
                 <x-admin.form-input name="name" label="Nombre" required placeholder="Nombre completo" />
                 <x-admin.form-input name="email" label="Email" type="email" required placeholder="usuario@ejemplo.com" />

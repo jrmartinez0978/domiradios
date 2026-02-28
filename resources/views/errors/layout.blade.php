@@ -10,8 +10,8 @@
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             html, body {
-                background-color: #0a0a0f;
-                color: #8b8fa8;
+                background-color: #FAFAFA;
+                color: #4B5563;
                 font-family: 'Inter', system-ui, sans-serif;
                 height: 100vh;
             }
@@ -27,7 +27,7 @@
             .code {
                 font-size: 7rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #E21C25, #ff4444);
+                background: linear-gradient(135deg, #005046, #00796B);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -37,12 +37,12 @@
             .message {
                 font-size: 1.25rem;
                 font-weight: 600;
-                color: #e5e7eb;
+                color: #1F2937;
                 margin-bottom: 0.5rem;
             }
             .detail {
                 font-size: 0.875rem;
-                color: #5c5f7a;
+                color: #6B7280;
                 margin-bottom: 2rem;
             }
             .back-link {
@@ -50,19 +50,18 @@
                 align-items: center;
                 gap: 0.5rem;
                 padding: 0.75rem 1.5rem;
-                background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(255,255,255,0.08);
+                background: #005046;
+                border: 1px solid #005046;
                 border-radius: 0.75rem;
-                color: #e5e7eb;
+                color: #ffffff;
                 text-decoration: none;
                 font-size: 0.875rem;
                 font-weight: 600;
                 transition: all 0.2s;
-                backdrop-filter: blur(12px);
             }
             .back-link:hover {
-                background: rgba(255,255,255,0.1);
-                border-color: rgba(255,255,255,0.12);
+                background: #003d35;
+                border-color: #003d35;
             }
         </style>
     </head>

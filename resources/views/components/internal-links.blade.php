@@ -21,11 +21,12 @@
     <div class="flex flex-wrap gap-2">
         @foreach($popularGenres as $genre)
         <a href="{{ route('ciudades.show', $genre->slug) }}"
+           wire:navigate
            class="btn-glass text-xs !px-3 !py-1.5 hover:border-accent-red/30">
             {{ $genre->name }}
         </a>
         @endforeach
-        <a href="{{ route('ciudades.index') }}" class="btn-glass text-xs !px-3 !py-1.5 text-accent-red">
+        <a href="{{ route('ciudades.index') }}" wire:navigate class="btn-glass text-xs !px-3 !py-1.5 text-accent-red">
             Ver todas <i class="fas fa-arrow-right ml-1"></i>
         </a>
     </div>

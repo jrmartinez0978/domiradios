@@ -15,11 +15,11 @@ class BlogPostController extends Controller
      */
     public function index()
     {
-        $blogPosts = BlogPost::with('user')
+        $posts = BlogPost::with('user')
             ->orderByDesc('created_at')
             ->paginate(20);
 
-        return view('admin.blog-posts.index', compact('blogPosts'));
+        return view('admin.blog-posts.index', compact('posts'));
     }
 
     /**
@@ -69,7 +69,9 @@ class BlogPostController extends Controller
      */
     public function edit(BlogPost $blogPost)
     {
-        return view('admin.blog-posts.edit', compact('blogPost'));
+        $post = $blogPost;
+
+        return view('admin.blog-posts.edit', compact('post'));
     }
 
     /**

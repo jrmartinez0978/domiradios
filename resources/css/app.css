@@ -2,12 +2,12 @@
 @tailwind components;
 
 /* ========================================
-   DOMIRADIOS - Dark Theme + Glassmorphism
+   DOMIRADIOS - Light Theme (Habi Style)
    ======================================== */
 
 @layer base {
   body {
-    @apply bg-dark-950 text-gray-100 antialiased;
+    @apply bg-white text-gray-800 antialiased;
   }
 
   /* Custom scrollbar */
@@ -15,91 +15,178 @@
     width: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-dark-900;
+    @apply bg-surface-100;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-dark-500 rounded-full;
+    @apply bg-primary-200 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-dark-400;
+    @apply bg-primary-300;
   }
 
   /* Selection */
   ::selection {
-    @apply bg-accent-red/30 text-white;
+    @apply bg-primary-100 text-primary;
   }
 
   /* Focus rings */
   *:focus-visible {
-    @apply outline-none ring-2 ring-accent-red/50 ring-offset-2 ring-offset-dark-900;
+    @apply outline-none ring-2 ring-primary/30 ring-offset-2 ring-offset-white;
   }
 }
 
 @layer components {
-  /* Glass Card */
+  /* ---- FRONTEND (Light Theme) ---- */
+
+  /* Card with subtle shadow */
+  .card {
+    @apply bg-white rounded-2xl border border-surface-300 shadow-sm;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-300;
+  }
+  .card-hover:hover {
+    @apply shadow-lg border-primary-200;
+    transform: translateY(-2px);
+  }
+
+  /* Primary teal button (like habidominicana search btn) */
+  .btn-primary {
+    @apply bg-primary text-white font-semibold px-6 py-3
+           rounded-xl transition-all duration-200 hover:bg-primary-600
+           hover:shadow-lg hover:shadow-primary/20 active:scale-95;
+  }
+
+  /* Outlined button (like "View all" on habidominicana) */
+  .btn-outline {
+    @apply bg-white border border-primary text-primary font-medium
+           px-5 py-2.5 rounded-xl transition-all duration-200;
+  }
+  .btn-outline:hover {
+    @apply bg-primary-50 border-primary-600;
+  }
+
+  /* Ghost/subtle button */
+  .btn-ghost {
+    @apply bg-transparent text-primary font-medium px-4 py-2
+           rounded-xl transition-all duration-200;
+  }
+  .btn-ghost:hover {
+    @apply bg-primary-50;
+  }
+
+  /* Light input (clean, with borders) */
+  .input-light {
+    @apply bg-white border border-surface-300 rounded-xl px-4 py-3
+           text-gray-800 placeholder-gray-400 transition-all duration-200;
+  }
+  .input-light:focus {
+    @apply border-primary ring-1 ring-primary/20;
+  }
+
+  /* Badge styles (habidominicana style) */
+  .badge-primary {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
+           bg-primary text-white;
+  }
+
+  .badge-featured {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
+           bg-accent-light text-primary border border-primary/20;
+  }
+
+  .badge-hot {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
+           bg-accent text-white;
+  }
+
+  /* Section heading (teal like habidominicana) */
+  .section-title {
+    @apply text-2xl font-bold text-primary;
+  }
+
+  .section-subtitle {
+    @apply text-gray-500 mt-1;
+  }
+
+  /* Top info bar (dark teal like habidominicana) */
+  .top-bar {
+    @apply bg-primary text-white text-sm py-2;
+  }
+
+  /* Nav (white with teal text) */
+  .nav-main {
+    @apply bg-white/95 backdrop-blur-sm border-b border-surface-300 shadow-sm;
+  }
+
+  .nav-link {
+    @apply text-primary font-medium hover:text-primary-700 transition-colors;
+  }
+
+  /* Hero section (dark teal bg like habidominicana) */
+  .hero-section {
+    @apply bg-primary text-white py-16;
+  }
+
+  /* Footer (mint/sage like habidominicana) */
+  .footer-main {
+    @apply bg-footer text-primary;
+  }
+
+  .footer-bottom {
+    @apply bg-primary text-white;
+  }
+
+  /* Equalizer animation bars */
+  .equalizer-bar {
+    @apply w-[3px] bg-primary rounded-full;
+  }
+
+  /* Text gradient with primary */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-400;
+  }
+
+  /* Player bar (primary themed) */
+  .player-bar {
+    @apply bg-white border-t border-surface-300 shadow-[0_-4px_20px_rgba(0,0,0,0.08)];
+  }
+
+  /* ---- ADMIN (Light Theme) ---- */
+
+  .admin .glass-card,
   .glass-card {
-    @apply bg-glass-white backdrop-blur-xl border border-glass-border rounded-2xl;
+    @apply bg-white border border-surface-300 rounded-2xl shadow-sm;
   }
 
   .glass-card-hover {
     @apply glass-card transition-all duration-300;
   }
   .glass-card-hover:hover {
-    @apply bg-glass-white-10 border-glass-border-light shadow-lg shadow-black/20;
+    @apply bg-surface-100 border-surface-400 shadow-md;
     transform: translateY(-2px);
   }
 
-  /* Glow effects */
-  .glow-red {
-    box-shadow: 0 0 15px rgba(226, 28, 37, 0.3), 0 0 45px rgba(226, 28, 37, 0.1);
-  }
-
-  .glow-red-intense {
-    box-shadow: 0 0 20px rgba(226, 28, 37, 0.5), 0 0 60px rgba(226, 28, 37, 0.2);
-  }
-
-  /* Text gradient */
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-red to-red-400;
-  }
-
-  .text-gradient-blue {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400;
-  }
-
-  /* Glass input */
   .glass-input {
-    @apply bg-glass-white-10 backdrop-blur-lg border border-glass-border rounded-xl px-4 py-3
-           text-gray-100 placeholder-dark-400 transition-all duration-200;
+    @apply bg-white border border-surface-300 rounded-xl px-4 py-3
+           text-gray-800 placeholder-gray-400 transition-all duration-200;
   }
   .glass-input:focus {
-    @apply border-accent-red/50 bg-glass-white-20 ring-1 ring-accent-red/30;
-  }
-
-  /* Glass button */
-  .btn-primary {
-    @apply bg-gradient-to-r from-accent-red to-red-600 text-white font-semibold px-6 py-3
-           rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-accent-red/25
-           active:scale-95;
+    @apply border-primary/50 bg-white ring-1 ring-primary/30;
   }
 
   .btn-glass {
-    @apply bg-glass-white-10 backdrop-blur-lg border border-glass-border text-gray-200
+    @apply bg-surface-100 border border-surface-300 text-gray-700
            px-4 py-2 rounded-xl transition-all duration-200;
   }
   .btn-glass:hover {
-    @apply bg-glass-white-20 border-glass-border-light text-white;
+    @apply bg-surface-200 border-surface-400 text-gray-900;
   }
 
-  /* Badge */
-  .badge-featured {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold
-           bg-accent-red/20 text-red-300 border border-accent-red/30;
-  }
-
-  /* Equalizer animation bars */
-  .equalizer-bar {
-    @apply w-[3px] bg-accent-red rounded-full;
+  /* Subtle shadow (admin) */
+  .glow-primary {
+    box-shadow: 0 0 15px rgba(0, 80, 70, 0.1), 0 0 45px rgba(0, 80, 70, 0.05);
   }
 }
 

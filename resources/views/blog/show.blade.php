@@ -38,16 +38,16 @@
     <article class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         {{-- Breadcrumb --}}
         <nav class="mb-6 text-sm">
-            <ol class="flex items-center space-x-2 text-dark-400">
-                <li><a href="/" class="hover:text-accent-red">Inicio</a></li>
+            <ol class="flex items-center space-x-2 text-gray-500">
+                <li><a href="/" class="hover:text-primary">Inicio</a></li>
                 <li>/</li>
-                <li><a href="{{ route('blog.index') }}" class="hover:text-accent-red">Blog</a></li>
+                <li><a href="{{ route('blog.index') }}" class="hover:text-primary">Blog</a></li>
                 @if($post->category)
                     <li>/</li>
-                    <li><a href="{{ route('blog.category', $post->category) }}" class="hover:text-accent-red">{{ $post->category }}</a></li>
+                    <li><a href="{{ route('blog.category', $post->category) }}" class="hover:text-primary">{{ $post->category }}</a></li>
                 @endif
                 <li>/</li>
-                <li class="text-gray-100 font-semibold">{{ Str::limit($post->title, 50) }}</li>
+                <li class="text-gray-800 font-semibold">{{ Str::limit($post->title, 50) }}</li>
             </ol>
         </nav>
 
@@ -55,11 +55,11 @@
         <div class="flex items-center justify-between mb-4">
             @if($post->category)
                 <a href="{{ route('blog.category', $post->category) }}"
-                   class="inline-block px-4 py-2 bg-accent-red text-white text-sm font-semibold rounded-full hover:bg-red-600 transition-colors">
+                   class="inline-block px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full hover:bg-primary-700 transition-colors">
                     {{ $post->category }}
                 </a>
             @endif
-            <div class="flex items-center space-x-4 text-sm text-dark-400">
+            <div class="flex items-center space-x-4 text-sm text-gray-500">
                 <time datetime="{{ $post->published_at->toIso8601String() }}">
                     {{ $post->formatted_published_date }}
                 </time>
@@ -77,19 +77,19 @@
         </div>
 
         {{-- Título --}}
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-100 mb-6">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
             {{ $post->title }}
         </h1>
 
         {{-- Autor --}}
-        <div class="flex items-center mb-8 pb-6 border-b border-glass-border">
+        <div class="flex items-center mb-8 pb-6 border-b border-surface-300">
             <div class="flex items-center">
-                <div class="w-12 h-12 bg-accent-red text-white rounded-full flex items-center justify-center text-xl font-bold mr-3">
+                <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold mr-3">
                     {{ substr($post->user->name, 0, 1) }}
                 </div>
                 <div>
-                    <p class="font-semibold text-gray-100">{{ $post->user->name }}</p>
-                    <p class="text-sm text-dark-400">Autor</p>
+                    <p class="font-semibold text-gray-800">{{ $post->user->name }}</p>
+                    <p class="text-sm text-gray-500">Autor</p>
                 </div>
             </div>
         </div>
@@ -104,7 +104,7 @@
                     itemprop="image"
                 >
                 @if($post->featured_image_alt)
-                    <figcaption class="text-sm text-dark-400 text-center mt-2 italic">
+                    <figcaption class="text-sm text-gray-500 text-center mt-2 italic">
                         {{ $post->featured_image_alt }}
                     </figcaption>
                 @endif
@@ -113,24 +113,24 @@
 
         {{-- Extracto --}}
         @if($post->excerpt)
-            <div class="text-xl text-dark-300 font-medium mb-8 p-6 bg-glass-white-10 rounded-xl border-l-4 border-accent-red">
+            <div class="text-xl text-gray-600 font-medium mb-8 p-6 bg-surface-100 rounded-xl border-l-4 border-primary">
                 {{ $post->excerpt }}
             </div>
         @endif
 
         {{-- Contenido Principal --}}
-        <div class="prose prose-lg prose-invert max-w-none mb-8">
+        <div class="prose prose-lg max-w-none mb-8">
             {!! clean($post->content) !!}
         </div>
 
         {{-- Tags --}}
         @if($post->tags && is_array($post->tags) && count($post->tags) > 0)
-            <div class="mb-8 pt-6 border-t border-glass-border">
-                <h3 class="text-lg font-semibold mb-3 text-gray-100">Etiquetas:</h3>
+            <div class="mb-8 pt-6 border-t border-surface-300">
+                <h3 class="text-lg font-semibold mb-3 text-gray-800">Etiquetas:</h3>
                 <div class="flex flex-wrap gap-2">
                     @foreach($post->tags as $tag)
                         <a href="{{ route('blog.tag', $tag) }}"
-                           class="px-3 py-1 bg-glass-white-10 text-dark-300 text-sm rounded-full hover:bg-accent-red hover:text-white transition-colors">
+                           class="px-3 py-1 bg-surface-100 text-gray-600 text-sm rounded-full hover:bg-primary hover:text-white transition-colors">
                             #{{ $tag }}
                         </a>
                     @endforeach
@@ -139,8 +139,8 @@
         @endif
 
         {{-- Compartir en Redes Sociales --}}
-        <div class="mb-12 pt-6 border-t border-glass-border">
-            <h3 class="text-lg font-semibold mb-3 text-gray-100">Compartir:</h3>
+        <div class="mb-12 pt-6 border-t border-surface-300">
+            <h3 class="text-lg font-semibold mb-3 text-gray-800">Compartir:</h3>
             <div class="flex space-x-3">
                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.show', $post->slug)) }}"
                    target="_blank"
@@ -165,11 +165,11 @@
 
         {{-- Posts Relacionados --}}
         @if($relatedPosts->count() > 0)
-            <section class="pt-8 border-t border-glass-border">
-                <h2 class="text-3xl font-bold text-gray-100 mb-6">Artículos Relacionados</h2>
+            <section class="pt-8 border-t border-surface-300">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Artículos Relacionados</h2>
                 <div class="grid md:grid-cols-3 gap-6">
                     @foreach($relatedPosts as $relatedPost)
-                        <article class="glass-card rounded-xl overflow-hidden transition-shadow duration-300">
+                        <article class="card rounded-xl overflow-hidden transition-shadow duration-300">
                             @if($relatedPost->featured_image)
                                 <a href="{{ route('blog.show', $relatedPost->slug) }}">
                                     <img
@@ -182,19 +182,19 @@
                             @endif
                             <div class="p-6">
                                 @if($relatedPost->category)
-                                    <span class="inline-block px-3 py-1 bg-accent-red text-white text-sm rounded-full mb-3">
+                                    <span class="inline-block px-3 py-1 bg-primary text-white text-sm rounded-full mb-3">
                                         {{ $relatedPost->category }}
                                     </span>
                                 @endif
-                                <h3 class="text-lg font-bold mb-2 line-clamp-2">
-                                    <a href="{{ route('blog.show', $relatedPost->slug) }}" class="hover:text-accent-red transition-colors">
+                                <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+                                    <a href="{{ route('blog.show', $relatedPost->slug) }}" class="hover:text-primary transition-colors">
                                         {{ $relatedPost->title }}
                                     </a>
                                 </h3>
-                                <p class="text-dark-400 text-sm mb-3 line-clamp-2">
+                                <p class="text-gray-500 text-sm mb-3 line-clamp-2">
                                     {{ $relatedPost->excerpt }}
                                 </p>
-                                <div class="flex items-center justify-between text-xs text-dark-400">
+                                <div class="flex items-center justify-between text-xs text-gray-500">
                                     <span>{{ $relatedPost->formatted_published_date }}</span>
                                     <span>{{ $relatedPost->reading_time }} min</span>
                                 </div>
@@ -208,7 +208,7 @@
         {{-- CTA para volver al blog --}}
         <div class="mt-12 text-center">
             <a href="{{ route('blog.index') }}"
-               class="inline-flex items-center px-6 py-3 bg-accent-red text-white font-semibold rounded-lg hover:bg-red-600 transition-colors">
+               class="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>

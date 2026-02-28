@@ -5,8 +5,8 @@
     <button
         type="button"
         @click="on = !on"
-        :class="on ? 'bg-accent-red' : 'bg-dark-600'"
-        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-accent-red/50"
+        :class="on ? 'bg-primary' : 'bg-gray-200'"
+        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary/50"
     >
         <span
             :class="on ? 'translate-x-5' : 'translate-x-0'"
@@ -14,9 +14,9 @@
         ></span>
     </button>
     @if($label)
-        <label class="text-sm font-medium text-dark-300 cursor-pointer" @click="on = !on">{{ $label }}</label>
+        <label class="text-sm font-medium text-gray-600 cursor-pointer" @click="on = !on">{{ $label }}</label>
     @endif
     @error($name)
-        <p class="mt-1 text-xs text-accent-red">{{ $message }}</p>
+        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
     @enderror
 </div>

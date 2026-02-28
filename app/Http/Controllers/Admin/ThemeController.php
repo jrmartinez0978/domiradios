@@ -38,8 +38,14 @@ class ThemeController extends Controller
             'grad_end_color' => 'nullable|string|max:20',
             'grad_orientation' => 'nullable|string|max:50',
             'is_single_theme' => 'boolean',
-            'isActive' => 'boolean',
+            'is_active' => 'boolean',
         ]);
+
+        // Map form field name to model attribute
+        if (array_key_exists('is_active', $data)) {
+            $data['isActive'] = $data['is_active'];
+            unset($data['is_active']);
+        }
 
         if ($request->hasFile('img')) {
             $data['img'] = $request->file('img')->store('themes', 'public');
@@ -79,8 +85,14 @@ class ThemeController extends Controller
             'grad_end_color' => 'nullable|string|max:20',
             'grad_orientation' => 'nullable|string|max:50',
             'is_single_theme' => 'boolean',
-            'isActive' => 'boolean',
+            'is_active' => 'boolean',
         ]);
+
+        // Map form field name to model attribute
+        if (array_key_exists('is_active', $data)) {
+            $data['isActive'] = $data['is_active'];
+            unset($data['is_active']);
+        }
 
         if ($request->hasFile('img')) {
             $data['img'] = $request->file('img')->store('themes', 'public');

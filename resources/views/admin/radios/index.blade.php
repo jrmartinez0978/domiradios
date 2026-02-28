@@ -5,8 +5,8 @@
 @section('page-header')
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-gray-100">Emisoras</h2>
-            <p class="text-dark-300 text-sm mt-1">Gestiona las estaciones de radio</p>
+            <h2 class="text-2xl font-bold text-gray-800">Emisoras</h2>
+            <p class="text-gray-500 text-sm mt-1">Gestiona las estaciones de radio</p>
         </div>
         <a href="{{ route('admin.radios.create') }}" class="btn-primary inline-flex items-center gap-2">
             <i class="fas fa-plus"></i> Nueva Emisora
@@ -16,7 +16,7 @@
 
 @section('content')
     {{-- Filters --}}
-    <div class="glass-card p-4 mb-6">
+    <div class="bg-white rounded-2xl border border-surface-300 shadow-sm p-4 mb-6">
         <form method="GET" action="{{ route('admin.radios.index') }}" class="flex flex-wrap items-end gap-4">
             <div class="flex-1 min-w-[200px]">
                 <x-admin.form-input name="search" label="Buscar" :value="request('search')" placeholder="Nombre, frecuencia..." />
@@ -53,38 +53,38 @@
     {{-- Data Table --}}
     <x-admin.data-table :headers="['Imagen', 'Nombre', 'Frecuencia', 'Source', 'Estado', 'Destacada', 'Rating', 'Acciones']" :checkboxes="true">
         @forelse($radios as $radio)
-            <tr class="hover:bg-glass-white-10 transition-colors">
+            <tr class="hover:bg-primary-50 transition-colors">
                 <td class="px-4 py-3">
-                    <input type="checkbox" name="ids[]" value="{{ $radio->id }}" class="row-checkbox w-4 h-4 rounded bg-dark-600 border-dark-500 text-accent-red focus:ring-accent-red/50 focus:ring-offset-0">
+                    <input type="checkbox" name="ids[]" value="{{ $radio->id }}" class="row-checkbox w-4 h-4 rounded bg-white border-surface-300 text-primary focus:ring-primary/50 focus:ring-offset-0">
                 </td>
                 <td class="px-4 py-3">
-                    <img src="{{ $radio->optimized_logo_url }}" alt="{{ $radio->name }}" class="w-10 h-10 rounded-lg object-cover border border-glass-border">
+                    <img src="{{ $radio->optimized_logo_url }}" alt="{{ $radio->name }}" class="w-10 h-10 rounded-lg object-cover border border-surface-300">
                 </td>
                 <td class="px-4 py-3">
-                    <a href="{{ route('admin.radios.show', $radio) }}" class="text-gray-100 hover:text-accent-red transition-colors font-medium">
+                    <a href="{{ route('admin.radios.show', $radio) }}" class="text-gray-800 hover:text-primary transition-colors font-medium">
                         {{ $radio->name }}
                     </a>
                 </td>
-                <td class="px-4 py-3 text-dark-300">{{ $radio->bitrate ?? '-' }}</td>
-                <td class="px-4 py-3 text-dark-300">{{ $radio->source_radio ?? '-' }}</td>
+                <td class="px-4 py-3 text-gray-500">{{ $radio->bitrate ?? '-' }}</td>
+                <td class="px-4 py-3 text-gray-500">{{ $radio->source_radio ?? '-' }}</td>
                 <td class="px-4 py-3">
                     @if($radio->isActive)
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-accent-green/20 text-green-300 border border-accent-green/30">Activa</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">Activa</span>
                     @else
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-dark-600 text-dark-300 border border-glass-border">Inactiva</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-surface-300">Inactiva</span>
                     @endif
                 </td>
                 <td class="px-4 py-3">
                     @if($radio->isFeatured)
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-accent-amber/20 text-amber-300 border border-accent-amber/30">Destacada</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-600 border border-amber-200">Destacada</span>
                     @else
-                        <span class="text-dark-400 text-xs">-</span>
+                        <span class="text-gray-400 text-xs">-</span>
                     @endif
                 </td>
                 <td class="px-4 py-3">
                     <div class="flex items-center gap-0.5">
                         @for($i = 1; $i <= 5; $i++)
-                            <i class="fas fa-star text-xs {{ $i <= $radio->rating ? 'text-accent-amber' : 'text-dark-600' }}"></i>
+                            <i class="fas fa-star text-xs {{ $i <= $radio->rating ? 'text-amber-500' : 'text-gray-200' }}"></i>
                         @endfor
                     </div>
                 </td>
@@ -96,7 +96,7 @@
                         <form method="POST" action="{{ route('admin.radios.destroy', $radio) }}" class="inline" onsubmit="return confirm('Eliminar esta emisora?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-glass !px-3 !py-1.5 text-xs text-accent-red border-accent-red/30 hover:bg-accent-red/20">
+                            <button type="submit" class="btn-glass !px-3 !py-1.5 text-xs text-red-600 border-red-200 hover:bg-red-50">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -105,7 +105,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="9" class="px-4 py-8 text-center text-dark-400">No se encontraron emisoras.</td>
+                <td colspan="9" class="px-4 py-8 text-center text-gray-400">No se encontraron emisoras.</td>
             </tr>
         @endforelse
     </x-admin.data-table>

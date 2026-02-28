@@ -2,9 +2,9 @@
 
 <div>
     @if($label)
-        <label for="{{ $name }}" class="block text-sm font-medium text-dark-300 mb-1.5">
+        <label for="{{ $name }}" class="block text-sm font-medium text-gray-600 mb-1.5">
             {{ $label }}
-            @if($required) <span class="text-accent-red">*</span> @endif
+            @if($required) <span class="text-primary">*</span> @endif
         </label>
     @endif
     <textarea
@@ -16,6 +16,6 @@
         {{ $attributes->merge(['class' => 'glass-input w-full']) }}
     >{{ old($name, $value) }}</textarea>
     @error($name)
-        <p class="mt-1 text-xs text-accent-red">{{ $message }}</p>
+        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
     @enderror
 </div>

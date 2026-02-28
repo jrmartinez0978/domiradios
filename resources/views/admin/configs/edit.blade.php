@@ -4,19 +4,19 @@
 
 @section('page-header')
     <div>
-        <h2 class="text-2xl font-bold text-gray-100">Configuracion</h2>
-        <p class="text-dark-300 text-sm mt-1">Ajustes avanzados del sistema</p>
+        <h2 class="text-2xl font-bold text-gray-800">Configuracion</h2>
+        <p class="text-gray-500 text-sm mt-1">Ajustes avanzados del sistema</p>
     </div>
 @endsection
 
 @section('content')
     <div class="max-w-3xl">
-        <form method="POST" action="{{ route('admin.config.update') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('admin.configs.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
-            <div class="glass-card p-6 space-y-5">
-                <h3 class="text-lg font-semibold text-gray-100 border-b border-glass-border pb-3">Configuracion Avanzada</h3>
+            <div class="bg-white rounded-2xl border border-surface-300 shadow-sm p-6 space-y-5">
+                <h3 class="text-lg font-semibold text-gray-800 border-b border-surface-300 pb-3">Configuracion Avanzada</h3>
 
                 @php
                     $fields = $config->toArray();

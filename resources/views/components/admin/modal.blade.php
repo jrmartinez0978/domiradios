@@ -16,7 +16,7 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+        class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
         @click="open = false"
     ></div>
 
@@ -31,11 +31,11 @@
         x-transition:leave-end="opacity-0 scale-95"
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
-        <div class="glass-card w-full max-w-lg p-6" @click.stop>
+        <div class="bg-white rounded-2xl border border-surface-300 shadow-lg w-full max-w-lg p-6" @click.stop>
             {{-- Header --}}
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-white">{{ $title }}</h3>
-                <button @click="open = false" class="p-1 rounded-lg text-dark-400 hover:text-white hover:bg-glass-white-10 transition-colors">
+                <h3 class="text-lg font-semibold text-gray-800">{{ $title }}</h3>
+                <button @click="open = false" class="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-surface-100 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -43,7 +43,7 @@
             </div>
 
             {{-- Body --}}
-            <div class="text-sm text-dark-300 mb-6">
+            <div class="text-sm text-gray-600 mb-6">
                 {{ $slot }}
             </div>
 

@@ -16,6 +16,7 @@
                     @endif
                     @if (!$loop->last && isset($item['url']))
                         <a href="{{ $item['url'] }}"
+                           wire:navigate
                            class="hover:text-accent-red hover:underline transition-colors"
                            itemprop="item">
                             <span itemprop="name">{{ $item['name'] }}</span>

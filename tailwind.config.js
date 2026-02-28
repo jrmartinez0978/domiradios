@@ -9,10 +9,47 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Primary palette (teal from habidominicana)
+        primary: {
+          DEFAULT: '#005046',
+          50:  '#E6F2F0',
+          100: '#CCE5E1',
+          200: '#99CBC3',
+          300: '#66B1A5',
+          400: '#339787',
+          500: '#005046',
+          600: '#00463D',
+          700: '#003D35',
+          800: '#00332C',
+          900: '#002A24',
+          950: '#001A17',
+        },
+        // Accent coral (hot deal badges)
+        accent: {
+          DEFAULT: '#F76B57',
+          light: '#FFEEDA',
+          red: '#F76B57',
+          green: '#25D366',
+          amber: '#F59E0B',
+          blue: '#3B82F6',
+        },
+        // Surface colors
+        surface: {
+          DEFAULT: '#FAFAFA',
+          50:  '#FFFFFF',
+          100: '#FAFAFA',
+          200: '#F3F4F6',
+          300: '#E5E7EB',
+          400: '#D1D5DB',
+          500: '#9CA3AF',
+        },
+        // Footer mint/sage
+        footer: '#D1E0DD',
+        // Legacy brand colors
         'brand-red':  '#E21C25',
         'brand-blue': '#003A70',
         'brand-gray': '#F5F7FA',
-        // Dark theme palette
+        // Admin dark palette (kept for admin panel)
         dark: {
           950: '#0a0a0f',
           900: '#0f1117',
@@ -23,7 +60,7 @@ module.exports = {
           400: '#5c5f7a',
           300: '#8b8fa8',
         },
-        // Glass colors
+        // Admin glass colors
         glass: {
           white: 'rgba(255, 255, 255, 0.05)',
           'white-10': 'rgba(255, 255, 255, 0.10)',
@@ -31,19 +68,6 @@ module.exports = {
           border: 'rgba(255, 255, 255, 0.08)',
           'border-light': 'rgba(255, 255, 255, 0.12)',
         },
-        // Accent colors
-        accent: {
-          red: '#E21C25',
-          'red-glow': 'rgba(226, 28, 37, 0.4)',
-          blue: '#3B82F6',
-          green: '#10B981',
-          amber: '#F59E0B',
-        },
-      },
-      backdropBlur: {
-        xs: '2px',
-        '2xl': '40px',
-        '3xl': '64px',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
@@ -64,8 +88,8 @@ module.exports = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 5px rgba(226, 28, 37, 0.3)' },
-          '50%': { boxShadow: '0 0 20px rgba(226, 28, 37, 0.6)' },
+          '0%, 100%': { boxShadow: '0 0 5px rgba(0, 80, 70, 0.2)' },
+          '50%': { boxShadow: '0 0 20px rgba(0, 80, 70, 0.4)' },
         },
         equalizer: {
           '0%, 100%': { height: '4px' },
