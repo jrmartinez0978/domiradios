@@ -27,7 +27,7 @@
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                               {{ request()->routeIs('admin.dashboard') ? 'bg-primary-50 text-primary border border-primary/20' : 'text-gray-600 hover:text-primary hover:bg-primary-50' }}">
                         <i class="fas fa-tachometer-alt w-5 text-center"></i>
-                        <span>Dashboard</span>
+                        <span>Panel</span>
                     </a>
                 </li>
             </ul>
@@ -66,7 +66,7 @@
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                               {{ request()->routeIs('admin.blog-posts.*') ? 'bg-primary-50 text-primary border border-primary/20' : 'text-gray-600 hover:text-primary hover:bg-primary-50' }}">
                         <i class="fas fa-newspaper w-5 text-center"></i>
-                        <span>Blog Posts</span>
+                        <span>Blog</span>
                     </a>
                 </li>
             </ul>
@@ -97,7 +97,7 @@
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                               {{ request()->routeIs('admin.settings.*') ? 'bg-primary-50 text-primary border border-primary/20' : 'text-gray-600 hover:text-primary hover:bg-primary-50' }}">
                         <i class="fas fa-cog w-5 text-center"></i>
-                        <span>Settings</span>
+                        <span>Ajustes</span>
                     </a>
                 </li>
                 <li>
@@ -105,7 +105,7 @@
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                               {{ request()->routeIs('admin.configs.*') ? 'bg-primary-50 text-primary border border-primary/20' : 'text-gray-600 hover:text-primary hover:bg-primary-50' }}">
                         <i class="fas fa-sliders-h w-5 text-center"></i>
-                        <span>Config</span>
+                        <span>Configuracion</span>
                     </a>
                 </li>
             </ul>

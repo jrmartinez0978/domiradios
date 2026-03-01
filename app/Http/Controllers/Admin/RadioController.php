@@ -81,7 +81,7 @@ class RadioController extends Controller
         $radio->genres()->sync($syncIds);
 
         return redirect()->route('admin.radios.index')
-            ->with('success', 'Radio created successfully.');
+            ->with('success', 'Emisora creada correctamente.');
     }
 
     /**
@@ -132,7 +132,7 @@ class RadioController extends Controller
         $radio->genres()->sync($syncIds);
 
         return redirect()->route('admin.radios.index')
-            ->with('success', 'Radio updated successfully.');
+            ->with('success', 'Emisora actualizada correctamente.');
     }
 
     /**
@@ -143,7 +143,7 @@ class RadioController extends Controller
         $radio->delete();
 
         return redirect()->route('admin.radios.index')
-            ->with('success', 'Radio deleted successfully.');
+            ->with('success', 'Emisora eliminada correctamente.');
     }
 
     /**

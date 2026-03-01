@@ -54,7 +54,7 @@ class ThemeController extends Controller
         Theme::create($data);
 
         return redirect()->route('admin.themes.index')
-            ->with('success', 'Theme created successfully.');
+            ->with('success', 'Tema creado correctamente.');
     }
 
     /**
@@ -101,7 +101,7 @@ class ThemeController extends Controller
         $theme->update($data);
 
         return redirect()->route('admin.themes.index')
-            ->with('success', 'Theme updated successfully.');
+            ->with('success', 'Tema actualizado correctamente.');
     }
 
     /**
@@ -112,6 +112,6 @@ class ThemeController extends Controller
         $theme->delete();
 
         return redirect()->route('admin.themes.index')
-            ->with('success', 'Theme deleted successfully.');
+            ->with('success', 'Tema eliminado correctamente.');
     }
 }

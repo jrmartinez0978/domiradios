@@ -13,7 +13,17 @@ class SettingController extends Controller
      */
     public function edit()
     {
-        $setting = Setting::firstOrNew();
+        $setting = Setting::firstOrCreate([], [
+            'app_name' => '',
+            'app_email' => '',
+            'app_copyright' => '',
+            'app_phone' => '',
+            'app_website' => '',
+            'app_facebook' => '',
+            'app_twitter' => '',
+            'app_term_of_use' => '',
+            'app_privacy_policy' => '',
+        ]);
 
         return view('admin.settings.edit', compact('setting'));
     }
@@ -35,11 +45,11 @@ class SettingController extends Controller
             'app_privacy_policy' => 'nullable|string',
         ]);
 
-        $setting = Setting::firstOrNew();
+        $setting = Setting::firstOrCreate();
         $setting->fill($data);
         $setting->save();
 
         return redirect()->route('admin.settings.edit')
-            ->with('success', 'Settings updated successfully.');
+            ->with('success', 'Ajustes actualizados correctamente.');
     }
 }

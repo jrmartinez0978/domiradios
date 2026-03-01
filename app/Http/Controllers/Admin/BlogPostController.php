@@ -51,7 +51,7 @@ class BlogPostController extends Controller
         BlogPost::create($data);
 
         return redirect()->route('admin.blog-posts.index')
-            ->with('success', 'Blog post created successfully.');
+            ->with('success', 'Articulo creado correctamente.');
     }
 
     /**
@@ -90,7 +90,7 @@ class BlogPostController extends Controller
         $blogPost->update($data);
 
         return redirect()->route('admin.blog-posts.index')
-            ->with('success', 'Blog post updated successfully.');
+            ->with('success', 'Articulo actualizado correctamente.');
     }
 
     /**
@@ -101,6 +101,6 @@ class BlogPostController extends Controller
         $blogPost->delete();
 
         return redirect()->route('admin.blog-posts.index')
-            ->with('success', 'Blog post deleted successfully.');
+            ->with('success', 'Articulo eliminado correctamente.');
     }
 }
