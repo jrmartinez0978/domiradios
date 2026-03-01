@@ -92,6 +92,11 @@ Route::get('/appdomiradios/api/api.php', [MobileApiController::class, 'handle'])
     ->middleware('api.rate.limit:100,60')
     ->name('api.mobile.legacy');
 
+// Compatibilidad con app Android (panel.domiradios.com.do/api/api.php)
+Route::get('/api/api.php', [MobileApiController::class, 'handle'])
+    ->middleware('api.rate.limit:100,60')
+    ->name('api.mobile.android');
+
 // Redirects 301 para URLs legacy
 Route::redirect('/terminos-y-condiciones', '/terminos', 301);
 Route::redirect('/politica-de-privacidad', '/privacidad', 301);

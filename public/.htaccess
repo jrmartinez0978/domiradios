@@ -13,6 +13,10 @@
     RewriteRule ^appdomiradios/uploads/radios/(.*)$ /storage/$1 [L,R=301]
     RewriteRule ^appdomiradios/uploads/themes/(.*)$ /storage/$1 [L,R=301]
     RewriteRule ^appdomiradios/uploads/genres/(.*)$ /storage/$1 [L,R=301]
+    # Android app (panel.domiradios.com.do) image paths
+    RewriteRule ^uploads/radios/(.*)$ /storage/$1 [L,R=301]
+    RewriteRule ^uploads/themes/(.*)$ /storage/$1 [L,R=301]
+    RewriteRule ^uploads/genres/(.*)$ /storage/$1 [L,R=301]
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
