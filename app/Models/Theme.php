@@ -9,6 +9,8 @@ class Theme extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'name',
         'img',

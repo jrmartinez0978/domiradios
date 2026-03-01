@@ -9,6 +9,8 @@ class Config extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'is_full_bg',
         'ui_top_chart',
