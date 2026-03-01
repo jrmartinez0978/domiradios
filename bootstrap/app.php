@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Registrar alias de middleware personalizados
         $middleware->alias([
             'api.rate.limit' => \App\Http\Middleware\ApiRateLimiting::class,
+            'api.key' => \App\Http\Middleware\VerifyApiKey::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })

@@ -1,14 +1,10 @@
 <?php
-use Illuminate\Support\Facades\Route;
-use App\Livewire\PrivacyPolicy;
-use App\Livewire\TermsAndConditions;
-use App\Http\Controllers\RadioController;
-use App\Http\Controllers\BlogController;
-use App\Http\Controllers\Api\MobileApiController;
-use App\Models\Radio;
-use Illuminate\Http\Request;
-use App\Http\Controllers\SitemapController;
+
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\RadioController;
+use App\Http\Controllers\SitemapController;
+use Illuminate\Support\Facades\Route;
 
 // Autenticación admin
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -22,7 +18,7 @@ Route::get('/', [RadioController::class, 'index'])->name('emisoras.index');
 Route::get('/buscar', [RadioController::class, 'buscar'])->name('buscar');
 
 // Ruta para agregar a favoritos (rate limited: 30 requests/min)
-Route::post('/favoritos/agregar/{id}', function($id) {
+Route::post('/favoritos/agregar/{id}', function ($id) {
     return response()->json(['success' => true]);
 })->middleware('api.rate.limit:30,1')->name('agregar.favorito');
 
@@ -42,9 +38,15 @@ Route::get('/blog/tag/{tag}', [BlogController::class, 'tag'])->name('blog.tag');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Rutas para las páginas legales e informativas
-Route::get('/terminos', function() { return view('livewire.terms-and-conditions'); })->name('terminos');
-Route::get('/privacidad', function() { return view('livewire.privacy-policy'); })->name('privacidad');
-Route::get('/sobre-nosotros', function() { return view('about'); })->name('about');
+Route::get('/terminos', function () {
+    return view('livewire.terms-and-conditions');
+})->name('terminos');
+Route::get('/privacidad', function () {
+    return view('livewire.privacy-policy');
+})->name('privacidad');
+Route::get('/sobre-nosotros', function () {
+    return view('about');
+})->name('about');
 
 // Ruta para la página de contacto
 Route::get('/contacto', [App\Http\Controllers\ContactoController::class, 'index'])->name('contacto');
@@ -82,33 +84,6 @@ Route::get('/api/radio/current-track/{id}', [RadioController::class, 'getCurrent
     ->middleware('api.rate.limit:60,1')
     ->name('radio.current-track');
 
-// API móvil - reemplaza appdomiradios/api/api.php (rate limited: 100 requests/hora)
-Route::get('/api/mobile', [MobileApiController::class, 'handle'])
-    ->middleware('api.rate.limit:100,60')
-    ->name('api.mobile');
-
-// Compatibilidad con ruta legacy de las apps móviles
-Route::get('/appdomiradios/api/api.php', [MobileApiController::class, 'handle'])
-    ->middleware('api.rate.limit:100,60')
-    ->name('api.mobile.legacy');
-
-// Compatibilidad con app Android (panel.domiradios.com.do/api/api.php)
-Route::get('/api/api.php', [MobileApiController::class, 'handle'])
-    ->middleware('api.rate.limit:100,60')
-    ->name('api.mobile.android');
-
 // Redirects 301 para URLs legacy
 Route::redirect('/terminos-y-condiciones', '/terminos', 301);
 Route::redirect('/politica-de-privacidad', '/privacidad', 301);
-
-
-
-
-
-
-
-
-
-
-
-

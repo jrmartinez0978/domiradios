@@ -85,8 +85,8 @@
       <nav>
         <h4 class="font-semibold mb-3 text-lg">Legal</h4>
         <ul class="space-y-1">
-          <li><a class="hover:text-brand-red" href="/appdomiradios/terms-and-conditions">Términos y condiciones</a></li>
-          <li><a class="hover:text-brand-red" href="/appdomiradios/privacy-policy">Política de privacidad</a></li>
+          <li><a class="hover:text-brand-red" href="/terminos">Términos y condiciones</a></li>
+          <li><a class="hover:text-brand-red" href="/privacidad">Política de privacidad</a></li>
           <li><a class="hover:text-brand-red" href="#contacto">Contacto</a></li>
         </ul>
       </nav>

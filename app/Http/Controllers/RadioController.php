@@ -6,29 +6,20 @@ use App\Models\BlogPost;
 use App\Models\Genre;
 use App\Models\Radio;
 use App\Models\Visita;
+use App\Services\StreamInfoService;
 use App\Traits\HasSeo;
-use Artesaos\SEOTools\Facades\JsonLd; // Importación necesaria
-use Artesaos\SEOTools\Facades\SEOMeta;  // Importación necesaria para Log
+use Artesaos\SEOTools\Facades\JsonLd;
+use Artesaos\SEOTools\Facades\SEOMeta;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache; // Importar el trait
-use Illuminate\Support\Facades\Http; // Para structured data
-use Illuminate\Support\Facades\Log; // Para canonical URLs
+use Illuminate\Support\Facades\Cache;
 
 class RadioController extends Controller
 {
-    use HasSeo; // Usar el trait
+    use HasSeo;
 
-    private const DEFAULT_TRACK_INFO = 'Sin información';
-
-    private const SOURCE_SONICPANEL = 'SonicPanel';
-
-    private const SOURCE_SHOUTCAST = 'Shoutcast';
-
-    private const SOURCE_ICECAST = 'Icecast';
-
-    private const SOURCE_AZURACAST = 'AzuraCast';
-
-    private const SOURCE_JRMSTREAM = 'JRMStream';
+    public function __construct(
+        private readonly StreamInfoService $streamInfoService
+    ) {}
 
     // Método para mostrar la vista de favoritos
     public function favoritos()
@@ -389,251 +380,12 @@ class RadioController extends Controller
         return view('emisoras', compact('emisoras', 'latestBlogPosts'));
     }
 
-    // Método para obtener la canción actual y oyentes
     public function getCurrentTrack($id)
     {
         $radio = Radio::findOrFail($id);
+        $trackInfo = $this->streamInfoService->getTrackInfo($radio);
 
-        $linkRadio = $radio->link_radio; // Enlace completo incluyendo puerto y mount point
-
-        Log::debug('Processing radio ID '.$id.' source_radio '.$radio->source_radio);
-
-        try {
-            // Parsear el link_radio para extraer componentes
-            $parsedUrl = parse_url($linkRadio);
-            $scheme = $parsedUrl['scheme'] ?? 'http'; // Default to http
-            $host = $parsedUrl['host'] ?? null;
-            $portFromUrl = $parsedUrl['port'] ?? null; // Port explicitly in link_radio
-            $path = $parsedUrl['path'] ?? '';
-
-            if (! $host) {
-                Log::error("Could not parse host from link_radio '{$linkRadio}' for radio ID {$id}.");
-                throw new \Exception('Invalid link_radio: host missing.');
-            }
-
-            // Construir la URL base del servidor de streaming (scheme://host:port)
-            $serverBaseUrl = $scheme.'://'.$host;
-            if ($portFromUrl) {
-                $serverBaseUrl .= ':'.$portFromUrl;
-            }
-
-            Log::debug("Radio ID {$id}: baseUrl='{$serverBaseUrl}' path='{$path}'");
-
-            $currentTrack = self::DEFAULT_TRACK_INFO;
-            $listeners = $this->getFictitiousListeners($id);
-            $infoUrl = '';
-
-            switch ($radio->source_radio) {
-                case self::SOURCE_SONICPANEL:
-                    $sonicPort = $portFromUrl;
-                    if (! $sonicPort) {
-                        if (preg_match('/\/(\d+)(?:\/|$)/', $path, $matches)) {
-                            $sonicPort = $matches[1];
-                        } else {
-                            Log::warning("Radio ID {$id}: SonicPanel port could not be determined, using fallback.");
-                            $currentTrack = $radio->name.' - En vivo';
-                            break;
-                        }
-                    }
-                    $infoUrl = $scheme.'://'.$host.'/cp/get_info.php?p='.$sonicPort;
-
-                    try {
-                        $response = Http::timeout(5)->get($infoUrl);
-                        if ($response->successful()) {
-                            $json = json_decode($response->body(), true);
-                            if ($json !== null) {
-                                $currentTrack = $json['title'] ?? self::DEFAULT_TRACK_INFO;
-                                $listeners = $json['listeners'] ?? $this->getFictitiousListeners($id);
-                            }
-                        }
-                    } catch (\Throwable $e) {
-                        Log::warning("Radio ID {$id}: SonicPanel stats unavailable: ".$e->getMessage());
-                    }
-                    break;
-
-                case self::SOURCE_SHOUTCAST:
-                    // Shoutcast stats: /stats?sid=1 (v2 XML) o /7.html (v1 HTML)
-                    $infoUrl = $serverBaseUrl.'/stats?sid=1';
-
-                    try {
-                        $response = Http::timeout(5)->get($infoUrl);
-                        if ($response->failed()) {
-                            // Intentar parsear HTML de Shoutcast v1
-                            if (strpos($response->body(), '<HTML>') !== false) {
-                                if (preg_match('/Current Song: <\/font><\/td><td class=default><b>(.*?)<\/b><\/td>/i', $response->body(), $songMatches)) {
-                                    $currentTrack = trim($songMatches[1]);
-                                }
-                                if (preg_match('/Current Listeners: <\/font><\/td><td class=default><b>(\d+)<\/b><\/td>/i', $response->body(), $listenerMatches)) {
-                                    $listeners = (int) trim($listenerMatches[1]);
-                                }
-                                break;
-                            }
-                            // Stats no disponibles (proxy, CDN, etc) - fallback silencioso
-                            break;
-                        }
-                        $data = $response->body();
-                        libxml_use_internal_errors(true);
-                        $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
-                        if ($xml === false) {
-                            libxml_clear_errors();
-                            // Intentar parsear como HTML v1
-                            if (preg_match('/Current Song: <\/font><\/td><td class=default><b>(.*?)<\/b><\/td>/i', $data, $songMatches)) {
-                                $currentTrack = trim($songMatches[1]);
-                            }
-                            if (preg_match('/Current Listeners: <\/font><\/td><td class=default><b>(\d+)<\/b><\/td>/i', $data, $listenerMatches)) {
-                                $listeners = (int) trim($listenerMatches[1]);
-                            }
-                        } else {
-                            $currentTrack = isset($xml->SONGTITLE) ? (string) $xml->SONGTITLE : self::DEFAULT_TRACK_INFO;
-                            $listeners = isset($xml->CURRENTLISTENERS) ? (int) $xml->CURRENTLISTENERS : $this->getFictitiousListeners($id);
-                        }
-                    } catch (\Throwable $e) {
-                        Log::warning("Radio ID {$id}: Shoutcast stats unavailable: ".$e->getMessage());
-                    }
-                    break;
-
-                case self::SOURCE_ICECAST:
-                    // Icecast stats: /status-json.xsl (JSON) con fallback a .xspf (XML)
-                    $infoUrl = $serverBaseUrl.'/status-json.xsl';
-
-                    try {
-                        $response = Http::timeout(5)->get($infoUrl);
-                        if ($response->successful()) {
-                            $json = json_decode($response->body(), true);
-                            if ($json !== null && isset($json['icestats'])) {
-                                $icestats = $json['icestats'];
-                                $source = null;
-                                if (isset($icestats['source']) && is_array($icestats['source'])) {
-                                    if (array_is_list($icestats['source'])) {
-                                        // Múltiples sources - buscar la que coincida con el path
-                                        if (! empty($path) && $path !== '/') {
-                                            foreach ($icestats['source'] as $src) {
-                                                if (isset($src['listenurl']) && strpos($src['listenurl'], $path) !== false) {
-                                                    $source = $src;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        if (! $source && ! empty($icestats['source'])) {
-                                            $source = $icestats['source'][0];
-                                        }
-                                    } else {
-                                        $source = $icestats['source'];
-                                    }
-                                }
-
-                                if ($source) {
-                                    $currentTrack = $source['title'] ?? $source['song'] ?? self::DEFAULT_TRACK_INFO;
-                                    $listeners = $source['listeners'] ?? $this->getFictitiousListeners($id);
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Fallback XSPF
-                        $xspfUrl = $linkRadio.'.xspf';
-                        $xspfResponse = Http::timeout(5)->get($xspfUrl);
-                        if ($xspfResponse->successful()) {
-                            libxml_use_internal_errors(true);
-                            $xml = simplexml_load_string($xspfResponse->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
-                            if ($xml !== false) {
-                                $namespaces = $xml->getNamespaces(true);
-                                $xml->registerXPathNamespace('x', $namespaces[''] ?? 'http://xspf.org/ns/0/');
-                                $titleNode = $xml->xpath('//x:trackList/x:track/x:title');
-                                $currentTrack = isset($titleNode[0]) ? (string) $titleNode[0] : self::DEFAULT_TRACK_INFO;
-                                $annotationNode = $xml->xpath('//x:trackList/x:track/x:annotation');
-                                if (isset($annotationNode[0])) {
-                                    if (preg_match('/Current Listeners:\s*(\d+)/i', (string) $annotationNode[0], $listenerMatches)) {
-                                        $listeners = (int) $listenerMatches[1];
-                                    }
-                                }
-                            }
-                            libxml_clear_errors();
-                        }
-                    } catch (\Throwable $e) {
-                        Log::warning("Radio ID {$id}: Icecast stats unavailable: ".$e->getMessage());
-                    }
-                    break;
-
-                case self::SOURCE_AZURACAST:
-                    // AzuraCast API: /api/nowplaying o /api/nowplaying/station_id
-                    $infoUrl = $serverBaseUrl.'/api/nowplaying';
-
-                    try {
-                        $response = Http::timeout(5)->get($infoUrl);
-                        if ($response->failed()) {
-                            // Intentar con station_id del path (/radio/ID/stream)
-                            if (preg_match('/\/radio\/([^\/]+)\//', $path, $pathMatches)) {
-                                $specificInfoUrl = $serverBaseUrl.'/api/nowplaying/'.$pathMatches[1];
-                                $response = Http::timeout(5)->get($specificInfoUrl);
-                            }
-                        }
-                        if ($response->successful()) {
-                            $json = json_decode($response->body(), true);
-                            if ($json !== null) {
-                                $currentTrack = $json['now_playing']['song']['title'] ?? $json['now_playing']['song']['text'] ?? self::DEFAULT_TRACK_INFO;
-                                $listeners = $json['listeners']['current'] ?? $json['listeners']['total'] ?? $this->getFictitiousListeners($id);
-                            }
-                        }
-                    } catch (\Throwable $e) {
-                        Log::warning("Radio ID {$id}: AzuraCast stats unavailable: ".$e->getMessage());
-                    }
-                    break;
-
-                case self::SOURCE_JRMSTREAM:
-                    // JRMStream usa WebRTC/Opus, no tiene endpoint HTTP de stats
-                    $currentTrack = $radio->name.' - En vivo';
-                    $listeners = $this->getFictitiousListeners($id);
-                    break;
-
-                case 'Other':
-                case 'user_submitted':
-                    // Fuentes sin endpoint de stats conocido - fallback genérico
-                    $currentTrack = $radio->name.' - En vivo';
-                    $listeners = $this->getFictitiousListeners($id);
-                    break;
-
-                default:
-                    Log::warning("Radio ID {$id}: Tipo de fuente no reconocido: ".$radio->source_radio);
-                    $currentTrack = $radio->name.' - En vivo';
-                    $listeners = $this->getFictitiousListeners($id);
-                    break;
-            }
-
-            return response()->json([
-                'current_track' => $currentTrack,
-                'listeners' => $listeners,
-            ]);
-
-        } catch (\Throwable $e) { // Catch Throwable for broader error catching including Http client errors
-            Log::error("Radio ID {$id}: Exception in getCurrentTrack: ".$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
-
-            // Fallback to default information on any exception
-            return response()->json([
-                'current_track' => self::DEFAULT_TRACK_INFO,
-                'listeners' => $this->getFictitiousListeners($id),
-            ]);
-        }
-    }
-
-    // Método para generar un número de oyentes ficticio y realista
-    private function getFictitiousListeners($radioId)
-    {
-        // Utilizar caché para mantener el conteo entre solicitudes
-        $cacheKey = 'listeners_'.$radioId;
-        $listeners = Cache::get($cacheKey, rand(1, 100));
-
-        // Cambiar el número de oyentes de forma aleatoria entre -3 y +2
-        $change = rand(-3, 2);
-        $listeners += $change;
-
-        // Asegurarse de que el número de oyentes esté entre 1 y 100
-        $listeners = max(1, min($listeners, 100));
-
-        // Guardar el nuevo valor en caché por un tiempo definido (ejemplo: 1 minuto)
-        Cache::put($cacheKey, $listeners, now()->addMinutes(1));
-
-        return $listeners;
+        return response()->json($trackInfo);
     }
 
     public function registerPlay(Request $request)

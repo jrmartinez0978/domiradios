@@ -9,15 +9,6 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-# Legacy mobile app image paths → Laravel storage (NE prevents double-encoding)
-    RewriteRule ^appdomiradios/uploads/radios/(.*)$ /storage/$1 [L,R=301,NE]
-    RewriteRule ^appdomiradios/uploads/themes/(.*)$ /storage/$1 [L,R=301,NE]
-    RewriteRule ^appdomiradios/uploads/genres/(.*)$ /storage/$1 [L,R=301,NE]
-    # Android app (panel.domiradios.com.do) image paths
-    RewriteRule ^uploads/radios/(.*)$ /storage/$1 [L,R=301,NE]
-    RewriteRule ^uploads/themes/(.*)$ /storage/$1 [L,R=301,NE]
-    RewriteRule ^uploads/genres/(.*)$ /storage/$1 [L,R=301,NE]
-
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
