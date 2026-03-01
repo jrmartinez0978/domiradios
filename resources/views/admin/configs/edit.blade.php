@@ -10,13 +10,29 @@
 @endsection
 
 @php
-    $uiLayoutOptions = [
+    // Opciones de layout para radios (TopChart, Favoritos, Busqueda, Detalle Genero)
+    $uiRadioOptions = [
         1 => 'Cuadricula Plana',
         2 => 'Lista Plana',
         3 => 'Cuadricula con Tarjetas',
         4 => 'Lista con Tarjetas',
-        5 => 'Cuadricula Horizontal',
-        6 => 'Lista Horizontal',
+    ];
+    // Opciones de layout para Generos (incluye Magic Grid y Ocultar)
+    $uiGenreOptions = [
+        1 => 'Cuadricula Plana',
+        2 => 'Lista Plana',
+        3 => 'Cuadricula con Tarjetas',
+        4 => 'Lista con Tarjetas',
+        5 => 'Cuadricula Magica',
+        0 => 'Ocultar',
+    ];
+    // Opciones de layout para Temas (incluye Ocultar)
+    $uiThemeOptions = [
+        1 => 'Cuadricula Plana',
+        2 => 'Lista Plana',
+        3 => 'Cuadricula con Tarjetas',
+        4 => 'Lista con Tarjetas',
+        0 => 'Ocultar',
     ];
     $playerStyleOptions = [
         1 => 'Disco Cuadrado',
@@ -27,8 +43,8 @@
         6 => 'Disco Giratorio (sin LastFM)',
     ];
     $appTypeOptions = [
-        1 => 'Multiples Emisoras',
-        2 => 'Emisora Unica',
+        1 => 'Emisora Unica',
+        2 => 'Multiples Emisoras',
     ];
 @endphp
 
@@ -52,18 +68,18 @@
                 <h3 class="text-lg font-semibold text-gray-800 border-b border-surface-300 pb-3">Estilos de UI</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <x-admin.form-select name="ui_top_chart" label="Top Chart" :options="$uiLayoutOptions" :value="$config->ui_top_chart" required />
-                    <x-admin.form-select name="ui_genre" label="Generos" :options="$uiLayoutOptions" :value="$config->ui_genre" required />
+                    <x-admin.form-select name="ui_top_chart" label="Top Chart" :options="$uiRadioOptions" :value="$config->ui_top_chart" required />
+                    <x-admin.form-select name="ui_genre" label="Generos" :options="$uiGenreOptions" :value="$config->ui_genre" required />
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <x-admin.form-select name="ui_favorite" label="Favoritos" :options="$uiLayoutOptions" :value="$config->ui_favorite" required />
-                    <x-admin.form-select name="ui_themes" label="Temas" :options="$uiLayoutOptions" :value="$config->ui_themes" required />
+                    <x-admin.form-select name="ui_favorite" label="Favoritos" :options="$uiRadioOptions" :value="$config->ui_favorite" required />
+                    <x-admin.form-select name="ui_themes" label="Temas" :options="$uiThemeOptions" :value="$config->ui_themes" required />
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <x-admin.form-select name="ui_detail_genre" label="Detalle Genero" :options="$uiLayoutOptions" :value="$config->ui_detail_genre" required />
-                    <x-admin.form-select name="ui_search" label="Busqueda" :options="$uiLayoutOptions" :value="$config->ui_search" required />
+                    <x-admin.form-select name="ui_detail_genre" label="Detalle Genero" :options="$uiRadioOptions" :value="$config->ui_detail_genre" required />
+                    <x-admin.form-select name="ui_search" label="Busqueda" :options="$uiRadioOptions" :value="$config->ui_search" required />
                 </div>
             </div>
 

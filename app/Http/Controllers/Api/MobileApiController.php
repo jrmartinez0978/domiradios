@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class MobileApiController extends Controller
 {
@@ -52,23 +51,6 @@ class MobileApiController extends Controller
         ], 200, [], JSON_NUMERIC_CHECK);
     }
 
-    /**
-     * Build full URL for an image path stored in the database.
-     */
-    private function imageUrl(?string $path): string
-    {
-        if (empty($path)) {
-            return '';
-        }
-
-        // Already a full URL
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
-        }
-
-        return url('storage/' . $path);
-    }
-
     private function getGenres(): \Illuminate\Http\JsonResponse
     {
         $genres = DB::table('genres')
@@ -76,10 +58,6 @@ class MobileApiController extends Controller
             ->where('isActive', 1)
             ->orderByDesc('id')
             ->get()
-            ->map(function ($genre) {
-                $genre->img = $this->imageUrl($genre->img);
-                return $genre;
-            })
             ->toArray();
 
         return $this->success($genres);
@@ -97,10 +75,6 @@ class MobileApiController extends Controller
                 ->where('r.id', $radioId)
                 ->where('r.isActive', 1)
                 ->get()
-                ->map(function ($radio) {
-                    $radio->img = $this->imageUrl($radio->img);
-                    return $radio;
-                })
                 ->toArray();
 
             return $this->success($radios);
@@ -147,10 +121,6 @@ class MobileApiController extends Controller
             ->offset($offset)
             ->limit($limit)
             ->get()
-            ->map(function ($radio) {
-                $radio->img = $this->imageUrl($radio->img);
-                return $radio;
-            })
             ->toArray();
 
         return $this->success($radios);
@@ -166,10 +136,6 @@ class MobileApiController extends Controller
                 ->where('is_single_theme', 1)
                 ->where('isActive', 1)
                 ->get()
-                ->map(function ($theme) {
-                    $theme->img = $this->imageUrl($theme->img);
-                    return $theme;
-                })
                 ->toArray();
 
             return $this->success($themes);
@@ -189,10 +155,6 @@ class MobileApiController extends Controller
             ->offset($offset)
             ->limit($limit)
             ->get()
-            ->map(function ($theme) {
-                $theme->img = $this->imageUrl($theme->img);
-                return $theme;
-            })
             ->toArray();
 
         return $this->success($themes);

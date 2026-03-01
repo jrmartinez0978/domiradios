@@ -35,13 +35,13 @@ class ConfigController extends Controller
     {
         $data = $request->validate([
             'is_full_bg' => 'required|integer|in:0,1',
-            'ui_top_chart' => 'required|integer|in:1,2,3,4,5,6',
-            'ui_genre' => 'required|integer|in:1,2,3,4,5,6',
-            'ui_favorite' => 'required|integer|in:1,2,3,4,5,6',
-            'ui_themes' => 'required|integer|in:1,2,3,4,5,6',
-            'ui_detail_genre' => 'required|integer|in:1,2,3,4,5,6',
+            'ui_top_chart' => 'required|integer|in:1,2,3,4',
+            'ui_genre' => 'required|integer|in:0,1,2,3,4,5',
+            'ui_favorite' => 'required|integer|in:1,2,3,4',
+            'ui_themes' => 'required|integer|in:0,1,2,3,4',
+            'ui_detail_genre' => 'required|integer|in:1,2,3,4',
             'ui_player' => 'required|integer|in:1,2,3,4,5,6',
-            'ui_search' => 'required|integer|in:1,2,3,4,5,6',
+            'ui_search' => 'required|integer|in:1,2,3,4',
             'app_type' => 'required|integer|in:1,2',
         ]);
 
