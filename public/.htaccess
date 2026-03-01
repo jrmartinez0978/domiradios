@@ -9,6 +9,10 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # Fix double slashes from mobile apps (url_endpoint trailing slash)
+    RewriteCond %{THE_REQUEST} \s//+(.*)\s
+    RewriteRule .* /%1 [R=301,L,NE]
+
     # Legacy mobile app image paths → Laravel storage
     RewriteRule ^appdomiradios/uploads/radios/(.*)$ /storage/$1 [L,R=301]
     RewriteRule ^appdomiradios/uploads/themes/(.*)$ /storage/$1 [L,R=301]
