@@ -19,12 +19,12 @@
         6 => 'Lista Horizontal',
     ];
     $playerStyleOptions = [
-        1 => 'Estilo 1',
-        2 => 'Estilo 2',
-        3 => 'Estilo 3',
-        4 => 'Estilo 4',
-        5 => 'Estilo 5',
-        6 => 'Estilo 6',
+        1 => 'Disco Cuadrado',
+        2 => 'Disco Circular',
+        3 => 'Disco Giratorio',
+        4 => 'Disco Cuadrado (sin LastFM)',
+        5 => 'Disco Circular (sin LastFM)',
+        6 => 'Disco Giratorio (sin LastFM)',
     ];
     $appTypeOptions = [
         1 => 'Multiples Emisoras',
