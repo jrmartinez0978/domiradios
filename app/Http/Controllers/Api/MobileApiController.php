@@ -74,7 +74,6 @@ class MobileApiController extends Controller
         $genres = DB::table('genres')
             ->select('id', 'name', 'img')
             ->where('isActive', 1)
-            ->where('type', 'genre')
             ->orderByDesc('id')
             ->get()
             ->map(function ($genre) {
@@ -207,16 +206,6 @@ class MobileApiController extends Controller
             return $this->success([]);
         }
 
-        $excluded = ['id', 'created_at', 'updated_at'];
-        $configs = [];
-        $id = 1;
-        foreach ((array) $row as $key => $value) {
-            if (in_array($key, $excluded)) {
-                continue;
-            }
-            $configs[] = (object) ['id' => $id++, 'name' => $key, 'value' => $value];
-        }
-
-        return $this->success($configs);
+        return $this->success([$row]);
     }
 }
